@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, maximum-scale=1.0,minimum-scale=1.0, user-scalable=no minimal-ui">
+	<meta name="description" content="小爱课程表使用教程和下载指南">
+	<link rel="icon" href="https://pic.imgdb.cn/item/659e7a14871b83018a852c61.png" type="image/x-icon" />
+	<title>小爱课程表使用方法</title>
+	<style>
+		:root {
+			--bg-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+
+			/* 其他CSS变量保持不变 */
+			--primary-color: #4a90e2;
+			--text-color: #2c3e50;
+			--card-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+			--transition-default: all 0.3s ease;
+			--border-radius: 20px;
+		}
+
+		body {
+			font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+			line-height: 1.6;
+			margin: 0;
+			padding: 0;
+			background: var(--bg-gradient);
+			background-attachment: fixed;  /* 确保背景固定 */
+			min-height: 100vh;
+			color: var(--text-color);
+		}
+
+		.container {
+			max-width: 1000px;
+			margin: 20px auto;
+			padding: 30px;
+			background-color: rgba(255, 255, 255, 0.95);
+			border-radius: 20px;
+			box-shadow: var(--card-shadow);
+			backdrop-filter: blur(10px);
+		}
+
+		h1 {
+			text-align: center;
+			color: var(--text-color);
+			font-size: clamp(1.8rem, 4vw, 2.5rem);
+			margin-bottom: 40px;
+			position: relative;
+			padding-bottom: 15px;
+		}
+
+		h1::after {
+			content: '';
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 80px;
+			height: 4px;
+			background: var(--primary-color);
+			border-radius: 2px;
+		}
+
+		.instruction {
+			display: grid;
+			gap: 40px;
+			padding: 20px;
+		}
+
+		.step {
+			background: rgba(255, 255, 255, 0.98);
+			border-radius: 24px;
+			padding: 30px;
+			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+			transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+		}
+
+		.step::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 4px;
+			height: 100%;
+			background: var(--primary-color);
+			border-radius: 4px;
+		}
+
+		.step:hover {
+			transform: translateY(-8px) scale(1.01);
+			box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+		}
+
+		.step img {
+			width: 100%;
+			max-width: 600px;
+			height: auto;
+			display: block;
+			margin: 20px auto;
+			border-radius: 16px;
+			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+			transition: var(--transition-default);
+		}
+
+		.step img:hover {
+			transform: scale(1.03);
+			box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
+		}
+
+		.step h2 {
+			font-weight: 600;
+			background: linear-gradient(120deg, var(--primary-color), #34495e);
+			background-clip: text;
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			padding-bottom: 10px;
+			border-bottom: 2px solid #eee;
+			color: var(--primary-color);
+			font-size: clamp(1.2rem, 3vw, 1.8rem);
+			margin-bottom: 20px;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.step h2::before {
+			content: attr(data-step);
+			background: var(--primary-color);
+			color: white;
+			width: 30px;
+			height: 30px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 0.8em;
+		}
+
+		.step p {
+			color: #505050;
+			font-size: clamp(1rem, 2vw, 1.1rem);
+			line-height: 1.8;
+			margin: 15px 0;
+		}
+
+		@media (max-width: 768px) {
+			.container {
+				margin: 15px;
+				padding: 20px;
+			}
+
+			.instruction {
+				gap: 30px;
+				padding: 10px;
+			}
+
+			.step {
+				padding: 25px;
+			}
+
+			.step img {
+				margin: 15px auto;
+			}
+		}
+
+		/* 优化动画效果 */
+		@keyframes slideInUp {
+			from {
+				opacity: 0;
+				transform: translateY(30px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.step {
+			animation: slideInUp 0.6s ease-out forwards;
+			opacity: 0;
+			will-change: transform, opacity;
+		}
+
+		.step:nth-child(1) { animation-delay: 0.1s; }
+		.step:nth-child(2) { animation-delay: 0.2s; }
+		.step:nth-child(3) { animation-delay: 0.3s; }
+		.step:nth-child(4) { animation-delay: 0.4s; }
+		.step:nth-child(5) { animation-delay: 0.5s; }
+
+		.copyright {
+			background: rgba(255, 255, 255, 0.9);
+			padding: 15px;
+			border-radius: 12px;
+			margin-top: 50px;
+			text-align: center;
+		}
+
+		.copyright p {
+			font-size: 1rem;
+			color: #666;
+			font-weight: 500;
+		}
+
+		/* 添加页面滚动平滑效果 */
+		html {
+			scroll-behavior: smooth;
+		}
+
+		/* 设备说明样式 */
+		.device-notice {
+			margin-bottom: 40px;
+		}
+
+		.device-types {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 20px;
+			margin-top: 20px;
+		}
+
+		.device-type {
+			background: rgba(255, 255, 255, 0.9);
+			padding: 20px;
+			border-radius: 12px;
+			text-align: center;
+		}
+
+		.device-type h3 {
+			color: var(--primary-color);
+			margin-bottom: 15px;
+		}
+
+		.download-btn {
+			display: inline-block;
+			background: var(--primary-color);
+			color: white;
+			padding: 12px 24px;
+			border-radius: 25px;
+			text-decoration: none;
+			margin-top: 15px;
+			transition: var(--transition-default);
+			font-weight: 500;
+		}
+
+		.download-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+		}
+
+		@media (max-width: 768px) {
+			.device-types {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		/* 优化返回顶部按钮 */
+		#backToTop {
+			position: fixed;
+			bottom: 30px;
+			right: 30px;
+			background: var(--primary-color);
+			color: white;
+			border: none;
+			border-radius: 50%;
+			width: 50px;
+			height: 50px;
+			cursor: pointer;
+			opacity: 0;
+			visibility: hidden;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+			transition: var(--transition-default);
+			z-index: 1000;
+		}
+		
+		#backToTop.visible {
+			opacity: 1;
+			visibility: visible;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<h1>小爱课程表使用方法</h1>
+		
+		<!-- 添加设备选择提示 -->
+		<div class="device-notice step">
+			<h2 data-step="0">设备类型说明</h2>
+			<div class="device-types">
+				<div class="device-type">
+					<h3>非小米手机用户</h3>
+					<p>有官方的小爱课程表：</p>
+					<a href="https://xdtx.lanzoum.com/b01ynxxeza" class="download-btn" target="_blank">
+						下载小爱课程表（密码：aatm）
+					</a>
+				</div>
+				<div class="device-type">
+					<h3>小米手机用户</h3>
+					<p>可直接使用系统内置的小爱课程表</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="instruction">
+			<div class="step">
+				<h2 data-step="1">第一步：打开小爱课程表应用(非小米手机用户可跳过此步骤)</h2>
+				<img src="img/1.jpg" alt="打开小爱课程表应用">
+				<p>在您的手机或平板电脑上找到小爱同学并打开小爱课程表。</p>
+			</div>
+			<div class="step">
+				<h2 data-step="2">第二步:寻找导入入口</h2>
+				<img src="img/2.jpg" alt="浏览课程表">
+				<p>在主页的加号打开教务系统导入。</p>
+			</div>
+			<div class="step">
+				<h2 data-step="3">第三步：打开项目</h2>
+				<img src="img/3.jpg" alt="查看课程详情">
+				<img src="img/4.jpg" alt="查看课程详情">
+				<p></p>
+			</div>
+			<div class="step">
+				<h2 data-step="4">第四步：一键导入课程</h2>
+				<img src="img/5.jpg" alt="编辑课程">
+				<p>登录教务系统后，查看想导入的课表一键导入</p>
+			</div>
+			<div class="step">
+				<h2 data-step="5">第五步：修改上课日期和上课周数</h2>
+				<img src="img/6.jpg" alt="添加新课程">
+				<img src="img/7.jpg" alt="添加新课程">
+				<p>在弹出窗口修改上课日期和上课周数，如果修改失败就去设置那里修改</p>
+			</div>
+		</div>
+		
+		<footer class="copyright">
+			<p>@小东同学</p>
+		</footer>
+	</div>
+
+	<!-- 添加返回顶部按钮 -->
+	<button id="backToTop" style="
+		position: fixed;
+		bottom: 30px;
+		right: 30px;
+		background: var(--primary-color);
+		color: white;
+		border: none;
+		border-radius: 50%;
+		width: 50px;
+		height: 50px;
+		cursor: pointer;
+		display: none;
+		box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+		transition: all 0.3s ease;
+	">↑</button>
+
+	<script>
+		// 优化返回顶部按钮功能
+		const backToTop = document.getElementById('backToTop');
+		
+		const handleScroll = () => {
+			const scrolled = window.scrollY > 200;
+			backToTop.classList.toggle('visible', scrolled);
+		};
+		
+		// 使用节流优化滚动事件
+		let ticking = false;
+		window.addEventListener('scroll', () => {
+			if (!ticking) {
+				window.requestAnimationFrame(() => {
+					handleScroll();
+					ticking = false;
+				});
+				ticking = true;
+			}
+		});
+		
+		backToTop.addEventListener('click', () => {
+			window.scrollTo({
+				top: 0,
+				behavior: 'smooth'
+			});
+		});
+		
+		// 优化图片加载
+		document.addEventListener('DOMContentLoaded', () => {
+			const images = document.querySelectorAll('img');
+			images.forEach(img => {
+				img.setAttribute('loading', 'lazy');
+				img.setAttribute('alt', img.getAttribute('alt') || '课程表使用说明图片');
+			});
+		});
+	</script>
+</body>
+
+</html>

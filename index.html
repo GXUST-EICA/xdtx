@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>校园工具集</title>
+	<link rel="stylesheet" href="styles.css">
+	<link href="css2.css" rel="stylesheet">
+</head>
+
+<body>
+	<nav class="navbar">
+		<div class="nav-content">
+			<a href="https://www.eica.fun" class="nav-logo">嵌入式智控协会</a>
+			<a href="https://www.eica.fun" class="nav-link">官网</a>
+		</div>
+	</nav>
+
+	<header class="hero">
+		<h1>校园智能工具集</h1>
+		<p>让校园生活更智能、更便捷</p>
+	</header>
+
+	<main class="container">
+		<div class="card">
+			<div class="card-icon">🌐</div>
+			<span class="card-tag">网络工具</span>
+			<h2>校园网连接助手</h2>
+			<p>智能管理校园网连接，告别断网烦恼</p>
+			<ul>
+				<li>智能检测网络状态</li>
+				<li>自动重连功能</li>
+				<li>系统托盘运行</li>
+				<li>开机自启动</li>
+			</ul>
+			<div class="card-footer">
+				<div class="download-info">
+					<span class="system-req">Win 7+</span>
+					<span class="password-hint">提取码：xdtx</span>
+				</div>
+				<a href="https://xdtx.lanzoum.com/b01ynxxewh" class="btn">
+					<span>立即下载</span>
+					<span class="btn-icon">↓</span>
+				</a>
+			</div>
+		</div>
+
+		<div class="card">
+			<div class="card-icon">📚</div>
+			<span class="card-tag">课程管理</span>
+			<h2>智能课程表</h2>
+			<p>与小爱同学完美配合的课程管理助手</p>
+			<ul>
+				<li>无广告干扰</li>
+				<li>科大教务系统同步</li>
+				<li>支持自定义课程</li>
+				<li>与小爱同学完美配合</li>
+			</ul>
+			<div class="card-footer">
+				<div class="download-info">
+					<span class="system-req">全部安卓手机</span>
+				</div>
+				<a href="xiaoai.html" class="btn">
+					<span>立即了解</span>
+					<span class="btn-icon">→</span>
+				</a>
+			</div>
+		</div>
+
+		<div class="card">
+			<div class="card-icon">📊</div>
+			<span class="card-tag">成绩统计</span>
+			<h2>平均学分计算器</h2>
+			<p>学分绩点计算</p>
+			<ul>
+				<li>Excel表格批量导入导出</li>
+				<li>智能识别课程信息</li>
+				<li>补考成绩特殊处理</li>
+				<li>成绩分析与统计</li>
+			</ul>
+			<div class="card-footer">
+				<div class="download-info">
+					<span class="system-req">Excel格式</span>
+					<span class="password-hint">提取码：xdtx</span>
+				</div>
+				<a href="https://xdtx.lanzoum.com/b01ynxy4bc" class="btn">
+					<span>立即下载</span>
+					<span class="btn-icon">↓</span>
+				</a>
+			</div>
+		</div>
+	</main>
+
+	<footer>
+		<p>Made by 小东同学</p>
+	</footer>
+
+	<script>
+	// Logo 彩虹彩蛋
+	let logoClickCount = 0;
+	const logo = document.querySelector('.nav-logo');
+	logo.addEventListener('click', (e) => {
+		e.preventDefault();
+		logoClickCount++;
+		if(logoClickCount === 5) {
+			logo.classList.add('rainbow');
+			setTimeout(() => {
+				logo.classList.remove('rainbow');
+				logoClickCount = 0;
+			}, 3000);
+		}
+	});
+
+	// 页脚彩蛋
+	const footer = document.querySelector('footer p');
+	footer.addEventListener('click', () => {
+		footer.classList.add('clicked');
+		setTimeout(() => footer.classList.remove('clicked'), 500);
+		
+		// 随机改变文字
+		const texts = [
+			'Made by 小东同学 ❤️',
+			'今天也要加油哦 ✨',
+			'休息一下吧 ☕',
+			'要不要来杯奶茶？ ☕',
+			'你真棒！ 🌟'
+		];
+		footer.textContent = texts[Math.floor(Math.random() * texts.length)];
+	});
+
+	// 添加页面载入动画类
+	document.addEventListener('DOMContentLoaded', () => {
+		document.body.classList.add('loaded');
+	});
+	</script>
+</body>
+
+</html>
