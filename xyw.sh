@@ -1,20 +1,19 @@
 #!/bin/sh
-# 校园网登录服务 v1.0
-# 依赖：busybox (httpd/nc)
+# 校园网登录服务 v1.2
+# 依赖：busybox (nc)
 
-WEB_PORT=6666
+WEB_PORT=2481
 LOG_FILE="/tmp/xyw.log"
 PID_FILE="/var/run/xyw.pid"
 CONFIG_FILE="./xyw.conf"
 
 start() {
     echo "Starting campus network service..."
+    echo "Access URL: http://$(hostname -i):$WEB_PORT/"
     load_config
-    # 创建网页目录
     mkdir -p ./www
     echo "$(gen_html)" > ./www/index.html
     
-    # 启动单一服务
     {
         while true; do
             handle_http &
@@ -32,7 +31,6 @@ stop() {
 }
 
 check_connection() {
-    # 原有网络检查逻辑的Shell实现
     if ! wget -qO- --timeout=3 http://www.baidu.com | grep -qi 'baidu'; then
         do_login
     fi
@@ -59,12 +57,12 @@ gen_html() {
 <pre>$(date +%F%T) $(check_connection && echo Connected || echo Disconnected)</pre>
 
 <h3>手动登录</h3>
-<form action="/login" method="post">
+<form action="/login" method="get">
 运营商: 
 <select name="operator">
-    <option value="@cmcc">中国移动</option>
-    <option value="@telecom">中国电信</option>
-    <option value="">校园网</option>
+    <option value="@cmcc" ${OPERATOR=='@cmcc'&&'selected'}>中国移动</option>
+    <option value="@telecom" ${OPERATOR=='@telecom'&&'selected'}>中国电信</option>
+    <option value="" ${OPERATOR==''&&'selected'}>校园网</option>
 </select><br>
 账号: <input name="user" value="${USERNAME}"><br>
 密码: <input type="password" name="pass" value="${PASSWORD}"><br>
@@ -74,9 +72,10 @@ gen_html() {
 <script>
 document.forms[0].onsubmit = async (e) => {
     e.preventDefault();
-    const form = new FormData(e.target);
-    const res = await fetch('/login?user='+form.get('user')+'&pass='+form.get('pass'));
+    const params = new URLSearchParams(new FormData(e.target));
+    const res = await fetch('/login?'+params.toString());
     alert(await res.text());
+    location.reload();
 }
 </script>
 </body>
@@ -84,27 +83,39 @@ document.forms[0].onsubmit = async (e) => {
 EOF
 }
 
-# 修改HTTP处理函数
 handle_http() {
     busybox nc -l -p $WEB_PORT -e sh -c "
-        read -r line
-        if echo \"\$line\" | grep -q 'GET /login'; then
-            # ... 原有参数解析逻辑 ...
-            echo -e 'HTTP/1.1 200 OK\r\n'
-            do_login && echo 'Login OK' || echo 'Login Failed'
-        else
-            echo -e 'HTTP/1.1 301 Moved\r\nLocation: http://$HOSTNAME:$WEB_PORT/\r\n'
-        fi
+        while read -r line; do
+            if echo \"\$line\" | grep -q '^GET /login'; then
+                params=\"\${line#*?}\"
+                params=\"\${params% *}\"
+                IFS='&' read -ra ARR <<< \"\$params\"
+                for p in \"\${ARR[@]}\"; do
+                    case \$p in
+                        user=*) USERNAME=\${p#*=} ;;
+                        pass=*) PASSWORD=\${p#*=} ;;
+                        operator=*) OPERATOR=\${p#*=} ;;
+                    esac
+                done
+                echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nConnection: close\r\n\r'
+                do_login && echo '登录成功' || echo '登录失败'
+                break
+            elif echo \"\$line\" | grep -q '^GET / '; then
+                echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r'
+                cat ./www/index.html
+                break
+            fi
+        done
     "
 }
 
 save_config() {
     cat > $CONFIG_FILE <<EOF
-USERNAME=$USERNAME
-PASSWORD=$PASSWORD
-OPERATOR=$OPERATOR
-LOGIN_URL=$LOGIN_URL
-CHECK_INTERVAL=$CHECK_INTERVAL
+USERNAME='$USERNAME'
+PASSWORD='$PASSWORD'
+OPERATOR='$OPERATOR'
+LOGIN_URL='$LOGIN_URL'
+CHECK_INTERVAL='$CHECK_INTERVAL'
 EOF
 }
 
@@ -123,4 +134,4 @@ case "$1" in
         echo "Usage: $0 {start|stop}"
         exit 1
         ;;
-esac
+esac 
