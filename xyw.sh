@@ -1,5 +1,5 @@
 #!/bin/sh
-# 校园网登录服务 v1.3
+# 校园网登录服务 v1.4
 # 依赖：busybox (nc)
 
 WEB_PORT=2481
@@ -9,34 +9,49 @@ CONFIG_FILE="./xyw.conf"
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> $LOG_FILE
-    echo "$1"  # 控制台直接输出
+    echo "$1"
 }
 
 start() {
     echo "🟢 正在启动校园网服务..."
-    echo "🔗 访问地址: http://$(hostname -i):$WEB_PORT/"
     
+    # 获取可靠IP地址
+    LOCAL_IP=$(ip -o -4 addr show | awk '{print $4}' | cut -d/ -f1 | grep -v '127.0.0.1' | head -n1)
+    [ -z "$LOCAL_IP" ] && LOCAL_IP=$(hostname -i 2>/dev/null)
+    echo "🔗 访问地址: http://${LOCAL_IP:-0.0.0.0}:$WEB_PORT/"
+    
+    # 检查端口占用
+    if netstat -ltn | grep -q ":$WEB_PORT "; then
+        log "❌ 端口 $WEB_PORT 已被占用"
+        exit 1
+    fi
+    
+    # 加载配置
     load_config
-    log "加载配置: USERNAME=${USERNAME} OPERATOR=${OPERATOR}"
+    [ -z "$USERNAME" ] && log "⚠️ 未检测到账号配置"
     
+    # 创建网页目录
     mkdir -p ./www || {
-        echo "❌ 无法创建网页目录"
+        log "❌ 无法创建网页目录"
         exit 1
     }
     echo "$(gen_html)" > ./www/index.html
     
+    # 主服务循环
     {
-        log "服务进程启动 PID: $$"
+        log "✅ 服务进程启动 PID: $$"
         while true; do
-            log "等待HTTP连接..."
+            log "🔄 等待HTTP连接..."
             handle_http &
             sleep ${CHECK_INTERVAL:-30}
-            log "开始定期网络检查..."
+            log "🔍 开始网络状态检查..."
             check_connection
         done
     } >> $LOG_FILE 2>&1 &
+    
     echo $! > $PID_FILE
-    echo "✅ 服务已启动! PID: $(cat $PID_FILE)"
+    log "✅ 服务启动完成! PID: $(cat $PID_FILE)"
+    echo "👉 调试命令: tail -f $LOG_FILE"
 }
 
 stop() {
@@ -99,42 +114,50 @@ EOF
 }
 
 handle_http() {
-    log "收到新的HTTP请求"
-    busybox nc -l -p $WEB_PORT -e sh -c "
-        log 'NC进程启动处理请求'
+    log "🌐 收到新的HTTP请求"
+    busybox nc -vlp $WEB_PORT -e sh -c "
+        log '🔛 NC进程启动 (版本: $(nc --version 2>&1 | head -1))'
         while read -r line; do
-            echo \"原始请求: \$line\" >> $LOG_FILE
-            if echo \"\$line\" | grep -q '^GET /login'; then
-                params=\"\${line#*?}\"
-                params=\"\${params% *}\"
-                log \"登录请求参数: \$params\"
-                
-                IFS='&' read -ra ARR <<< \"\$params\"
-                for p in \"\${ARR[@]}\"; do
-                    case \$p in
-                        user=*) USERNAME=\${p#*=} ;;
-                        pass=*) PASSWORD=\${p#*=} ;;
-                        operator=*) OPERATOR=\${p#*=} ;;
-                    esac
-                done
-                
-                echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nConnection: close\r\n\r'
-                if do_login; then
-                    echo '登录成功'
-                    log '用户 ${USERNAME} 登录成功'
-                else
-                    echo '登录失败'
-                    log '用户 ${USERNAME} 登录失败'
-                fi
-                break
-            elif echo \"\$line\" | grep -q '^GET / '; then
-                log '返回网页界面'
-                echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r'
-                cat ./www/index.html
-                break
-            fi
+            log \"📨 原始请求: \${line%%$'\r'*}\"
+            case \"\$line\" in
+                *'GET /login'*)
+                    params=\"\${line#*?}\"
+                    params=\"\${params%% *}\"
+                    log \"🔠 解码前参数: \$params\"
+                    params=\$(echo -e \"\${params//%/\\\\x}\")
+                    log \"🔡 解码后参数: \$params\"
+                    
+                    IFS='&' read -ra ARR <<< \"\$params\"
+                    for p in \"\${ARR[@]}\"; do
+                        case \$p in
+                            user=*) USERNAME=\${p#*=} ;;
+                            pass=*) PASSWORD=\${p#*=} ;;
+                            operator=*) OPERATOR=\${p#*=} ;;
+                        esac
+                    done
+                    
+                    echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nConnection: close\r\n\r'
+                    if do_login; then
+                        echo '✅ 登录成功'
+                        log \"💚 用户 \${USERNAME} 登录成功\"
+                    else
+                        echo '❌ 登录失败'
+                        log \"💔 用户 \${USERNAME} 登录失败\"
+                    fi
+                    ;;
+                *'GET /'*)
+                    log '📄 返回网页界面'
+                    echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r'
+                    cat ./www/index.html
+                    ;;
+                *)
+                    log '🚫 未知请求类型'
+                    echo -e 'HTTP/1.1 404 Not Found\r\n\r'
+                    ;;
+            esac
+            break  # 单次请求处理
         done
-    "
+    " 2>>$LOG_FILE
 }
 
 save_config() {
