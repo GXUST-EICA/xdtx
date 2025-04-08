@@ -15,10 +15,9 @@ log() {
 start() {
     echo "🟢 正在启动校园网服务..."
     
-    # 获取可靠IP地址
-    LOCAL_IP=$(ip -o -4 addr show | awk '{print $4}' | cut -d/ -f1 | grep -v '127.0.0.1' | head -n1)
-    [ -z "$LOCAL_IP" ] && LOCAL_IP=$(hostname -i 2>/dev/null)
-    echo "🔗 访问地址: http://${LOCAL_IP:-0.0.0.0}:$WEB_PORT/"
+    # 强制指定监听地址
+    BIND_IP="0.0.0.0"
+    echo "🔗 监听地址: $BIND_IP:$WEB_PORT"
     
     # 检查端口占用
     if netstat -ltn | grep -q ":$WEB_PORT "; then
@@ -115,48 +114,55 @@ EOF
 
 handle_http() {
     log "🌐 收到新的HTTP请求"
-    busybox nc -vlp $WEB_PORT -e sh -c "
-        log '🔛 NC进程启动 (版本: $(nc --version 2>&1 | head -1))'
-        while read -r line; do
-            log \"📨 原始请求: \${line%%$'\r'*}\"
-            case \"\$line\" in
-                *'GET /login'*)
-                    params=\"\${line#*?}\"
-                    params=\"\${params%% *}\"
-                    log \"🔠 解码前参数: \$params\"
-                    params=\$(echo -e \"\${params//%/\\\\x}\")
-                    log \"🔡 解码后参数: \$params\"
-                    
-                    IFS='&' read -ra ARR <<< \"\$params\"
-                    for p in \"\${ARR[@]}\"; do
-                        case \$p in
-                            user=*) USERNAME=\${p#*=} ;;
-                            pass=*) PASSWORD=\${p#*=} ;;
-                            operator=*) OPERATOR=\${p#*=} ;;
-                        esac
-                    done
-                    
-                    echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nConnection: close\r\n\r'
-                    if do_login; then
-                        echo '✅ 登录成功'
-                        log \"💚 用户 \${USERNAME} 登录成功\"
-                    else
-                        echo '❌ 登录失败'
-                        log \"💔 用户 \${USERNAME} 登录失败\"
-                    fi
-                    ;;
-                *'GET /'*)
-                    log '📄 返回网页界面'
-                    echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r'
-                    cat ./www/index.html
-                    ;;
-                *)
-                    log '🚫 未知请求类型'
-                    echo -e 'HTTP/1.1 404 Not Found\r\n\r'
-                    ;;
-            esac
-            break  # 单次请求处理
-        done
+    # 使用兼容性更好的nc参数
+    /bin/busybox nc -l -p $WEB_PORT -s 0.0.0.0 -e /bin/sh -c "
+        log '🔛 NC进程启动 (PID $$)'
+        # 设置超时防止僵死进程
+        timeout -t 5 -s KILL sh -c '
+            while read -r line; do
+                line=\${line%%\$'\r'*}
+                log \"📨 原始请求: \$line\"
+                case \"\$line\" in
+                    *'GET /login'*)
+                        params=\"\${line#*?}\"
+                        params=\"\${params%% *}\"
+                        log \"🔠 解码前参数: \$params\"
+                        params=\$(echo -e \"\${params//%/\\\\x}\")
+                        log \"🔡 解码后参数: \$params\"
+                        
+                        IFS='&' read -ra ARR <<< \"\$params\"
+                        for p in \"\${ARR[@]}\"; do
+                            case \$p in
+                                user=*) USERNAME=\${p#*=} ;;
+                                pass=*) PASSWORD=\${p#*=} ;;
+                                operator=*) OPERATOR=\${p#*=} ;;
+                            esac
+                        done
+                        
+                        echo -e 'HTTP/1.1 200 OK\r'
+                        echo -e 'Content-Type: text/plain\r\n'
+                        if do_login; then
+                            echo '✅ 登录成功'
+                            log \"💚 用户 \${USERNAME} 登录成功\"
+                        else
+                            echo '❌ 登录失败'
+                            log \"💔 用户 \${USERNAME} 登录失败\"
+                        fi
+                        ;;
+                    *'GET /'*)
+                        log '📄 返回网页界面'
+                        echo -e 'HTTP/1.1 200 OK\r'
+                        echo -e 'Content-Type: text/html\r\n'
+                        cat ./www/index.html
+                        ;;
+                    *)
+                        log '🚫 未知请求类型'
+                        echo -e 'HTTP/1.1 404 Not Found\r\n'
+                        ;;
+                esac
+                break  # 单次请求处理
+            done
+        '
     " 2>>$LOG_FILE
 }
 
