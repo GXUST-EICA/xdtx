@@ -1,5 +1,5 @@
 #!/bin/sh
-# 校园网登录服务 v1.2
+# 校园网登录服务 v1.3
 # 依赖：busybox (nc)
 
 WEB_PORT=2481
@@ -7,21 +7,36 @@ LOG_FILE="/tmp/xyw.log"
 PID_FILE="/var/run/xyw.pid"
 CONFIG_FILE="./xyw.conf"
 
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> $LOG_FILE
+    echo "$1"  # 控制台直接输出
+}
+
 start() {
-    echo "Starting campus network service..."
-    echo "Access URL: http://$(hostname -i):$WEB_PORT/"
+    echo "🟢 正在启动校园网服务..."
+    echo "🔗 访问地址: http://$(hostname -i):$WEB_PORT/"
+    
     load_config
-    mkdir -p ./www
+    log "加载配置: USERNAME=${USERNAME} OPERATOR=${OPERATOR}"
+    
+    mkdir -p ./www || {
+        echo "❌ 无法创建网页目录"
+        exit 1
+    }
     echo "$(gen_html)" > ./www/index.html
     
     {
+        log "服务进程启动 PID: $$"
         while true; do
+            log "等待HTTP连接..."
             handle_http &
             sleep ${CHECK_INTERVAL:-30}
+            log "开始定期网络检查..."
             check_connection
         done
-    } > $LOG_FILE 2>&1 &
+    } >> $LOG_FILE 2>&1 &
     echo $! > $PID_FILE
+    echo "✅ 服务已启动! PID: $(cat $PID_FILE)"
 }
 
 stop() {
@@ -84,11 +99,16 @@ EOF
 }
 
 handle_http() {
+    log "收到新的HTTP请求"
     busybox nc -l -p $WEB_PORT -e sh -c "
+        log 'NC进程启动处理请求'
         while read -r line; do
+            echo \"原始请求: \$line\" >> $LOG_FILE
             if echo \"\$line\" | grep -q '^GET /login'; then
                 params=\"\${line#*?}\"
                 params=\"\${params% *}\"
+                log \"登录请求参数: \$params\"
+                
                 IFS='&' read -ra ARR <<< \"\$params\"
                 for p in \"\${ARR[@]}\"; do
                     case \$p in
@@ -97,10 +117,18 @@ handle_http() {
                         operator=*) OPERATOR=\${p#*=} ;;
                     esac
                 done
+                
                 echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nConnection: close\r\n\r'
-                do_login && echo '登录成功' || echo '登录失败'
+                if do_login; then
+                    echo '登录成功'
+                    log '用户 ${USERNAME} 登录成功'
+                else
+                    echo '登录失败'
+                    log '用户 ${USERNAME} 登录失败'
+                fi
                 break
             elif echo \"\$line\" | grep -q '^GET / '; then
+                log '返回网页界面'
                 echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r'
                 cat ./www/index.html
                 break
