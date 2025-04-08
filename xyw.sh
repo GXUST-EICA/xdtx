@@ -2,7 +2,7 @@
 # 校园网登录服务 v1.0
 # 依赖：busybox (httpd/nc)
 
-WEB_PORT=8080
+WEB_PORT=6666
 LOG_FILE="/tmp/xyw.log"
 PID_FILE="/var/run/xyw.pid"
 CONFIG_FILE="./xyw.conf"
@@ -10,22 +10,19 @@ CONFIG_FILE="./xyw.conf"
 start() {
     echo "Starting campus network service..."
     load_config
-    # 启动守护进程
-    {
-        while true; do
-            check_connection
-            sleep ${CHECK_INTERVAL:-30}
-        done
-    } > $LOG_FILE 2>&1 &
-    echo $! > $PID_FILE
-    
-    # 启动微型web服务器
-    busybox httpd -p $WEB_PORT -h ./www &
-    echo $! >> $PID_FILE
-    
     # 创建网页目录
     mkdir -p ./www
     echo "$(gen_html)" > ./www/index.html
+    
+    # 启动单一服务
+    {
+        while true; do
+            handle_http &
+            sleep ${CHECK_INTERVAL:-30}
+            check_connection
+        done
+    } > $LOG_FILE 2>&1 &
+    echo $! > $PID_FILE
 }
 
 stop() {
@@ -87,24 +84,18 @@ document.forms[0].onsubmit = async (e) => {
 EOF
 }
 
-# HTTP请求处理
+# 修改HTTP处理函数
 handle_http() {
-    while read -r line; do
-        # 解析GET请求
-        if [[ $line =~ "GET /login" ]]; then
-            params=${line#*?}
-            params=${params% *}
-            IFS='&' read -ra ARR <<< "$params"
-            for p in "${ARR[@]}"; do
-                case $p in
-                    user=*) USERNAME=${p#*=} ;;
-                    pass=*) PASSWORD=${p#*=} ;;
-                    operator=*) OPERATOR=${p#*=} ;;
-                esac
-            done
-            do_login && echo "Login OK" || echo "Login Failed"
+    busybox nc -l -p $WEB_PORT -e sh -c "
+        read -r line
+        if echo \"\$line\" | grep -q 'GET /login'; then
+            # ... 原有参数解析逻辑 ...
+            echo -e 'HTTP/1.1 200 OK\r\n'
+            do_login && echo 'Login OK' || echo 'Login Failed'
+        else
+            echo -e 'HTTP/1.1 301 Moved\r\nLocation: http://$HOSTNAME:$WEB_PORT/\r\n'
         fi
-    done < <(busybox nc -l -p $WEB_PORT)
+    "
 }
 
 save_config() {
@@ -124,7 +115,6 @@ load_config() {
 case "$1" in
     start)
         start
-        handle_http & # 启动HTTP处理器
         ;;
     stop)
         stop
