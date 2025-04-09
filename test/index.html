@@ -1,46 +1,164 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 
 <head>
-	<title>文档中心</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>文档中心 | 知识库</title>
 	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 	<style>
-		/* 分类容器样式 */
-		.category {
-			margin: 20px;
-			padding: 20px;
-			border: 1px solid #ddd;
+		/* 基础重置 */
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
 		}
 
-		/* 文档导航样式 */
+		body {
+			font-family: 'Segoe UI', '微软雅黑', system-ui;
+			background: #f8fafc;
+		}
+
+		/* 侧边导航 (PC) */
 		.nav {
 			position: fixed;
 			left: 0;
-			width: 250px;
-			padding: 20px;
-			background: #f5f5f5;
+			width: 280px;
 			height: 100vh;
+			padding: 2rem 1.5rem;
+			background: linear-gradient(160deg, #ffffff 0%, #f8fafc 100%);
+			border-right: 1px solid #e2e8f0;
 			overflow-y: auto;
+			transition: transform 0.3s ease;
+			z-index: 100;
 		}
 
-		/* 内容区域样式 */
+		/* 内容区域 */
 		.content {
-			margin-left: 250px;
-			padding: 20px;
+			margin-left: 280px;
+			padding: 3rem 4rem;
+			min-height: 100vh;
+			background: #ffffff;
+			box-shadow: -4px 0 20px rgba(0, 0, 0, 0.03);
 		}
 
-		/* 文档卡片样式 */
+		/* 文档卡片 */
 		.doc-card {
-			margin: 10px 0;
-			padding: 15px;
+			padding: 1.2rem;
+			margin: 0.8rem 0;
 			background: white;
-			border: 1px solid #eee;
+			border-radius: 12px;
+			border: 1px solid #e2e8f0;
+			transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 			cursor: pointer;
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+
+		.doc-card::before {
+			content: '📄';
+			font-size: 1.2em;
+		}
+
+		.doc-card:hover {
+			transform: translateX(8px);
+			box-shadow: 0 6px 16px -2px rgba(99, 102, 241, 0.1);
+			border-color: #818cf8;
+		}
+
+		/* 标题样式 */
+		h1 {
+			font-size: 2.2rem;
+			color: #1e293b;
+			margin-bottom: 2.5rem;
+			position: relative;
+			padding-left: 1.5rem;
+		}
+
+		h1::before {
+			content: '';
+			position: absolute;
+			left: 0;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 4px;
+			height: 80%;
+			background: #6366f1;
+			border-radius: 2px;
+		}
+
+		h2 {
+			font-size: 1.4rem;
+			color: #334155;
+			margin: 2rem 0 1.5rem;
+			padding-bottom: 0.5rem;
+			border-bottom: 2px solid #e2e8f0;
+		}
+
+		/* 移动端适配 */
+		@media (max-width: 768px) {
+			.nav {
+				width: 100%;
+				height: auto;
+				position: relative;
+				transform: translateX(-100%);
+				padding: 1rem;
+				border-right: none;
+				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+			}
+
+			.nav.active {
+				transform: translateX(0);
+			}
+
+			.content {
+				margin-left: 0;
+				padding: 2rem 1.5rem;
+			}
+
+			/* 移动端菜单按钮 */
+			.menu-toggle {
+				position: fixed;
+				top: 1rem;
+				left: 1rem;
+				z-index: 200;
+				background: #6366f1;
+				color: white;
+				padding: 0.8rem 1.2rem;
+				border-radius: 8px;
+				border: none;
+				box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+				cursor: pointer;
+			}
+		}
+
+		/* Markdown 内容美化 */
+		.content h3 {
+			color: #1e293b;
+			margin: 1.5rem 0 1rem;
+		}
+
+		.content pre {
+			background: #f8fafc;
+			padding: 1.5rem;
+			border-radius: 8px;
+			overflow-x: auto;
+			margin: 1.5rem 0;
+			border: 1px solid #e2e8f0;
+		}
+
+		.content code {
+			font-family: 'Fira Code', monospace;
+			background: #f1f5f9;
+			padding: 0.2em 0.4em;
+			border-radius: 4px;
 		}
 	</style>
 </head>
 
 <body>
+	<button class="menu-toggle" onclick="toggleNav()">☰ 菜单</button>
 	<div class="nav" id="nav"></div>
 	<div class="content" id="content"></div>
 
@@ -48,8 +166,8 @@
 		// 文档配置（绝对路径示例）
 		const config = {
 			"技术文档": [
-				"/test/md/C.md",
-				"/test/md/python.md"
+				"md/C.md",
+				"md/python.md"
 			],
 			"产品文档": [
 				"docs/product/requirements.md",
@@ -57,22 +175,32 @@
 			]
 		};
 
-		// 初始化页面
+		// 添加移动端菜单切换
+		function toggleNav() {
+			const nav = document.getElementById('nav');
+			nav.classList.toggle('active');
+		}
+
+		// 修改后的初始化函数
 		async function init() {
-			// 创建导航
 			const nav = document.getElementById('nav');
 			Object.keys(config).forEach(category => {
-				const div = document.createElement('div');
-				div.innerHTML = `<h2>${category}</h2>`;
-				nav.appendChild(div);
-
+				const section = document.createElement('section');
+				section.innerHTML = `
+					<h2>${category}</h2>
+				`;
+				
 				config[category].forEach(path => {
-					const docLink = document.createElement('div');
-					docLink.className = 'doc-card';
-					docLink.textContent = path.split('/').pop();
-					docLink.onclick = () => loadDoc(path);
-					div.appendChild(docLink);
+					const card = document.createElement('div');
+					card.className = 'doc-card';
+					card.textContent = path.split('/').pop().replace('.md', '');
+					card.onclick = () => {
+						loadDoc(path);
+						if (window.innerWidth <= 768) toggleNav();
+					}
+					section.appendChild(card);
 				});
+				nav.appendChild(section);
 			});
 		}
 
