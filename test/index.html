@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>文档中心</title>
+	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<style>
+		/* 分类容器样式 */
+		.category {
+			margin: 20px;
+			padding: 20px;
+			border: 1px solid #ddd;
+		}
+
+		/* 文档导航样式 */
+		.nav {
+			position: fixed;
+			left: 0;
+			width: 250px;
+			padding: 20px;
+			background: #f5f5f5;
+			height: 100vh;
+			overflow-y: auto;
+		}
+
+		/* 内容区域样式 */
+		.content {
+			margin-left: 250px;
+			padding: 20px;
+		}
+
+		/* 文档卡片样式 */
+		.doc-card {
+			margin: 10px 0;
+			padding: 15px;
+			background: white;
+			border: 1px solid #eee;
+			cursor: pointer;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="nav" id="nav"></div>
+	<div class="content" id="content"></div>
+
+	<script>
+		// 文档配置（绝对路径示例）
+		const config = {
+			"技术文档": [
+				"./center/md/C.md",
+				"./center/md/python.md"
+			],
+			"产品文档": [
+				"/docs/product/requirements.md",
+				"/docs/product/design.md"
+			]
+		};
+
+		// 初始化页面
+		async function init() {
+			// 创建导航
+			const nav = document.getElementById('nav');
+			Object.keys(config).forEach(category => {
+				const div = document.createElement('div');
+				div.innerHTML = `<h2>${category}</h2>`;
+				nav.appendChild(div);
+
+				config[category].forEach(path => {
+					const docLink = document.createElement('div');
+					docLink.className = 'doc-card';
+					docLink.textContent = path.split('/').pop();
+					docLink.onclick = () => loadDoc(path);
+					div.appendChild(docLink);
+				});
+			});
+		}
+
+		// 加载文档内容
+		async function loadDoc(path) {
+			const contentDiv = document.getElementById('content');
+			try {
+				contentDiv.innerHTML = '加载中...'; // 添加加载状态提示
+				const response = await fetch(path);
+				if (!response.ok) throw new Error(`HTTP错误! 状态码: ${response.status}`);
+				const markdown = await response.text();
+				contentDiv.innerHTML = marked.parse(markdown);
+			} catch (error) {
+				console.error('文档加载失败:', error);
+				contentDiv.innerHTML = `
+					<h3>文档加载失败</h3>
+					<p>路径：${path}</p>
+					<p>错误信息：${error.message}</p>
+				`;
+			}
+		}
+
+		// 初始化页面
+		init();
+	</script>
+</body>
+
+</html>
