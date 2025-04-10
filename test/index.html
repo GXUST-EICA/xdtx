@@ -41,10 +41,11 @@
 			z-index: 1000;
 			overflow-y: auto;
 			box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+			transform: translateX(-100%);
 		}
 
 		.nav.active {
-			transform: translateX(280px);
+			transform: translateX(0);
 		}
 
 		/* 内容区域 */
@@ -87,11 +88,11 @@
 		/* 响应式设计 */
 		@media (max-width: 768px) {
 			.nav.active {
-				transform: translateX(280px);
+				transform: translateX(0);
 			}
 			
 			.nav.active + .content {
-				margin-left: 80px;
+				margin-left: 0;
 				opacity: 0.3;
 				pointer-events: none;
 			}
@@ -103,7 +104,6 @@
 				padding: 2rem 3rem;
 			}
 			.nav {
-				left: 0;
 				transform: none;
 			}
 		}
