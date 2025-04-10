@@ -10,14 +10,16 @@
 	<link href="style/css2.css" rel="stylesheet">
 	<link href="style/prism-okaidia.min.css" rel="stylesheet">
 	<style>
+		/* 优化CSS变量 */
 		:root {
 			--primary: #6366f1;
 			--secondary: #818cf8;
 			--accent: #a5b4fc;
 			--bg: #f8fafc;
 			--text: #1e293b;
-			--radius: 12px;
-			--shadow: 0 8px 24px -6px rgba(99, 102, 241, 0.15);
+			--radius-m: 12px;  /* 重命名变量 */
+			--radius-s: 6px;
+			--shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.1);
 		}
 
 		/* 高级动画 */
@@ -34,129 +36,78 @@
 			border: 1px solid rgba(255, 255, 255, 0.3);
 		}
 
+		/* 移除冗余的body样式 */
 		body {
 			font-family: 'Inter', 'HarmonyOS Sans', system-ui;
-			background: linear-gradient(45deg, #f8fafc 0%, #f0f4ff 100%);
-			min-height: 100vh;
-			overflow-x: hidden;
+			background: var(--bg);
 			-webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
-			text-rendering: optimizeLegibility;
 		}
 
-		/* 重构导航系统 */
+		/* 完全重构导航系统 */
 		.nav {
 			position: fixed;
 			top: 0;
 			left: 0;
-			width: 280px;
-			height: 100vh;
-			padding: 2rem 1.5rem;
+			width: 100%;
+			height: 60px;
 			background: rgba(255, 255, 255, 0.98);
 			backdrop-filter: blur(16px);
-			border-right: 1px solid rgba(226, 232, 240, 0.2);
 			box-shadow: var(--shadow);
-			transform: translateX(0);
-			transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 			z-index: 1000;
+			padding: 0 1rem;
+			display: flex;
+			align-items: center;
 		}
 
-		.nav:hover {
-			transform: perspective(1000px) rotateY(0deg);
-		}
-
-		/* 智能内容区域 */
+		/* 移动端优先的内容区域 */
 		.content {
-			margin-left: 280px;
-			padding: 3rem 4rem;
-			min-height: 100vh;
-			background: linear-gradient(to bottom right, 
-				rgba(255,255,255,0.95) 0%, 
-				rgba(248,250,252,0.98) 100%);
+			padding: 5rem 1rem 2rem;
+			max-width: 800px;
+			margin: 0 auto;
 		}
 
-		/* 响应式重构 */
-		@media (max-width: 1024px) {
+		/* 增强型响应式设计 */
+		@media (min-width: 768px) {
 			.nav {
-				width: 240px;
-				transform: translateX(-100%);
-			}
-			
-			.nav.active {
+				width: 280px;
+				height: 100vh;
+				padding: 2rem;
 				transform: translateX(0);
+				box-shadow: none;
 			}
 
 			.content {
-				margin-left: 0;
-				padding: 5rem 1.5rem 2rem;
+				margin-left: 280px;
+				padding: 3rem 2rem;
 			}
 		}
 
-		@media (min-width: 1025px) {
-			.menu-toggle {
-				display: none !important;
-			}
-		}
-
-		/* 移动端优化增强 */
-		@media (max-width: 640px) {
-			.content {
-				padding: 4rem 1rem 1.5rem;
-			}
-
-			.doc-card {
-				padding: 1.2rem;
-				margin: 0.8rem 0;
-				border-radius: var(--radius);
-			}
-
-			h1 {
-				font-size: 2.2rem;
-				margin-bottom: 2rem;
-			}
-		}
-
-		/* 新增：浮动操作按钮 */
-		.fab {
+		/* 优化移动端菜单切换 */
+		.menu-toggle {
 			position: fixed;
-			bottom: 2rem;
-			right: 2rem;
-			padding: 1rem;
+			top: 1rem;
+			left: 1rem;
+			z-index: 1100;
+			padding: 0.8rem;
 			background: var(--primary);
 			color: white;
-			border-radius: 50%;
-			box-shadow: var(--shadow);
-			cursor: pointer;
-			transition: all 0.2s ease;
+			border-radius: var(--radius-s);
 		}
 
-		/* 优化代码块显示 */
-		.content pre {
-			margin: 1.5rem 0;
-			padding: 1.5rem !important;
-			border-radius: var(--radius);
-		}
-
-		/* 增强文档卡片交互 */
+		/* 文档卡片移动端优化 */
 		.doc-card {
-			position: relative;
-			padding: 1.5rem;
-			margin: 1rem 0;
-			background: rgba(255,255,255,0.95);
-			border-radius: var(--radius);
-			border: 1px solid rgba(226,232,240,0.3);
-			transition: all 0.2s ease;
+			padding: 1rem;
+			margin: 0.5rem 0;
+			border-radius: var(--radius-s);
 		}
 
-		.doc-card:hover {
-			transform: translateY(-2px);
-			box-shadow: var(--shadow);
-		}
-
-		.doc-card i {
-			color: var(--primary);
-			margin-right: 1rem;
-			font-size: 1.2em;
+		/* 按需加载关键CSS */
+		.loading {
+			--size: 28px;
+			width: var(--size);
+			height: var(--size);
+			border-width: 3px;
 		}
 
 		/* 标题艺术字 */
@@ -198,27 +149,6 @@
 			background: linear-gradient(90deg, var(--primary), var(--secondary));
 		}
 
-		/* 加载动画 */
-		.loading {
-			display: flex;
-			justify-content: center;
-			padding: 3rem;
-		}
-
-		.loading::after {
-			content: "";
-			width: 40px;
-			height: 40px;
-			border: 4px solid var(--accent);
-			border-top-color: var(--primary);
-			border-radius: 50%;
-			animation: spin 1s linear infinite;
-		}
-
-		@keyframes spin {
-			to { transform: rotate(360deg); }
-		}
-
 		/* 新增错误状态卡片 */
 		.error-card {
 			padding: 2rem;
@@ -226,13 +156,6 @@
 			border-radius: 12px;
 			border: 2px solid #ffebee;
 			text-align: center;
-		}
-
-		/* 增强字体渲染 */
-		body {
-			-webkit-font-smoothing: antialiased;
-			-moz-osx-font-smoothing: grayscale;
-			text-rendering: optimizeLegibility;
 		}
 	</style>
 </head>
@@ -248,6 +171,24 @@
 	<script src="style/prism-autoloader.min.js"></script>
 
 	<script>
+		// 性能优化：延迟加载非关键资源
+		window.addEventListener('load', function() {
+			const nonCritical = [
+				'style/prism.min.js',
+				'style/prism-autoloader.min.js'
+			];
+			
+			nonCritical.forEach(src => {
+				const script = document.createElement('script');
+				script.src = src;
+				script.async = true;
+				document.body.appendChild(script);
+			});
+		});
+
+		// 优化：添加缓存机制
+		const docCache = new Map();
+
 		// 文档配置（绝对路径示例）
 		const config = {
 			"技术文档": [
@@ -312,18 +253,43 @@
 			});
 		}
 
-		// 加载文档内容
+		// 优化：添加触摸支持
+		let touchStartX = 0;
+		document.addEventListener('touchstart', e => {
+			touchStartX = e.changedTouches[0].screenX;
+		});
+
+		document.addEventListener('touchend', e => {
+			const touchEndX = e.changedTouches[0].screenX;
+			if (Math.abs(touchEndX - touchStartX) > 50) {
+				document.getElementById('nav').classList.remove('active');
+			}
+		});
+
+		// 优化：添加缓存机制
 		async function loadDoc(path) {
 			const contentDiv = document.getElementById('content');
+			const cacheKey = path.toLowerCase();
+
+			if(docCache.has(cacheKey)) {
+				contentDiv.innerHTML = docCache.get(cacheKey);
+				Prism.highlightAllUnder(contentDiv);
+				return;
+			}
+
 			try {
 				contentDiv.innerHTML = '<div class="loading"></div>';
 				const response = await fetch(path.startsWith('/') ? path : `/${path}`);
 				if (!response.ok) throw new Error(`加载失败: ${response.status}`);
-				const markdown = await response.text();
-				contentDiv.innerHTML = marked.parse(markdown);
 				
-				// 添加代码块高亮
+				const markdown = await response.text();
+				const html = marked.parse(markdown);
+				
+				// 缓存处理后的HTML
+				docCache.set(cacheKey, html);
+				contentDiv.innerHTML = html;
 				Prism.highlightAllUnder(contentDiv);
+				
 			} catch (error) {
 				console.error('文档加载失败:', error);
 				contentDiv.innerHTML = `
