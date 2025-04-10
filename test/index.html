@@ -76,6 +76,8 @@
 			max-width: 800px;
 			margin: 0 auto;
 			transition: filter var(--transition);
+			opacity: 1;
+			min-height: 100vh;
 		}
 
 		/* 移动端适配 */
@@ -91,6 +93,10 @@
 
 			.nav-container.active + .content-container {
 				transform: translateX(var(--nav-width));
+			}
+
+			.menu-toggle {
+				display: block;
 			}
 		}
 
@@ -141,6 +147,20 @@
 			overflow: hidden;
 			clip: rect(0, 0, 0, 0);
 			border: 0;
+		}
+
+		.menu-toggle {
+			position: fixed;
+			top: 1rem;
+			left: 1rem;
+			z-index: 1001;
+			padding: 0.5rem 1rem;
+			background: var(--primary);
+			color: white;
+			border: none;
+			border-radius: var(--radius-s);
+			cursor: pointer;
+			display: none;
 		}
 	</style>
 </head>
