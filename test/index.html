@@ -57,6 +57,8 @@
 
 		.nav-container {
 			position: fixed;
+			left: 0;
+			top: 0;
 			width: var(--nav-width);
 			height: 100vh;
 			background: var(--surface);
@@ -82,20 +84,31 @@
 				grid-template-columns: 1fr;
 			}
 
-			.nav-container.active {
-				transform: translateX(0);
+			.content-container {
+				margin-left: 0;
+				width: 100%;
 			}
 
 			.nav-container.active + .content-container {
-				filter: blur(4px);
-				pointer-events: none;
+				transform: translateX(var(--nav-width));
 			}
 		}
 
 		/* 桌面端适配 */
 		@media (min-width: 769px) {
+			.app-container {
+				display: block;
+			}
+			
 			.nav-container {
 				transform: translateX(0);
+				position: fixed;
+			}
+			
+			.content-container {
+				margin-left: var(--nav-width);
+				width: calc(100% - var(--nav-width));
+				padding: 2rem;
 			}
 		}
 
