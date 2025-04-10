@@ -40,6 +40,7 @@
 			transition: transform 0.3s ease;
 			z-index: 1000;
 			overflow-y: auto;
+			box-shadow: 2px 0 12px rgba(0,0,0,0.1);
 		}
 
 		.nav.active {
@@ -51,7 +52,7 @@
 			padding: 1rem;
 			max-width: 800px;
 			margin: 0 auto;
-			transition: margin 0.3s ease;
+			transition: all 0.3s ease;
 		}
 
 		/* 移动端菜单按钮 */
@@ -84,19 +85,26 @@
 		}
 
 		/* 响应式设计 */
+		@media (max-width: 768px) {
+			.nav.active {
+				transform: translateX(280px);
+			}
+			
+			.nav.active + .content {
+				margin-left: 80px;
+				opacity: 0.3;
+				pointer-events: none;
+			}
+		}
+
 		@media (min-width: 768px) {
+			.content {
+				margin-left: 300px;
+				padding: 2rem 3rem;
+			}
 			.nav {
 				left: 0;
 				transform: none;
-			}
-
-			.content {
-				margin-left: 280px;
-				padding: 2rem;
-			}
-
-			.menu-toggle {
-				display: none;
 			}
 		}
 
