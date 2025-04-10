@@ -10,6 +10,8 @@
 	<script src="style/marked.min.js" defer></script>
 	<link rel="stylesheet" href="style/prism-okaidia.min.css">
 	<link rel="preload" href="style/MiSans-Regular.ttf" as="font" crossorigin>
+	<script src="style/prism.min.js" defer></script>
+	<link rel="stylesheet" href="style/all.min.css">
 	
 	<!-- 优化后的样式 -->
 	<style>
@@ -91,12 +93,19 @@
 				width: 100%;
 			}
 
+			.nav-container.active {
+				transform: translateX(0);
+			}
+
 			.nav-container.active + .content-container {
-				transform: translateX(var(--nav-width));
+				filter: blur(2px);
+				pointer-events: none;
 			}
 
 			.menu-toggle {
-				display: block;
+				display: flex;
+				align-items: center;
+				gap: 8px;
 			}
 		}
 
@@ -161,6 +170,16 @@
 			border-radius: var(--radius-s);
 			cursor: pointer;
 			display: none;
+		}
+
+		.content-container img {
+			max-width: 100%;
+		}
+		.content-container pre {
+			overflow-x: auto;
+			background: #2d2d2d;
+			padding: 1rem;
+			border-radius: var(--radius-s);
 		}
 	</style>
 </head>
