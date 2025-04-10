@@ -31,7 +31,7 @@
 		.nav {
 			position: fixed;
 			top: 0;
-			left: -280px;
+			left: 0;
 			width: 280px;
 			height: 100vh;
 			background: rgba(255, 255, 255, 0.98);
@@ -99,12 +99,12 @@
 		}
 
 		@media (min-width: 768px) {
-			.content {
-				margin-left: 300px;
-				padding: 2rem 3rem;
-			}
 			.nav {
-				transform: none;
+				transform: translateX(0);
+			}
+			.content {
+				margin-left: 280px;
+				padding: 2rem 3rem;
 			}
 		}
 
