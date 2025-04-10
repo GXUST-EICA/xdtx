@@ -254,7 +254,34 @@
 				});
 			}
 
-			// ... 其他方法保持不变 ...
+			showLoading() {
+				this.content.innerHTML = `<div class="doc-card">加载中...</div>`;
+			}
+
+			showError(error) {
+				this.content.innerHTML = `
+					<div class="doc-card" style="color:red">
+						<h3>加载失败</h3>
+						<p>${error.message}</p>
+					</div>
+				`;
+			}
+
+			addHeadingAnchors() {
+				document.querySelectorAll('h2, h3, h4').forEach(heading => {
+					const anchor = document.createElement('a');
+					anchor.href = `#${heading.id}`;
+					anchor.className = 'heading-anchor';
+					heading.prepend(anchor);
+				});
+			}
+
+			autoLoadFirstDocument() {
+				const firstCategory = Object.values(this.config)[0];
+				if (firstCategory && firstCategory.length > 0) {
+					this.loadDocument(firstCategory[0]);
+				}
+			}
 		}
 
 		// 初始化应用
