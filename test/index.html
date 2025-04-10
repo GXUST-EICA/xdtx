@@ -111,6 +111,7 @@
 			position: relative;
 			display: inline-block;
 			background: linear-gradient(45deg, var(--primary), var(--secondary));
+			background-clip: text;
 			-webkit-background-clip: text;
 			-webkit-text-fill-color: transparent;
 			text-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
@@ -164,8 +165,10 @@
 		/* 移动端魔法适配 */
 		@media (max-width: 768px) {
 			.nav {
-				width: 85%;
+				width: 100%;
 				transform: perspective(800px) rotateY(-15deg) translateX(-100%);
+				padding: 1.5rem 1rem;
+				z-index: 1000;
 			}
 
 			.nav.active {
@@ -174,19 +177,34 @@
 
 			.content {
 				margin-left: 0;
-				padding: 2rem;
+				padding: 5rem 1rem 2rem;
 				clip-path: none;
+				min-height: calc(100vh - 3rem);
 			}
 
 			.menu-toggle {
-				background: linear-gradient(45deg, var(--primary), var(--secondary));
-				padding: 1rem 1.5rem;
-				font-weight: 500;
-				transition: transform 0.3s ease;
+				position: fixed;
+				top: 1rem;
+				left: 1rem;
+				z-index: 1001;
+				border-radius: 12px;
+				box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 			}
 
 			.menu-toggle:active {
 				transform: scale(0.95);
+			}
+
+			/* 添加导航栏背景遮罩 */
+			.nav.active::after {
+				content: '';
+				position: fixed;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				background: rgba(0,0,0,0.3);
+				backdrop-filter: blur(3px);
 			}
 		}
 
@@ -237,6 +255,7 @@
 		function toggleNav() {
 			const nav = document.getElementById('nav');
 			nav.classList.toggle('active');
+			document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : 'auto';
 		}
 
 		// 增强型初始化
