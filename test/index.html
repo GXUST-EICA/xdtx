@@ -7,6 +7,7 @@
 	<title>知识库 | 极简文档中心</title>
 	<script src="style/marked.min.js"></script>
 	<link href="style/all.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 	<style>
 		:root {
 			--primary: #6366f1;
@@ -34,6 +35,10 @@
 			font-family: 'Inter', 'HarmonyOS Sans', system-ui;
 			background: linear-gradient(45deg, #f8fafc 0%, #f0f4ff 100%);
 			min-height: 100vh;
+			overflow-x: hidden;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+			text-rendering: optimizeLegibility;
 		}
 
 		/* 3D立体导航 */
@@ -144,11 +149,10 @@
 
 		.content pre {
 			position: relative;
-			background: #ffffff;
-			padding: 2rem;
-			border-radius: 12px;
-			box-shadow: 0 8px 24px rgba(0,0,0,0.05);
-			margin: 2rem 0;
+			background: #1e1e1e !important;
+			padding: 1.5rem;
+			border-radius: 8px;
+			overflow-x: auto;
 		}
 
 		.content pre::before {
@@ -228,6 +232,22 @@
 		@keyframes spin {
 			to { transform: rotate(360deg); }
 		}
+
+		/* 新增错误状态卡片 */
+		.error-card {
+			padding: 2rem;
+			background: #fff0f0;
+			border-radius: 12px;
+			border: 2px solid #ffebee;
+			text-align: center;
+		}
+
+		/* 增强字体渲染 */
+		body {
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+			text-rendering: optimizeLegibility;
+		}
 	</style>
 </head>
 
@@ -293,17 +313,22 @@
 		async function loadDoc(path) {
 			const contentDiv = document.getElementById('content');
 			try {
-				contentDiv.innerHTML = '加载中...'; // 添加加载状态提示
-				const response = await fetch(encodeURIComponent(path));
-				if (!response.ok) throw new Error(`HTTP错误! 状态码: ${response.status}`);
+				contentDiv.innerHTML = '<div class="loading"></div>';
+				const response = await fetch(path.startsWith('/') ? path : `/${path}`);
+				if (!response.ok) throw new Error(`加载失败: ${response.status}`);
 				const markdown = await response.text();
 				contentDiv.innerHTML = marked.parse(markdown);
+				
+				// 添加代码块高亮
+				Prism.highlightAllUnder(contentDiv);
 			} catch (error) {
 				console.error('文档加载失败:', error);
 				contentDiv.innerHTML = `
-					<h3>文档加载失败</h3>
-					<p>路径：${path}</p>
-					<p>错误信息：${error.message}</p>
+					<div class="error-card">
+						<i class="fas fa-exclamation-triangle"></i>
+						<h3>文档加载失败</h3>
+						<p>${error.message}</p>
+					</div>
 				`;
 			}
 		}
