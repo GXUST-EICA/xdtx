@@ -231,32 +231,32 @@
     <nav class="sidebar">
         <div class="toc">
             <h2>课程目录</h2>
-            <!-- 动态生成嵌套目录结构 -->
+            <!-- 简化后的静态目录结构 -->
             <div class="toc-category">编程语言基础
-                <div class="toc-subitem">C语言</div>
-                <div class="toc-subitem">Python</div>
+                <div class="toc-subitem" data-file="test/md/编程语言基础 - C语言.md">C语言</div>
+                <div class="toc-subitem" data-file="test/md/编程语言基础 - Python.md">Python</div>
             </div>
             <div class="toc-category">硬件基础
-                <div class="toc-subitem">电路基础</div>
-                <div class="toc-subitem">MCU概念及架构</div>
+                <div class="toc-subitem" data-file="test/md/硬件基础 - 电路基础.md">电路基础</div>
+                <div class="toc-subitem" data-file="test/md/硬件基础 - MCU概念及架构.md">MCU概念及架构</div>
             </div>
             <div class="toc-category">单片机协议
-                <div class="toc-subitem">STM32</div>
-                <div class="toc-subitem">串口助手</div>
+                <div class="toc-subitem" data-file="test/md/单片机协议 - STM32.md">STM32</div>
+                <div class="toc-subitem" data-file="test/md/单片机协议 - 串口助手.md">串口助手</div>
             </div>
             <div class="toc-category">开发环境
-                <div class="toc-subitem">标准库</div>
+                <div class="toc-subitem" data-file="test/md/开发环境 - 标准库.md">标准库</div>
                 <div class="toc-subitem">HAL库</div>
             </div>
             <div class="toc-category">PCB设计
-                <div class="toc-subitem">学习使用EDA工具</div>
-                <div class="toc-subitem">免费打样板</div>
+                <div class="toc-subitem" data-file="test/md/PCB设计 - 学习使用EDA工具.md">学习使用EDA工具</div>
+                <div class="toc-subitem" data-file="test/md/PCB设计 - 免费打样板.md">免费打样板</div>
             </div>
             <div class="toc-category">机器视觉
-                <div class="toc-subitem">基础视觉处理与Matlab</div>
-                <div class="toc-subitem">OpenMV</div>
-                <div class="toc-subitem">Linux与OpenCV（初识篇）</div>
-                <div class="toc-subitem">Linux与OpenCV-Linux篇(一)</div>
+                <div class="toc-subitem" data-file="test/md/机器视觉 - 基础视觉处理与Matlab.md">基础视觉处理与Matlab</div>
+                <div class="toc-subitem" data-file="test/md/机器视觉 - OpenMV.md">OpenMV</div>
+                <div class="toc-subitem" data-file="test/md/机器视觉 - Linux与OpenCV(初识).md">Linux与OpenCV(初识篇)</div>
+                <div class="toc-subitem" data-file="test/md/机器视觉 - Linux与OpenCV(Linux篇).md">Linux与OpenCV(Linux篇)</div>
             </div>
         </div>
     </nav>
@@ -324,80 +324,37 @@ console.log("欢迎来到协会培训中心");</code></pre>
             });
         });
 
-        // 动态生成目录逻辑
-        function generateTOC() {
-            const categories = {};
-            
-            // 解析文件路径
-            courseFiles.forEach(path => {
-                const [category, course] = path.split('/').pop()
-                    .replace('.md', '')
-                    .split(' - ');
-                    
-                if (!categories[category]) {
-                    categories[category] = [];
-                }
-                categories[category].push(course);
-            });
-
-            // 生成DOM结构
-            const tocContainer = document.querySelector('.toc');
-            Object.entries(categories).forEach(([category, courses]) => {
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'toc-category';
-                categoryDiv.textContent = category;
-
-                courses.forEach(course => {
-                    const subItem = document.createElement('div');
-                    subItem.className = 'toc-subitem';
-                    subItem.textContent = course;
-                    // 添加数据属性存储文件路径
-                    subItem.dataset.filePath = `test/md/${category} - ${course}.md`;
-                    subItem.addEventListener('click', loadMarkdownContent);
-                    categoryDiv.appendChild(subItem);
-                });
-
-                tocContainer.appendChild(categoryDiv);
-            });
-        }
-
-        // 新增Markdown加载函数
-        async function loadMarkdownContent(event) {
-            const filePath = event.target.dataset.filePath;
-            const contentArea = document.querySelector('.content');
-            
-            // 显示加载状态
-            contentArea.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>正在加载课程内容...</p>
-                </div>
-            `;
-
-            try {
-                const response = await fetch(filePath);
-                if (!response.ok) throw new Error('文件未找到');
-                const markdown = await response.text();
+        // 简化后的目录点击处理
+        document.querySelectorAll('.toc-subitem').forEach(item => {
+            item.addEventListener('click', async function() {
+                const filePath = this.dataset.file;
+                const contentArea = document.querySelector('.content');
                 
-                // 转换Markdown为HTML
                 contentArea.innerHTML = `
-                    <article class="markdown-content">
-                        ${marked.parse(markdown)}
-                    </article>
-                `;
-                
-                // 添加代码高亮
-                Prism.highlightAll();
-            } catch (error) {
-                contentArea.innerHTML = `
-                    <div class="error">
-                        <h3>⚠️ 内容加载失败</h3>
-                        <p>错误原因：${error.message}</p>
-                        <p>请检查文件路径：${filePath}</p>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>正在加载课程内容...</p>
                     </div>
                 `;
-            }
-        }
+
+                try {
+                    const response = await fetch(filePath);
+                    const markdown = await response.text();
+                    contentArea.innerHTML = `
+                        <article class="markdown-content">
+                            ${marked.parse(markdown)}
+                        </article>
+                    `;
+                } catch (error) {
+                    contentArea.innerHTML = `
+                        <div class="error">
+                            <h3>⚠️ 内容加载失败</h3>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                }
+            });
+        });
 
         // 初始化加载第一个课程
         document.querySelector('.toc-subitem').click();
