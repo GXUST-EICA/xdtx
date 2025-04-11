@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>协会培训中心</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/github-dark.min.css">
+    <link rel="stylesheet" href="style/github-dark.min.css">
     <style>
         :root {
             --primary-color: #4f46e5;  /* 更柔和的蓝色 */
@@ -65,10 +65,10 @@
         /* 移动端适配 */
         @media (max-width: 768px) {
             .sidebar {
-                width: 86%;
+                width: 86% !important;
                 transform: translateX(-105%);
-                box-shadow: 4px 0 15px rgba(0,0,0,0.1);
-                transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+                height: 100vh !important;
+                top: 0 !important;
             }
 
             .sidebar.active {
@@ -86,9 +86,11 @@
             }
 
             .menu-toggle {
-                display: flex;
+                display: flex !important;
                 align-items: center;
                 justify-content: center;
+                top: auto !important;
+                bottom: 2rem !important;
             }
 
             /* 手势提示条 */
@@ -102,6 +104,26 @@
                 background: rgba(0,0,0,0.1);
                 border-radius: 2px;
                 transform: translateX(-50%);
+            }
+        }
+
+        /* 新增移动端内容区点击关闭菜单 */
+        @media (max-width: 768px) {
+            .content {
+                transition: filter 0.3s;
+            }
+            .sidebar.active + .content {
+                filter: brightness(0.95);
+                pointer-events: none;
+            }
+            .sidebar.active + .content::after {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 99;
             }
         }
 
@@ -317,23 +339,29 @@
             }
         }, { passive: true });
 
-        // 优化后的菜单切换
+        // 修复后的菜单切换逻辑
         function toggleMenu() {
             const sidebar = document.getElementById('sidebar');
             const mask = document.getElementById('sidebarMask');
             const menuBtn = document.querySelector('.menu-toggle');
             
-            sidebar.classList.toggle('active');
-            mask.classList.toggle('active');
-            menuBtn.classList.toggle('active');
+            // 强制清除异常状态
+            const isActive = !sidebar.classList.contains('active');
+            sidebar.classList.toggle('active', isActive);
+            mask.classList.toggle('active', isActive);
+            menuBtn.classList.toggle('active', isActive);
             
-            // 动态调整遮罩层点击区域
-            if (sidebar.classList.contains('active')) {
+            // 可靠的状态切换
+            if(isActive) {
                 mask.style.display = 'block';
                 setTimeout(() => mask.classList.add('active'), 10);
+                document.body.style.overflow = 'hidden';
             } else {
                 mask.classList.remove('active');
-                setTimeout(() => mask.style.display = 'none', 300);
+                setTimeout(() => {
+                    mask.style.display = 'none';
+                    document.body.style.overflow = '';
+                }, 300);
             }
         }
 
@@ -380,6 +408,13 @@
                 overlay.innerHTML = `<img src="${src}" style="max-width: 90%; max-height: 90%;">`;
                 overlay.onclick = () => overlay.remove();
                 document.body.appendChild(overlay);
+            }
+        });
+
+        // 新增内容区点击关闭
+        document.querySelector('.content').addEventListener('click', () => {
+            if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
+                toggleMenu();
             }
         });
     </script>
