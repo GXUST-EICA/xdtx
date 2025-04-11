@@ -44,6 +44,58 @@
 			}
 		}
 
+		/* PC端布局优化 */
+		@media (min-width: 769px) {
+			body {
+				display: flex;
+				min-height: 100vh;
+			}
+
+			.sidebar {
+				width: 300px;
+				height: 100vh;
+				position: sticky;
+				top: 0;
+				overflow-y: auto;
+				transform: none !important;
+				box-shadow: 8px 0 40px rgba(108, 92, 231, 0.1);
+				border-right: 1px solid var(--secondary);
+			}
+
+			.content {
+				flex: 1;
+				padding: 2rem 4rem;
+				max-width: calc(100vw - 300px);
+			}
+
+			.menu-toggle {
+				display: none; /* 隐藏移动端菜单按钮 */
+			}
+
+			.search-box {
+				padding: 1.5rem;
+				position: sticky;
+				top: 0;
+				background: var(--glass);
+			}
+
+			.toc-category {
+				margin: 0.5rem 1rem;
+				transition: 0.2s all ease;
+			}
+
+			.toc-subitem {
+				padding: 0.8rem 1.5rem;
+				cursor: pointer;
+				border-radius: 8px;
+				transition: 0.2s all ease;
+			}
+
+			.toc-subitem:hover {
+				background: rgba(108, 92, 231, 0.1);
+			}
+		}
+
 		/* 新增功能：搜索框 */
 		.search-box {
 			padding: 1rem;
@@ -94,6 +146,29 @@
 		.highlight {
 			background: linear-gradient(90deg, #ffd70033, #ffd70000);
 			border-radius: 4px;
+		}
+
+		/* 新增Markdown内容样式 */
+		.markdown-content {
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 2rem;
+			background: var(--glass);
+			border-radius: var(--radius);
+			box-shadow: var(--shadow);
+		}
+
+		.markdown-content h2 {
+			color: var(--primary);
+			border-bottom: 2px solid var(--secondary);
+			padding-bottom: 0.5rem;
+		}
+
+		.markdown-content pre {
+			background: rgba(108, 92, 231, 0.05);
+			padding: 1rem;
+			border-radius: 8px;
+			overflow-x: auto;
 		}
 	</style>
 </head>
@@ -236,7 +311,7 @@
 		setupCategoryFold();
 		setupProgressBar();
 
-		// 增强内容加载（添加加载状态）
+		// 修改内容加载逻辑适配PC端布局
 		document.addEventListener('click', async (e) => {
 			if (e.target.closest('.toc-subitem')) {
 				const contentArea = document.querySelector('.course-content');
@@ -259,11 +334,16 @@
                         </article>
                     `;
 
+					// PC端自动滚动到标题位置
+					if (window.innerWidth > 768) {
+						window.scrollTo({
+							top: contentArea.offsetTop - 20,
+							behavior: 'smooth'
+						});
+					}
+
 					// 添加历史记录
 					history.pushState({}, '', `#${encodeURIComponent(filePath)}`);
-
-					// 自动滚动到内容区
-					contentArea.scrollIntoView({ behavior: 'smooth' });
 				} catch (error) {
 					contentArea.innerHTML = `
                         <div class="error">
