@@ -64,47 +64,44 @@
 
         /* 移动端适配 */
         @media (max-width: 768px) {
+            /* 修复视口高度问题 */
+            html, body {
+                height: -webkit-fill-available;
+            }
+            
+            /* 侧边栏定位优化 */
             .sidebar {
                 width: 86% !important;
-                transform: translateX(-105%);
                 height: 100vh !important;
                 top: 0 !important;
+                transform: translateX(-105%);
+                transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
             }
 
-            .sidebar.active {
-                transform: translateX(0);
+            /* 内容区安全高度 */
+            .content {
+                min-height: 100vh;
+                min-height: -webkit-fill-available;
             }
 
-            .sidebar-mask {
-                transition: opacity 0.3s ease;
-                opacity: 0;
-            }
-
-            .sidebar-mask.active {
-                opacity: 1;
-                display: block;
-            }
-
+            /* 菜单按钮定位修复 */
             .menu-toggle {
-                display: flex !important;
-                align-items: center;
-                justify-content: center;
-                top: auto !important;
                 bottom: 2rem !important;
+                right: 1.5rem !important;
+                top: auto !important;
+                display: flex !important;
             }
 
-            /* 手势提示条 */
-            .sidebar::before {
-                content: '';
-                position: absolute;
-                top: 12px;
-                left: 50%;
-                width: 40px;
-                height: 4px;
-                background: rgba(0,0,0,0.1);
-                border-radius: 2px;
-                transform: translateX(-50%);
+            /* 遮罩层优化 */
+            .sidebar-mask {
+                background: rgba(0,0,0,0.5);
+                backdrop-filter: blur(2px);
             }
+        }
+
+        /* 防止点击穿透 */
+        .sidebar-mask {
+            pointer-events: auto;
         }
 
         /* 新增移动端内容区点击关闭菜单 */
@@ -371,50 +368,64 @@
             }
         }
 
-        // 新增手势操作逻辑
-        let touchStartX = 0;
-        const sidebar = document.getElementById('sidebar');
+        // 增强移动端事件处理
+        let isAnimating = false;
 
-        sidebar.addEventListener('touchstart', e => {
-            touchStartX = e.touches[0].clientX;
-        }, { passive: true });
-
-        sidebar.addEventListener('touchmove', e => {
-            if (!sidebar.classList.contains('active')) return;
-            
-            const currentX = e.touches[0].clientX;
-            const deltaX = currentX - touchStartX;
-            
-            if (deltaX < -30) {
-                toggleMenu();
-            }
-        }, { passive: true });
-
-        // 修复后的菜单切换逻辑
         function toggleMenu() {
+            if (isAnimating) return;
+            isAnimating = true;
+            
             const sidebar = document.getElementById('sidebar');
             const mask = document.getElementById('sidebarMask');
             const menuBtn = document.querySelector('.menu-toggle');
             
-            // 强制清除异常状态
             const isActive = !sidebar.classList.contains('active');
             sidebar.classList.toggle('active', isActive);
-            mask.classList.toggle('active', isActive);
             menuBtn.classList.toggle('active', isActive);
             
-            // 可靠的状态切换
-            if(isActive) {
+            if (isActive) {
                 mask.style.display = 'block';
-                setTimeout(() => mask.classList.add('active'), 10);
-                document.body.style.overflow = 'hidden';
+                setTimeout(() => {
+                    mask.classList.add('active');
+                    isAnimating = false;
+                }, 10);
             } else {
                 mask.classList.remove('active');
                 setTimeout(() => {
                     mask.style.display = 'none';
-                    document.body.style.overflow = '';
+                    isAnimating = false;
                 }, 300);
             }
         }
+
+        // 增强手势检测
+        let touchStartX = 0;
+        let touchStartTime = 0;
+        const SWIPE_THRESHOLD = 30; // 滑动阈值
+        const SWIPE_TIME = 500;    // 最大触发时间
+
+        const sidebar = document.getElementById('sidebar');
+        sidebar.addEventListener('touchstart', e => {
+            touchStartX = e.touches[0].clientX;
+            touchStartTime = Date.now();
+        }, { passive: true });
+
+        sidebar.addEventListener('touchend', e => {
+            const deltaX = e.changedTouches[0].clientX - touchStartX;
+            const deltaTime = Date.now() - touchStartTime;
+            
+            if (Math.abs(deltaX) > SWIPE_THRESHOLD && deltaTime < SWIPE_TIME) {
+                toggleMenu();
+            }
+        }, { passive: true });
+
+        // 修复键盘弹出问题
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('active');
+                document.getElementById('sidebarMask').style.display = 'none';
+            }
+        });
 
         // 2. 暗黑模式切换
         function toggleDarkMode() {
