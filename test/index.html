@@ -395,6 +395,57 @@
 				padding: 0.8rem 1rem;
 			}
 		}
+
+		/* 欢迎页专属样式 */
+		.feature-badges {
+			display: flex;
+			gap: 1rem;
+			margin: 1.5rem 0;
+		}
+
+		.badge {
+			padding: 0.5rem 1rem;
+			border-radius: 20px;
+			font-size: 0.9rem;
+		}
+
+		.badge.new {
+			background: var(--accent);
+			color: white;
+		}
+
+		.quick-start-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+			gap: 1.5rem;
+			margin: 2rem 0;
+		}
+
+		.step-card {
+			background: var(--glass);
+			padding: 1.5rem;
+			border-radius: var(--radius);
+			transition: transform 0.2s ease;
+		}
+
+		.step-card:hover {
+			transform: translateY(-5px);
+		}
+
+		.mobile-features {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 1rem;
+			margin: 2rem 0;
+		}
+
+		.feature-tag {
+			display: flex;
+			align-items: center;
+			padding: 0.8rem 1.2rem;
+			background: rgba(108, 92, 231, 0.1);
+			border-radius: 8px;
+		}
 	</style>
 </head>
 
@@ -463,7 +514,7 @@
 		</div>
 	</main>
 
-	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script src="style/marked.min.js"></script>
 	<script>
 		// 动态生成目录
 		const courseFiles = [
