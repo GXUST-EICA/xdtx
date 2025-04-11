@@ -156,6 +156,12 @@
 				transform: none !important;
 				box-shadow: 8px 0 40px rgba(108, 92, 231, 0.1);
 				border-right: 1px solid var(--secondary);
+				/* 隐藏滚动条但保持滚动功能 */
+				scrollbar-width: none; /* Firefox */
+				-ms-overflow-style: none; /* IE/Edge */
+			}
+			.sidebar::-webkit-scrollbar {
+				display: none; /* Chrome/Safari */
 			}
 
 			.content {
@@ -169,10 +175,13 @@
 			}
 
 			.search-box {
-				padding: 1.5rem;
 				position: sticky;
 				top: 0;
+				padding: 1.5rem;
+				margin: 0 -1.5rem; /* 抵消容器padding */
+				z-index: 200;
 				background: var(--glass);
+				backdrop-filter: blur(10px);
 			}
 
 			.toc-category {
@@ -357,6 +366,12 @@
 			padding: 1rem;
 			margin: 1.5rem 0;
 			border-radius: 0 8px 8px 0;
+		}
+
+		/* 通用滚动优化 */
+		.toc, .mobile-toc, .sidebar {
+			overflow: overlay; /* 智能滚动条 */
+			scroll-behavior: smooth;
 		}
 	</style>
 </head>
