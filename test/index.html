@@ -1,578 +1,298 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>协会培训中心</title>
-    <style>
-        :root {
-            --primary: #6c5ce7;
-            --secondary: #a8a4e6;
-            --accent: #ff6b6b; /* 新增强调色 */
-            --background: linear-gradient(45deg, #f5f7fb 0%, #f0f2ff 100%);
-            --text: #2d3436;
-            --glass: rgba(255,255,255,0.9); /* 新增毛玻璃效果颜色 */
-        }
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+	<title>协会培训中心</title>
+	<style>
+		:root {
+			--primary: #6c5ce7;
+			--secondary: #a8a4e6;
+			--accent: #ff6b6b;
+			--background: linear-gradient(160deg, #f8f9ff 0%, #f3f5ff 100%);
+			--glass: rgba(255, 255, 255, 0.95);
+			--shadow: 0 12px 40px rgba(108, 92, 231, 0.1);
+			--radius: 16px; /* 统一圆角 */
+			--tap-highlight: rgba(108, 92, 231, 0.1); /* 点击反馈色 */
+		}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+		/* 动态目录生成样式 */
+		.toc-category {
+			background: var(--glass);
+			backdrop-filter: blur(12px);
+			border-radius: 12px;
+			margin: 1rem 0;
+			padding: 1rem;
+			box-shadow: var(--shadow);
+			transition: transform 0.2s ease;
+			position: relative;
+		}
 
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            line-height: 1.6;
-            background: var(--background);
-            color: var(--text);
-            display: flex;
-            min-height: 100vh;
-            overscroll-behavior: contain;
-        }
+		/* 移动端优化 */
+		@media (max-width: 768px) {
+			.sidebar {
+				width: 85%;
+				transform: translateX(-100%);
+				transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				box-shadow: 8px 0 40px rgba(108, 92, 231, 0.15);
+				backdrop-filter: blur(20px);
+			}
 
-        /* 侧边栏目录 */
-        .sidebar {
-            width: 320px; /* 加宽侧边栏 */
-            background: linear-gradient(175deg, var(--glass) 0%, rgba(245,247,251,0.7) 100%);
-            padding: 1.5rem;
-            position: fixed;
-            height: 100vh;
-            box-shadow: 8px 0 40px rgba(108, 92, 231, 0.15);
-            border-right: none;
-            /* 新增立体边框效果 */
-            position: relative;
-            touch-action: pan-y;
-        }
+			.sidebar.active {
+				transform: translateX(0);
+			}
+		}
 
-        .sidebar::after {
-            content: "";
-            position: absolute;
-            right: -1px;
-            top: 0;
-            height: 100%;
-            width: 4px;
-            background: linear-gradient(180deg, 
-                rgba(108, 92, 231, 0.2) 0%,
-                rgba(108, 92, 231, 0.1) 100%);
-        }
+		/* 新增功能：搜索框 */
+		.search-box {
+			padding: 1rem;
+			position: sticky;
+			top: 0;
+			background: var(--glass);
+			backdrop-filter: blur(10px);
+			z-index: 200;
+		}
 
-        /* 移动端适配 */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                width: 85%;
-                z-index: 100;
-                background: rgba(255,255,255,0.95);
-                backdrop-filter: blur(20px);
-                box-shadow: 8px 0 40px rgba(108, 92, 231, 0.15);
-                border-right: none;
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-        }
+		/* 移动端菜单按钮优化 */
+		.menu-toggle {
+			position: fixed;
+			top: 1rem;
+			left: 1rem;
+			z-index: 300;
+			background: var(--glass);
+			border: none;
+			padding: 0.8rem;
+			border-radius: 50%;
+			box-shadow: var(--shadow);
+			-webkit-tap-highlight-color: var(--tap-highlight);
+		}
 
-        /* 目录样式 */
-        .toc {
-            padding: 1rem;
-        }
-        
-        .toc-item {
-            padding: 0.8rem;
-            margin: 4px 0;
-            border-radius: 8px;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
+		/* 新增阅读进度条 */
+		.progress-bar {
+			position: fixed;
+			top: 0;
+			left: 0;
+			height: 3px;
+			background: var(--accent);
+			z-index: 500;
+		}
 
-        .toc-item:hover {
-            background: var(--secondary);
-            transform: translateX(6px);
-        }
+		/* 优化移动端目录交互 */
+		.toc-category h3 {
+			cursor: pointer;
+			padding: 12px;
+			margin: -12px;
+			border-radius: var(--radius);
+			-webkit-tap-highlight-color: var(--tap-highlight);
+		}
+		.toc-category[data-fold="true"] .toc-subitem {
+			display: none;
+		}
 
-        /* 内容区域 */
-        .content {
-            flex: 1;
-            padding: 4rem 6rem;
-            margin-left: 320px;
-            background: var(--background);
-            min-height: 100vh;
-        }
-
-        /* 默认隐藏菜单按钮 */
-        .menu-toggle {
-            display: none;
-        }
-
-        /* 只在移动端显示 */
-        @media (max-width: 768px) {
-            .menu-toggle {
-                display: flex; /* 显示按钮 */
-                /* 保持原有美化样式 */
-                width: 48px;
-                height: 48px;
-                background: linear-gradient(135deg, rgba(108, 92, 231, 0.95) 0%, rgba(164, 80, 229, 0.95) 100%);
-                box-shadow: 0 3px 15px rgba(108, 92, 231, 0.25);
-                /* 其他样式保持不变... */
-            }
-
-            /* 侧边栏默认隐藏 */
-            .sidebar {
-                transform: translateX(-100%);
-            }
-        }
-
-        /* 电脑端侧边栏常驻 */
-        @media (min-width: 769px) {
-            .sidebar {
-                transform: none !important;
-                width: 280px;
-            }
-            .content {
-                margin-left: 280px;
-            }
-        }
-
-        /* 现代标题样式 */
-        h1 {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 300;
-            margin: 0;
-            padding: 0 1rem 0.5rem;
-            background: linear-gradient(45deg, 
-                #6c5ce7 20%, 
-                #a450e5 50%, 
-                #ff6b6b 80%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 3rem;
-            pointer-events: none;
-            animation: titleFlow 8s ease infinite;
-            background-size: 300% 300%;
-        }
-
-        @keyframes titleFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        h1::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), transparent);
-        }
-
-        /* 代码块样式 */
-        pre {
-            background: #2d3436;
-            color: #f8f9fa;
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin: 1.5rem 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            overflow-x: auto;
-            position: relative;
-        }
-
-        pre::before {
-            content: " ";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #6c5ce7 0%, #a450e5 50%, #ff6b6b 100%);
-            border-radius: 12px 12px 0 0;
-        }
-
-        /* 交互效果 */
-        .active {
-            background: var(--secondary);
-            font-weight: 600;
-        }
-
-        /* 平滑滚动 */
-        html {
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* 新增目录样式 */
-        .toc-category {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: var(--primary);
-            background: rgba(108, 92, 231, 0.05);
-            border-left: 4px solid var(--primary);
-            margin: 1.2rem 0;
-            padding: 0.8rem 1rem;
-            border-radius: 6px 0 0 6px;
-            position: relative;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .toc-category::after {
-            content: "▶";
-            position: absolute;
-            right: 1rem;
-            color: var(--primary);
-            opacity: 0.6;
-            transition: transform 0.2s;
-        }
-
-        .toc-subitem {
-            background: rgba(255,255,255,0.9);
-            margin: 0.4rem 0;
-            padding: 0.8rem 1.5rem;
-            border-radius: 6px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 4px rgba(108, 92, 231, 0.05);
-            position: relative;
-            cursor: pointer;
-        }
-
-        .toc-subitem:hover {
-            transform: translateX(8px);
-            background: white;
-            box-shadow: 2px 4px 12px rgba(108, 92, 231, 0.1);
-        }
-
-        .toc-subitem:hover::before {
-            content: "";
-            position: absolute;
-            left: -8px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 60%;
-            background: var(--primary);
-            border-radius: 2px;
-        }
-
-        /* 移动端优化 */
-        @media (max-width: 768px) {
-            .toc-category {
-                font-size: 0.95em;
-                margin: 1rem 0;
-                padding: 0.6rem 0.8rem;
-                border-left-width: 3px;
-            }
-            
-            .toc-subitem {
-                font-size: 0.9em;
-                padding: 0.6rem 1rem;
-                margin: 0.3rem 0;
-                border-radius: 4px;
-            }
-
-            .toc-subitem:hover::before {
-                left: -6px;
-                width: 3px;
-            }
-        }
-
-        /* 新增加载动画样式 */
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: var(--primary);
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            margin: 0 auto;
-            border: 3px solid var(--secondary);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            filter: drop-shadow(0 0 4px rgba(108, 92, 231, 0.2));
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading p {
-            margin-top: 1rem;
-            font-size: 1.1em;
-            letter-spacing: 1px;
-            color: rgba(108, 92, 231, 0.8);
-        }
-
-        /* Markdown内容样式 */
-        .markdown-content {
-            background: rgba(255,255,255,0.95);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(108, 92, 231, 0.1);
-            transform-style: preserve-3d;
-            perspective: 1000px;
-            box-shadow: 0 25px 50px -12px rgba(108, 92, 231, 0.25);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .markdown-content:hover {
-            transform: translateY(-5px) rotateX(1deg) rotateY(1deg);
-            box-shadow: 0 35px 60px -15px rgba(108, 92, 231, 0.4);
-        }
-
-        .markdown-content h2 {
-            color: var(--primary);
-            margin: 1.5rem 0;
-            border-bottom: 2px solid var(--secondary);
-            padding-bottom: 0.5rem;
-        }
-
-        .markdown-content pre {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            overflow-x: auto;
-        }
-
-        .markdown-content img {
-            border-radius: 12px;
-            margin: 1.5rem 0;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-        }
-
-        .markdown-content img:hover {
-            transform: translateY(-4px);
-        }
-
-        .markdown-content table {
-            border-collapse: collapse;
-            width: 100%;
-            margin: 2rem 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .markdown-content td, .markdown-content th {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(108, 92, 231, 0.1);
-        }
-
-        .markdown-content tr:hover {
-            background: rgba(108, 92, 231, 0.03);
-        }
-
-        .error {
-            background: #ffe3e3;
-            color: #ff0000;
-            padding: 2rem;
-            border-radius: 12px;
-            margin: 2rem 0;
-        }
-
-        /* 新增移动端手势优化 */
-        .toc-subitem {
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* 优化按钮点击反馈 */
-        button:active {
-            opacity: 0.8;
-            transition: opacity 0.1s;
-        }
-
-        /* 新增章节徽章 */
-        .toc-category::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 8px;
-            height: 80%;
-            background: var(--primary);
-            border-radius: 4px;
-            transition: height 0.3s;
-        }
-
-        .toc-category:hover::before {
-            height: 100%;
-        }
-    </style>
+		/* 增强搜索高亮 */
+		.highlight {
+			background: linear-gradient(90deg, #ffd70033, #ffd70000);
+			border-radius: 4px;
+		}
+	</style>
 </head>
+
 <body>
-    <button class="menu-toggle">☰</button>
-    
-    <nav class="sidebar">
-        <div class="toc">
-            <h2>课程目录</h2>
-            <!-- 简化后的静态目录结构 -->
-            <div class="toc-category">编程语言基础
-                <div class="toc-subitem" data-file="test/md/编程语言基础 - C语言.md">C语言</div>
-                <div class="toc-subitem" data-file="test/md/编程语言基础 - Python.md">Python</div>
-            </div>
-            <div class="toc-category">硬件基础知识
-                <div class="toc-subitem" data-file="test/md/硬件基础知识 - 电路基础.md">电路基础</div>
-                <div class="toc-subitem" data-file="test/md/硬件基础知识 - MCU概念及架构.md">MCU概念及架构</div>
-            </div>
-            <div class="toc-category">单片机的协议
-                <div class="toc-subitem" data-file="test/md/单片机的协议 - STM32.md">STM32</div>
-                <div class="toc-subitem" data-file="test/md/单片机的协议 - 串口助手.md">串口助手</div>
-            </div>
-            <div class="toc-category">开发环境及其固件库
-                <div class="toc-subitem" data-file="test/md/开发环境及其固件库 - 标准库.md">标准库</div>
-                <div class="toc-subitem" data-file="test/md/开发环境及其固件库 - HAL库.md">HAL库</div>
-            </div>
-            <div class="toc-category">PCB设计与制作
-                <div class="toc-subitem" data-file="test/md/PCB设计与制作 - 学习使用EDA工具.md">学习使用EDA工具</div>
-                <div class="toc-subitem" data-file="test/md/PCB设计与制作 - 免费打样板.md">免费打样板</div>
-            </div>
-            <div class="toc-category">机器视觉
-                <div class="toc-subitem" data-file="test/md/机器视觉 - 基础视觉处理与Matlab.md">基础视觉处理与Matlab</div>
-                <div class="toc-subitem" data-file="test/md/机器视觉 - OpenMV.md">OpenMV</div>
-                <div class="toc-subitem" data-file="test/md/机器视觉 - Linux与OpenCV(初识).md">Linux与OpenCV(初识篇)</div>
-                <div class="toc-subitem" data-file="test/md/机器视觉 - Linux与OpenCV(Linux篇).md">Linux与OpenCV(Linux篇)</div>
-            </div>
-        </div>
-    </nav>
+	<!-- 移动端菜单按钮 -->
+	<button class="menu-toggle">☰</button>
 
-    <main class="content">
-        <h1>协会培训中心</h1>
-        <!-- 这里可以插入动态加载的Markdown内容 -->
-        <pre><code>// 示例代码块
-console.log("欢迎来到协会培训中心");</code></pre>
-    </main>
+	<!-- 侧边栏目录 -->
+	<nav class="sidebar">
+		<div class="search-box">
+			<input type="text" id="search" placeholder="🔍 搜索课程..."
+				style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--secondary)">
+		</div>
+		<div class="toc" id="dynamic-toc"></div>
+	</nav>
 
-    <script src="style/marked.min.js"></script>
+	<!-- 内容区域 -->
+	<main class="content">
+		<h1>协会培训中心</h1>
+		<div class="course-content"></div>
+	</main>
 
-    <script>
-        // 移动端菜单切换
-        document.querySelector('.menu-toggle').addEventListener('click', () => {
-            document.querySelector('.sidebar').classList.toggle('active');
-        });
+	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script>
+		// 动态生成目录
+		const courseFiles = [
+			// 编程语言基础
+			"test/md/编程语言基础 - C语言.md",
+			"test/md/编程语言基础 - Python.md",
 
-        // 目录点击交互
-        document.querySelectorAll('.toc-item').forEach(item => {
-            item.addEventListener('click', () => {
-                // 移除所有激活状态
-                document.querySelectorAll('.toc-item').forEach(i => i.classList.remove('active'));
-                // 添加当前激活状态
-                item.classList.add('active');
-                
-                // 移动端点击后自动关闭菜单
-                if (window.innerWidth <= 768) {
-                    document.querySelector('.sidebar').classList.remove('active');
-                }
-            });
-        });
+			// 硬件基础
+			"test/md/硬件基础知识 - 电路基础.md",
+			"test/md/硬件基础知识 - MCU概念及架构.md",
 
-        // 自动隐藏移动端菜单
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                document.querySelector('.sidebar').classList.remove('active');
-            }
-        });
+			// 单片机协议
+			"test/md/单片机的协议 - STM32.md",
+			"test/md/单片机的协议 - 串口助手.md",
 
-        // 代码块复制功能
-        document.querySelectorAll('pre').forEach(pre => {
-            const copyBtn = document.createElement('button');
-            copyBtn.textContent = '复制';
-            copyBtn.style.cssText = `
-                position: absolute;
-                right: 10px;
-                top: 10px;
-                background: var(--primary);
-                color: white;
-                border: none;
-                padding: 4px 8px;
-                border-radius: 4px;
-                cursor: pointer;
-            `;
-            pre.style.position = 'relative';
-            pre.appendChild(copyBtn);
+			// 开发环境
+			"test/md/开发环境及其固件库 - 标准库.md",
+			"test/md/开发环境及其固件库 - HAL库.md",
 
-            copyBtn.addEventListener('click', () => {
-                const code = pre.querySelector('code').innerText;
-                navigator.clipboard.writeText(code);
-                copyBtn.textContent = '已复制!';
-                setTimeout(() => copyBtn.textContent = '复制', 2000);
-            });
-        });
+			// PCB设计
+			"test/md/PCB设计与制作 - 学习使用EDA工具.md",
+			"test/md/PCB设计与制作 - 免费打样板.md",
 
-        // 新增视差滚动效果
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            document.querySelector('.sidebar').style.transform = `translateY(${scrolled * 0.2}px)`;
-            document.querySelector('h1').style.transform = `translateY(${scrolled * 0.3}px)`;
-        });
+			// 机器视觉
+			"test/md/机器视觉 - 基础视觉处理与Matlab.md",
+			"test/md/机器视觉 - OpenMV.md",
+			"test/md/机器视觉 - Linux与OpenCV（初识篇）.md",
+			"test/md/机器视觉 - Linux与OpenCV-Linux篇(一).md"
+		];
 
-        // 增强型加载动画
-        function showLoading() {
-            return `
-                <div class="loading">
-                    <div class="spinner-wrapper">
-                        <div class="spinner">
-                            <div class="double-bounce1"></div>
-                            <div class="double-bounce2"></div>
-                        </div>
-                        <div class="loading-progress"></div>
+		// 动态生成目录结构
+		function generateTOC() {
+			const tocMap = new Map();
+
+			courseFiles.forEach(path => {
+				const [category, filename] = path.split('/').pop().split(' - ');
+				if (!tocMap.has(category)) {
+					tocMap.set(category, []);
+				}
+				tocMap.get(category).push({
+					name: filename.replace('.md', ''),
+					path: path
+				});
+			});
+
+			let tocHTML = '';
+			tocMap.forEach((items, category) => {
+				tocHTML += `
+                    <div class="toc-category">
+                        <h3>${category}</h3>
+                        ${items.map(item => `
+                            <div class="toc-subitem" data-file="${item.path}">
+                                ${item.name}
+                            </div>
+                        `).join('')}
                     </div>
-                    <p>正在加载课程内容...</p>
-                </div>
-            `;
-        }
-
-        // 优化后的内容加载逻辑
-        document.querySelectorAll('.toc-subitem').forEach(item => {
-            item.addEventListener('click', async function() {
-                // 新增点击涟漪效果
-                const ripple = document.createElement('div');
-                ripple.style.cssText = `
-                    position: absolute;
-                    width: 100px;
-                    height: 100px;
-                    background: rgba(108, 92, 231, 0.2);
-                    border-radius: 50%;
-                    transform: translate(-50%, -50%) scale(0);
-                    animation: ripple 0.6s linear;
                 `;
-                
-                const rect = this.getBoundingClientRect();
-                ripple.style.left = `${event.clientX - rect.left}px`;
-                ripple.style.top = `${event.clientY - rect.top}px`;
-                this.appendChild(ripple);
+			});
 
-                const filePath = this.dataset.file;
-                const contentArea = document.querySelector('.content');
-                
-                contentArea.innerHTML = showLoading();
+			document.getElementById('dynamic-toc').innerHTML = tocHTML;
+		}
 
-                try {
-                    const response = await fetch(filePath);
-                    const markdown = await response.text();
-                    contentArea.innerHTML = `
+		// 新增功能：目录折叠
+		function setupCategoryFold() {
+			document.querySelectorAll('.toc-category h3').forEach(h3 => {
+				h3.addEventListener('click', () => {
+					const category = h3.parentElement;
+					const isFolded = category.getAttribute('data-fold') === 'true';
+					category.setAttribute('data-fold', !isFolded);
+				});
+			});
+		}
+
+		// 新增功能：阅读进度条
+		function setupProgressBar() {
+			const progressBar = document.createElement('div');
+			progressBar.className = 'progress-bar';
+			document.body.prepend(progressBar);
+			
+			window.addEventListener('scroll', () => {
+				const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+				const progress = (window.scrollY / scrollHeight) * 100;
+				progressBar.style.width = progress + '%';
+			});
+		}
+
+		// 增强搜索功能（支持实时高亮）
+		document.getElementById('search').addEventListener('input', (e) => {
+			const term = e.target.value.trim().toLowerCase();
+			document.querySelectorAll('.toc-subitem').forEach(item => {
+				const text = item.textContent;
+				const regex = new RegExp(`(${term})`, 'gi');
+				item.innerHTML = term ? 
+					text.replace(regex, '<span class="highlight">$1</span>') : 
+					text;
+				item.style.display = term ? 
+					(text.toLowerCase().includes(term) ? 'block' : 'none') : 
+					'block';
+			});
+		});
+
+		// 新增移动端手势支持
+		let touchStartX = 0;
+		document.addEventListener('touchstart', e => {
+			touchStartX = e.touches[0].clientX;
+		});
+		document.addEventListener('touchend', e => {
+			const deltaX = e.changedTouches[0].clientX - touchStartX;
+			if (Math.abs(deltaX) > 50 && window.innerWidth <= 768) {
+				document.querySelector('.sidebar').classList.toggle('active', deltaX > 0);
+			}
+		});
+
+		// 初始化新功能
+		generateTOC();
+		setupCategoryFold();
+		setupProgressBar();
+
+		// 增强内容加载（添加加载状态）
+		document.addEventListener('click', async (e) => {
+			if (e.target.closest('.toc-subitem')) {
+				const contentArea = document.querySelector('.course-content');
+				contentArea.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>正在加载内容...</p>
+                    </div>
+                `;
+				
+				const item = e.target.closest('.toc-subitem');
+				const filePath = item.dataset.file;
+
+				try {
+					const response = await fetch(filePath);
+					const markdown = await response.text();
+					contentArea.innerHTML = `
                         <article class="markdown-content">
                             ${marked.parse(markdown)}
                         </article>
                     `;
-                } catch (error) {
-                    contentArea.innerHTML = `
+
+					// 添加历史记录
+					history.pushState({}, '', `#${encodeURIComponent(filePath)}`);
+
+					// 自动滚动到内容区
+					contentArea.scrollIntoView({ behavior: 'smooth' });
+				} catch (error) {
+					contentArea.innerHTML = `
                         <div class="error">
                             <h3>⚠️ 内容加载失败</h3>
                             <p>${error.message}</p>
                         </div>
                     `;
-                }
-            });
-        });
-    </script>
+				}
+			}
+		});
+
+		// 新增持久化存储
+		window.addEventListener('beforeunload', () => {
+			localStorage.setItem('lastScroll', window.scrollY);
+		});
+		window.addEventListener('load', () => {
+			const lastScroll = localStorage.getItem('lastScroll');
+			if (lastScroll) window.scrollTo(0, lastScroll);
+		});
+
+		// 移动端点击外部关闭菜单
+		document.addEventListener('click', (e) => {
+			if (window.innerWidth <= 768 &&
+				!e.target.closest('.sidebar') &&
+				!e.target.closest('.menu-toggle')) {
+				document.querySelector('.sidebar').classList.remove('active');
+			}
+		});
+	</script>
 </body>
+
 </html>
