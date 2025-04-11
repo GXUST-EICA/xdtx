@@ -210,6 +210,9 @@
 			z-index: 200;
 			padding: 1rem;
 			transition: all 0.3s ease;
+			width: calc(100% - 3rem);
+			margin: 0 auto;
+			box-sizing: border-box;
 		}
 
 		#mobile-search {
@@ -226,6 +229,8 @@
 			background-position: 1rem center;
 			background-size: 1.2em;
 			padding-left: 2.8rem;
+			max-width: 100%;
+			box-sizing: border-box;
 		}
 
 		#mobile-search:focus {
@@ -372,6 +377,23 @@
 		.toc, .mobile-toc, .sidebar {
 			overflow: overlay; /* 智能滚动条 */
 			scroll-behavior: smooth;
+		}
+
+		/* 修复移动端目录空白问题 */
+		@media (max-width: 768px) {
+			.mobile-toc {
+				width: 90vw;
+				right: 1rem;
+				margin: 0;
+				padding: 1rem;
+			}
+
+			.toc-category, 
+			.toc-subitem {
+				margin-left: 0;
+				margin-right: 0;
+				padding: 0.8rem 1rem;
+			}
 		}
 	</style>
 </head>
