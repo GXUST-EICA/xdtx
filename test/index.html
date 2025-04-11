@@ -228,16 +228,6 @@
             touch-action: pan-y;
         }
 
-        /* 新增暗黑模式变量 */
-        .dark-mode {
-            --primary-color: #818cf8;      /* 更醒目的紫色 */
-            --bg-color: #0f172a;          /* 更深的背景 */
-            --text-color: #e2e8f0;        /* 更亮的文字 */
-            --surface-color: #1e293b;     /* 表面颜色加深 */
-            --border-color: #334155;      /* 边框颜色增强对比 */
-            --link-color: #7dd3fc;        /* 新增链接专用色 */
-        }
-
         /* 应用链接颜色 */
         a {
             color: var(--link-color);
@@ -287,7 +277,6 @@
     <!-- 新增功能工具栏 -->
     <div class="toolbar">
         <button class="tool-button" onclick="scrollToTop()">↑</button>
-        <button class="tool-button" onclick="toggleDarkMode()">🌓</button>
     </div>
 
     <button class="menu-toggle" onclick="toggleMenu()">☰ 目录</button>
@@ -427,18 +416,6 @@
             }
         });
 
-        // 2. 暗黑模式切换
-        function toggleDarkMode() {
-            const isDark = document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', isDark);
-            
-            // 动态切换代码高亮主题
-            const link = document.querySelector('link[href*="highlight.js"]');
-            link.href = isDark 
-                ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/github-dark-dimmed.min.css'
-                : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/github.min.css'; // 亮色模式也更新为github主题
-        }
-
         // 3. 滚动进度条
         window.addEventListener('scroll', () => {
             const progress = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
@@ -486,13 +463,9 @@
             }
         });
 
-        // 初始化时加载暗黑模式
+        // 初始化时移除暗黑模式相关代码
         window.addEventListener('load', () => {
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-            }
-            // 同步代码高亮主题
-            toggleDarkMode(); // 强制执行一次以同步样式
+            // 移除暗黑模式初始化代码
         });
     </script>
 </body>
