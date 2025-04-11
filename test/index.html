@@ -510,24 +510,44 @@
 			}
 		});
 
-		// 添加触摸事件处理
-		let touchStartY = 0;
+		// 增强移动端目录滚动处理
+		let isTouchingToc = false;
 		const mobileToc = document.querySelector('.mobile-toc');
 
+		// 触摸开始事件
 		mobileToc.addEventListener('touchstart', e => {
+			isTouchingToc = true;
 			touchStartY = e.touches[0].clientY;
 		}, { passive: true });
 
+		// 触摸移动事件
 		mobileToc.addEventListener('touchmove', e => {
-			// 当滚动到边界时阻止父容器滚动
-			const scrolledToTop = mobileToc.scrollTop === 0;
-			const scrolledToBottom = mobileToc.scrollTop + mobileToc.clientHeight >= mobileToc.scrollHeight;
-			const direction = e.touches[0].clientY - touchStartY;
-
-			if ((scrolledToTop && direction > 0) || (scrolledToBottom && direction < 0)) {
+			if (!isTouchingToc) return;
+			
+			const currentY = e.touches[0].clientY;
+			const deltaY = currentY - touchStartY;
+			const isScrollingUp = deltaY < 0;
+			
+			// 检测滚动边界
+			const atTop = mobileToc.scrollTop === 0;
+			const atBottom = mobileToc.scrollHeight - mobileToc.scrollTop === mobileToc.clientHeight;
+			
+			// 阻止父容器滚动
+			if ((atTop && !isScrollingUp) || (atBottom && isScrollingUp)) {
 				e.preventDefault();
 			}
+			
+			touchStartY = currentY;
 		}, { passive: false });
+
+		// 触摸结束事件
+		mobileToc.addEventListener('touchend', () => {
+			isTouchingToc = false;
+		}, { passive: true });
+
+		// 优化滚动容器样式
+		mobileToc.style.webkitOverflowScrolling = 'touch';
+		mobileToc.style.overscrollBehavior = 'contain';
 	</script>
 </body>
 
