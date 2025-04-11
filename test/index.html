@@ -7,9 +7,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/github-dark.min.css">
     <style>
         :root {
-            --primary-color: #2563eb;
-            --bg-color: #f8fafc;
-            --text-color: #1e293b;
+            --primary-color: #4f46e5;  /* 更柔和的蓝色 */
+            --bg-color: #f9fafb;      /* 更浅的底色 */
+            --text-color: #374151;
+            --surface-color: #ffffff; /* 新增表面色 */
+            --border-color: #e5e7eb;  /* 边框颜色 */
+        }
+
+        /* 新增渐变背景 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            z-index: -1;
         }
 
         * {
@@ -30,12 +44,14 @@
         /* 侧边栏样式 */
         .sidebar {
             width: 280px;
-            background: white;
+            background: var(--surface-color);
+            border-right: 1px solid var(--border-color);
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             padding: 1rem;
             overflow-y: auto;
             position: fixed;
             height: 100vh;
+            transition: transform 0.3s ease;
         }
 
         /* 主内容区 */
@@ -49,10 +65,27 @@
         /* 移动端适配 */
         @media (max-width: 768px) {
             .sidebar {
-                width: 100%;
-                position: static;
-                height: auto;
-                box-shadow: none;
+                width: 85%;
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                transform: translateX(-100%);
+                z-index: 99;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            /* 新增遮罩层 */
+            .sidebar-mask {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.3);
+                z-index: 98;
                 display: none;
             }
 
@@ -93,9 +126,63 @@
         .nav-item:hover {
             background: #f1f5f9;
         }
+
+        /* 新增目录分组样式 */
+        .nav-group {
+            margin: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        .nav-group-title {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            text-transform: uppercase;
+        }
+
+        /* 新增功能按钮组 */
+        .toolbar {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .tool-button {
+            background: var(--surface-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* 新增阅读进度条 */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--primary-color);
+            z-index: 999;
+        }
     </style>
 </head>
 <body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="sidebar-mask" id="sidebarMask" onclick="toggleMenu()"></div>
+    
+    <!-- 新增功能工具栏 -->
+    <div class="toolbar">
+        <button class="tool-button" onclick="scrollToTop()">↑</button>
+        <button class="tool-button" onclick="toggleDarkMode()">🌓</button>
+    </div>
+
     <button class="menu-toggle" onclick="toggleMenu()">☰ 目录</button>
     
     <div class="sidebar" id="sidebar">
@@ -155,8 +242,11 @@
         }
 
         // 加载Markdown文件
+        let currentPath = '';
         async function loadMarkdown(path) {
             try {
+                currentPath = path;
+                localStorage.setItem('lastOpenFile', path);
                 const response = await fetch(path);
                 const md = await response.text();
                 document.getElementById('content').innerHTML = marked.parse(md);
@@ -174,13 +264,56 @@
         // 移动端菜单切换
         function toggleMenu() {
             const sidebar = document.getElementById('sidebar');
-            sidebar.style.display = sidebar.style.display === 'block' ? 'none' : 'block';
+            const mask = document.getElementById('sidebarMask');
+            sidebar.classList.toggle('active');
+            mask.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+        }
+
+        // 2. 暗黑模式切换
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        // 3. 滚动进度条
+        window.addEventListener('scroll', () => {
+            const progress = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        });
+
+        // 4. 返回顶部
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // 初始化
         initFileList();
         // 默认加载第一个文件
         if (courseFiles.length > 0) loadMarkdown(courseFiles[0]);
+
+        // 新增图片灯箱功能
+        document.getElementById('content').addEventListener('click', (e) => {
+            if (e.target.tagName === 'IMG') {
+                const src = e.target.src;
+                const overlay = document.createElement('div');
+                overlay.style = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0,0,0,0.9);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                    cursor: zoom-out;
+                `;
+                overlay.innerHTML = `<img src="${src}" style="max-width: 90%; max-height: 90%;">`;
+                overlay.onclick = () => overlay.remove();
+                document.body.appendChild(overlay);
+            }
+        });
     </script>
 </body>
 </html> 
