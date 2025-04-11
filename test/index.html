@@ -8,8 +8,10 @@
         :root {
             --primary: #6c5ce7;
             --secondary: #a8a4e6;
-            --background: #f5f7fb;
+            --accent: #ff6b6b; /* 新增强调色 */
+            --background: linear-gradient(45deg, #f5f7fb 0%, #f0f2ff 100%);
             --text: #2d3436;
+            --glass: rgba(255,255,255,0.9); /* 新增毛玻璃效果颜色 */
         }
 
         * {
@@ -30,15 +32,28 @@
 
         /* 侧边栏目录 */
         .sidebar {
-            width: 280px;
-            background: linear-gradient(175deg, rgba(255,255,255,0.98) 0%, rgba(245,247,251,0.98) 100%);
+            width: 320px; /* 加宽侧边栏 */
+            background: linear-gradient(175deg, var(--glass) 0%, rgba(245,247,251,0.7) 100%);
             padding: 1.5rem;
             position: fixed;
             height: 100vh;
-            box-shadow: 4px 0 20px rgba(108, 92, 231, 0.1);
-            border-right: 1px solid rgba(108, 92, 231, 0.1);
-            overflow-y: auto;
+            box-shadow: 8px 0 40px rgba(108, 92, 231, 0.15);
+            border-right: none;
+            /* 新增立体边框效果 */
+            position: relative;
             touch-action: pan-y;
+        }
+
+        .sidebar::after {
+            content: "";
+            position: absolute;
+            right: -1px;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(180deg, 
+                rgba(108, 92, 231, 0.2) 0%,
+                rgba(108, 92, 231, 0.1) 100%);
         }
 
         /* 移动端适配 */
@@ -80,10 +95,10 @@
         /* 内容区域 */
         .content {
             flex: 1;
-            padding: 3rem 4rem;
-            margin-left: 280px;
-            max-width: 800px;
-            margin-top: 80px;
+            padding: 4rem 6rem;
+            margin-left: 320px;
+            background: var(--background);
+            min-height: 100vh;
         }
 
         /* 默认隐藏菜单按钮 */
@@ -128,12 +143,23 @@
             z-index: 300;
             margin: 0;
             padding: 0 1rem 0.5rem;
-            background: linear-gradient(45deg, #6c5ce7, #a450e5);
-            background-clip: text;
+            background: linear-gradient(45deg, 
+                #6c5ce7 20%, 
+                #a450e5 50%, 
+                #ff6b6b 80%);
             -webkit-background-clip: text;
+            background-clip: text;
             color: transparent;
-            font-size: 2.4rem;
+            font-size: 3rem;
             pointer-events: none;
+            animation: titleFlow 8s ease infinite;
+            background-size: 300% 300%;
+        }
+
+        @keyframes titleFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         h1::after {
@@ -193,6 +219,7 @@
             padding: 0.8rem 1rem;
             border-radius: 6px 0 0 6px;
             position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .toc-category::after {
@@ -291,6 +318,15 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(108, 92, 231, 0.1);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            box-shadow: 0 25px 50px -12px rgba(108, 92, 231, 0.25);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .markdown-content:hover {
+            transform: translateY(-5px) rotateX(1deg) rotateY(1deg);
+            box-shadow: 0 35px 60px -15px rgba(108, 92, 231, 0.4);
         }
 
         .markdown-content h2 {
@@ -351,6 +387,24 @@
         button:active {
             opacity: 0.8;
             transition: opacity 0.1s;
+        }
+
+        /* 新增章节徽章 */
+        .toc-category::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 80%;
+            background: var(--primary);
+            border-radius: 4px;
+            transition: height 0.3s;
+        }
+
+        .toc-category:hover::before {
+            height: 100%;
         }
     </style>
 </head>
@@ -453,18 +507,53 @@ console.log("欢迎来到协会培训中心");</code></pre>
             });
         });
 
-        // 简化后的目录点击处理
+        // 新增视差滚动效果
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            document.querySelector('.sidebar').style.transform = `translateY(${scrolled * 0.2}px)`;
+            document.querySelector('h1').style.transform = `translateY(${scrolled * 0.3}px)`;
+        });
+
+        // 增强型加载动画
+        function showLoading() {
+            return `
+                <div class="loading">
+                    <div class="spinner-wrapper">
+                        <div class="spinner">
+                            <div class="double-bounce1"></div>
+                            <div class="double-bounce2"></div>
+                        </div>
+                        <div class="loading-progress"></div>
+                    </div>
+                    <p>正在加载课程内容...</p>
+                </div>
+            `;
+        }
+
+        // 优化后的内容加载逻辑
         document.querySelectorAll('.toc-subitem').forEach(item => {
             item.addEventListener('click', async function() {
+                // 新增点击涟漪效果
+                const ripple = document.createElement('div');
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: 100px;
+                    height: 100px;
+                    background: rgba(108, 92, 231, 0.2);
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%) scale(0);
+                    animation: ripple 0.6s linear;
+                `;
+                
+                const rect = this.getBoundingClientRect();
+                ripple.style.left = `${event.clientX - rect.left}px`;
+                ripple.style.top = `${event.clientY - rect.top}px`;
+                this.appendChild(ripple);
+
                 const filePath = this.dataset.file;
                 const contentArea = document.querySelector('.content');
                 
-                contentArea.innerHTML = `
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p>正在加载课程内容...</p>
-                    </div>
-                `;
+                contentArea.innerHTML = showLoading();
 
                 try {
                     const response = await fetch(filePath);
@@ -484,9 +573,6 @@ console.log("欢迎来到协会培训中心");</code></pre>
                 }
             });
         });
-
-        // 初始化加载第一个课程
-        document.querySelector('.toc-subitem').click();
     </script>
 </body>
-</html> 
+</html>
