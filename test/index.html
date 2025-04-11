@@ -89,86 +89,42 @@
         /* 移动端菜单按钮 */
         .menu-toggle {
             position: fixed;
-            top: 1.2rem;
-            left: 1.2rem;
+            top: 1rem;
+            left: 1rem;
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, rgba(108, 92, 231, 0.95) 0%, rgba(164, 80, 229, 0.95) 100%);
-            backdrop-filter: blur(8px);
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 1.5rem;
+            backdrop-filter: blur(4px);
+            background: rgba(108, 92, 231, 0.9);
+            border: 1px solid rgba(255,255,255,0.1);
             color: white;
-            z-index: 1000;
-        }
-
-        .menu-toggle::before {
-            content: "☰";
-            font-size: 1.8rem;
-            transition: transform 0.3s;
-        }
-
-        .sidebar.active + .menu-toggle::before {
-            content: "×";
-            transform: rotate(180deg);
-        }
-
-        .menu-toggle:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 24px rgba(108, 92, 231, 0.4);
-        }
-
-        .menu-toggle:active {
-            transform: scale(0.95);
+            padding: 0.8rem;
+            border-radius: 50%;
+            display: none;
+            z-index: 200;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         @media (max-width: 768px) {
-            .menu-toggle {
-                width: 48px;
-                height: 48px;
-                top: 0.8rem;
-                left: 0.8rem;
-                box-shadow: 0 3px 15px rgba(108, 92, 231, 0.25);
-            }
-            
-            .menu-toggle::before {
-                font-size: 1.6rem;
-            }
-            
-            /* 按钮呼吸动画 */
-            @keyframes menu-pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.08); }
-                100% { transform: scale(1); }
+            .content {
+                margin-left: 0;
+                padding: 1.5rem;
+                padding-top: 1rem;
+                margin-top: 70px;
             }
             
             .menu-toggle {
-                animation: menu-pulse 2s ease-in-out infinite;
+                display: block;
+                width: 44px;
+                height: 44px;
+                font-size: 1.3rem;
+                background: rgba(108, 92, 231, 0.95);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
-            
-            .sidebar.active + .menu-toggle {
-                animation: none;
+
+            .menu-toggle:active {
+                transform: scale(0.92);
             }
-        }
-
-        /* 按钮点击涟漪效果 */
-        .menu-toggle::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.1);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .menu-toggle:active::after {
-            opacity: 1;
         }
 
         /* 现代标题样式 */
