@@ -191,14 +191,52 @@
 			}
 		}
 
-		/* 新增功能：搜索框 */
+		/* 搜索框现代化样式 */
 		.search-box {
-			padding: 1rem;
 			position: sticky;
 			top: 0;
 			background: var(--glass);
 			backdrop-filter: blur(10px);
 			z-index: 200;
+			padding: 1rem;
+			transition: all 0.3s ease;
+		}
+
+		#mobile-search {
+			width: 100%;
+			padding: 1rem 2rem;
+			border: none;
+			border-radius: 50px;
+			background: rgba(255, 255, 255, 0.9);
+			box-shadow: 0 4px 12px rgba(108, 92, 231, 0.1);
+			font-size: 1rem;
+			transition: all 0.2s ease;
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='%236c5ce7' d='M18.031 16.617l4.283 4.282-1.415 1.415-4.282-4.283A8.96 8.96 0 0 1 11 20c-4.968 0-9-4.032-9-9s4.032-9 9-9 9 4.032 9 9a8.96 8.96 0 0 1-1.969 5.617zm-2.006-.742A6.977 6.977 0 0 0 18 11c0-3.868-3.133-7-7-7-3.868 0-7 3.132-7 7 0 3.867 3.132 7 7 7a6.977 6.977 0 0 0 4.875-1.975l.15-.15z'/%3E%3C/svg%3E");
+			background-repeat: no-repeat;
+			background-position: 1rem center;
+			background-size: 1.2em;
+			padding-left: 2.8rem;
+		}
+
+		#mobile-search:focus {
+			outline: none;
+			box-shadow: 0 6px 16px rgba(108, 92, 231, 0.2);
+			background: rgba(255, 255, 255, 0.95);
+		}
+
+		#mobile-search::placeholder {
+			color: #a8a4e6;
+			opacity: 0.8;
+		}
+
+		/* 移动端优化 */
+		@media (max-width: 768px) {
+			#mobile-search {
+				font-size: 0.95rem;
+				padding: 0.8rem 1.5rem;
+				padding-left: 2.5rem;
+				background-size: 1em;
+			}
 		}
 
 		/* 移动端菜单按钮优化 */
