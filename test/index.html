@@ -94,6 +94,9 @@
 				box-shadow: var(--shadow);
 				transform: translateY(20px);
 				transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				max-height: 70vh;
+				overflow-y: auto;
+				-webkit-overflow-scrolling: touch;
 			}
 			.toc-overlay.active .mobile-toc {
 				transform: translateY(0);
@@ -118,6 +121,21 @@
 			.mobile-toc #search {
 				font-size: 1rem;
 				padding: 1rem;
+			}
+
+			/* 保证内容足够高度 */
+			.toc {
+				min-height: 120%;
+			}
+
+			/* 优化滚动条样式 */
+			.mobile-toc::-webkit-scrollbar {
+				width: 4px;
+				background: rgba(0,0,0,0.1);
+			}
+			.mobile-toc::-webkit-scrollbar-thumb {
+				background: var(--primary);
+				border-radius: 2px;
 			}
 		}
 
@@ -453,6 +471,25 @@
 				document.querySelector('.sidebar').classList.remove('active');
 			}
 		});
+
+		// 添加触摸事件处理
+		let touchStartY = 0;
+		const mobileToc = document.querySelector('.mobile-toc');
+
+		mobileToc.addEventListener('touchstart', e => {
+			touchStartY = e.touches[0].clientY;
+		}, { passive: true });
+
+		mobileToc.addEventListener('touchmove', e => {
+			// 当滚动到边界时阻止父容器滚动
+			const scrolledToTop = mobileToc.scrollTop === 0;
+			const scrolledToBottom = mobileToc.scrollTop + mobileToc.clientHeight >= mobileToc.scrollHeight;
+			const direction = e.touches[0].clientY - touchStartY;
+
+			if ((scrolledToTop && direction > 0) || (scrolledToBottom && direction < 0)) {
+				e.preventDefault();
+			}
+		}, { passive: false });
 	</script>
 </body>
 
