@@ -86,44 +86,37 @@
             margin-top: 80px;
         }
 
-        /* 移动端菜单按钮 */
+        /* 默认隐藏菜单按钮 */
         .menu-toggle {
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            width: 50px;
-            height: 50px;
-            font-size: 1.5rem;
-            backdrop-filter: blur(4px);
-            background: rgba(108, 92, 231, 0.9);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
-            padding: 0.8rem;
-            border-radius: 50%;
             display: none;
-            z-index: 200;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
+        /* 只在移动端显示 */
         @media (max-width: 768px) {
-            .content {
-                margin-left: 0;
-                padding: 1.5rem;
-                padding-top: 1rem;
-                margin-top: 70px;
-            }
-            
             .menu-toggle {
-                display: block;
-                width: 44px;
-                height: 44px;
-                font-size: 1.3rem;
-                background: rgba(108, 92, 231, 0.95);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                display: flex; /* 显示按钮 */
+                /* 保持原有美化样式 */
+                width: 48px;
+                height: 48px;
+                background: linear-gradient(135deg, rgba(108, 92, 231, 0.95) 0%, rgba(164, 80, 229, 0.95) 100%);
+                box-shadow: 0 3px 15px rgba(108, 92, 231, 0.25);
+                /* 其他样式保持不变... */
             }
 
-            .menu-toggle:active {
-                transform: scale(0.92);
+            /* 侧边栏默认隐藏 */
+            .sidebar {
+                transform: translateX(-100%);
+            }
+        }
+
+        /* 电脑端侧边栏常驻 */
+        @media (min-width: 769px) {
+            .sidebar {
+                transform: none !important;
+                width: 280px;
+            }
+            .content {
+                margin-left: 280px;
             }
         }
 
