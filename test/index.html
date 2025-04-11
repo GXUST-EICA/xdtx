@@ -116,7 +116,8 @@
 			
 			/* 搜索框优化 */
 			.mobile-toc .search-box {
-				padding: 0 0 1rem 0;
+				padding: 0 1rem 1rem;
+				margin: 0 -1rem;
 			}
 			.mobile-toc #search {
 				font-size: 1rem;
@@ -205,12 +206,12 @@
 		#mobile-search {
 			width: 100%;
 			padding: 1rem 2rem;
-			border: none;
+			border: 1px solid var(--secondary) !important;
 			border-radius: 50px;
 			background: rgba(255, 255, 255, 0.9);
-			box-shadow: 0 4px 12px rgba(108, 92, 231, 0.1);
+			box-shadow: 0 2px 8px rgba(108, 92, 231, 0.1) !important;
 			font-size: 1rem;
-			transition: all 0.2s ease;
+			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='%236c5ce7' d='M18.031 16.617l4.283 4.282-1.415 1.415-4.282-4.283A8.96 8.96 0 0 1 11 20c-4.968 0-9-4.032-9-9s4.032-9 9-9 9 4.032 9 9a8.96 8.96 0 0 1-1.969 5.617zm-2.006-.742A6.977 6.977 0 0 0 18 11c0-3.868-3.133-7-7-7-3.868 0-7 3.132-7 7 0 3.867 3.132 7 7 7a6.977 6.977 0 0 0 4.875-1.975l.15-.15z'/%3E%3C/svg%3E");
 			background-repeat: no-repeat;
 			background-position: 1rem center;
@@ -303,6 +304,60 @@
 			border-radius: 8px;
 			overflow-x: auto;
 		}
+
+		/* 优化移动端目录布局 */
+		.mobile-toc {
+			padding: 1rem;
+			bottom: calc(56px + 1.5rem);
+		}
+
+		.toc-category {
+			margin: 0.5rem -0.5rem;
+			padding: 0.5rem;
+		}
+
+		.toc-subitem {
+			margin: 4px -0.5rem;
+			padding: 0.8rem 1rem !important;
+		}
+
+		/* 添加初始页面的专属样式 */
+		.markdown-content h1 {
+			text-align: center;
+			margin: 2rem 0;
+			font-size: 2.5rem;
+			background: linear-gradient(135deg, var(--primary), var(--accent));
+			-webkit-background-clip: text;
+			background-clip: text;
+			-webkit-text-fill-color: transparent;
+		}
+
+		.markdown-content mermaid {
+			display: block;
+			margin: 2rem auto;
+			max-width: 100%;
+			overflow-x: auto;
+		}
+
+		.markdown-content table {
+			width: 100%;
+			border-collapse: collapse;
+			margin: 1.5rem 0;
+			background: var(--glass);
+		}
+
+		.markdown-content td, .markdown-content th {
+			padding: 1rem;
+			border: 1px solid var(--secondary);
+		}
+
+		blockquote {
+			background: rgba(108, 92, 231, 0.05);
+			border-left: 4px solid var(--primary);
+			padding: 1rem;
+			margin: 1.5rem 0;
+			border-radius: 0 8px 8px 0;
+		}
 	</style>
 </head>
 
@@ -324,7 +379,51 @@
 	<!-- 内容区域 -->
 	<main class="content">
 		<h1>协会培训中心</h1>
-		<div class="course-content"></div>
+		<div class="course-content">
+			<article class="markdown-content">
+				${marked.parse(`
+				# 👋 欢迎来到智能培训中心
+
+				## 🚀 快速开始
+				- 点击右下角悬浮按钮打开课程目录
+				- 使用搜索功能快速定位内容
+				- 点击任意课程开始学习
+
+				## 🌟 特色功能
+				- **实时进度保存** - 自动记录学习位置
+				- **多端同步** - 手机/PC无缝切换
+				- **智能搜索** - 支持关键词高亮
+				- **夜间模式** - 自动适应系统设置
+
+				## 📚 课程体系
+				```mermaid
+				graph TD
+					A[编程基础] --> B(C语言)
+					A --> C(Python)
+					D[硬件知识] --> E(电路基础)
+					D --> F(MCU架构)
+					G[开发实战] --> H(STM32)
+					G --> I(OpenCV)
+				```
+
+				## 🛠 技术栈
+				| 领域       | 技术                 |
+				|------------|----------------------|
+				| 前端       | HTML5/CSS3/ES6       |
+				| 解析引擎   | Marked.js            |
+				| 可视化     | Mermaid              |
+				| 交互       | 原生JavaScript       |
+
+				## 📱 移动端优化
+				- 手势操作支持
+				- 目录悬浮按钮
+				- 60fps流畅动画
+				- 智能滚动锁定
+
+				> 📍 温馨提示：长按目录项可添加书签
+				`)}
+			</article>
+		</div>
 	</main>
 
 	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -548,6 +647,18 @@
 		// 优化滚动容器样式
 		mobileToc.style.webkitOverflowScrolling = 'touch';
 		mobileToc.style.overscrollBehavior = 'contain';
+
+		// 增强目录触摸处理
+		let lastScrollTime = 0;
+		mobileToc.addEventListener('scroll', () => {
+			lastScrollTime = Date.now();
+		});
+
+		document.addEventListener('touchmove', (e) => {
+			if (Date.now() - lastScrollTime < 100 && !e.target.closest('.mobile-toc')) {
+				e.preventDefault();
+			}
+		}, { passive: false });
 	</script>
 </body>
 
