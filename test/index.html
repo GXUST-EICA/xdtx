@@ -1084,12 +1084,13 @@
 			if (lastScroll) window.scrollTo(0, lastScroll);
 		});
 
-		// 移动端点击外部关闭菜单
+		// 修改后的移动端点击外部关闭菜单逻辑
 		document.addEventListener('click', (e) => {
 			if (window.innerWidth <= 768 &&
-				!e.target.closest('.sidebar') &&
-				!e.target.closest('.menu-toggle')) {
-				document.querySelector('.sidebar').classList.remove('active');
+				!e.target.closest('.mobile-toc') &&
+				!e.target.closest('.floating-toc')) {
+				document.querySelector('.toc-overlay').classList.remove('active');
+				document.body.classList.remove('toc-open');
 			}
 		});
 
