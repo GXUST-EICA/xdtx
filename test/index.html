@@ -925,7 +925,7 @@
 			}
 		}
 
-		// 初始化加载流程
+		// 修改初始化流程
 		document.addEventListener('DOMContentLoaded', async () => {
 			const container = document.getElementById('welcome-container');
 			const loader = new ContentLoader();
@@ -944,8 +944,8 @@
 				container.innerHTML = content;
 
 				// 初始化可视化组件
-				this._initMermaid();
-				this._initTooltips();
+				initMermaid();  // 移除非必要的this
+				initTooltips(); // 使用独立函数
 
 			} catch (error) {
 				container.innerHTML = `
@@ -963,10 +963,10 @@
 			}
 		});
 
-		// 初始化Mermaid流程图
-		function _initMermaid() {
+		// 修改为独立函数
+		function initMermaid() {
 			if (typeof mermaid !== 'undefined') {
-				mermaid.initialize({
+				mermaid.initialize({ 
 					theme: 'neutral',
 					securityLevel: 'loose',
 					flowchart: { 
@@ -978,21 +978,16 @@
 			}
 		}
 
-		// 初始化工具提示
+		// 修改为独立函数
 		function initTooltips() {
-		    if(typeof tippy !== 'undefined') {
-		        tippy('[data-tippy-content]', {
-		            arrow: true,
-		            animation: 'fade',
-		            theme: 'light-border'
-		        });
-		    } else {
-		        console.warn('tippy.js 未加载，工具提示功能不可用');
-		    }
+			if (typeof tippy !== 'undefined') {
+				tippy('[data-tippy-content]', {
+					arrow: true,
+					animation: 'fade',
+					theme: 'light-border'
+				});
+			}
 		}
-
-		// 在DOM加载完成后调用
-		document.addEventListener('DOMContentLoaded', initTooltips);
 	</script>
 </body>
 
