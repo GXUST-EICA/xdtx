@@ -162,12 +162,19 @@
 				min-height: 100vh;
 			}
 
+			.content-wrapper {
+				display: flex;
+				height: calc(100vh - 120px); /* 减去头部高度 */
+				overflow: hidden;
+			}
+
 			.sidebar {
-				width: 300px;
-				height: 100vh;
+				width: 280px;
+				height: 100%;
+				overflow-y: auto;
+				padding-right: 15px; /* 补偿滚动条宽度 */
 				position: sticky;
 				top: 0;
-				overflow-y: auto;
 				transform: none !important;
 				box-shadow: 8px 0 40px rgba(108, 92, 231, 0.1);
 				border-right: 1px solid var(--secondary);
@@ -179,10 +186,11 @@
 				display: none; /* Chrome/Safari */
 			}
 
-			.content {
+			.markdown-content {
 				flex: 1;
-				padding: 2rem 4rem;
-				max-width: calc(100vw - 300px);
+				height: 100%;
+				overflow-y: auto;
+				padding: 0 2rem;
 			}
 
 			.menu-toggle {
@@ -511,6 +519,38 @@
 			from { opacity: 0; transform: translateY(20px); }
 			to { opacity: 1; transform: translateY(0); }
 		}
+
+		/* 移动端布局优化 */
+		@media (max-width: 768px) {
+			.mobile-toc {
+				max-height: 70vh;
+				overflow-y: auto;
+			}
+
+			.markdown-content {
+				max-height: calc(100vh - 160px); /* 动态高度调整 */
+				overflow-y: auto;
+				-webkit-overflow-scrolling: touch;
+			}
+
+			/* 当目录打开时隐藏内容区滚动 */
+			.toc-overlay.active + .content {
+				overflow: hidden;
+			}
+		}
+
+		/* 通用滚动优化 */
+		.markdown-content::-webkit-scrollbar,
+		.sidebar::-webkit-scrollbar {
+			width: 6px;
+			height: 6px;
+		}
+
+		.markdown-content::-webkit-scrollbar-thumb,
+		.sidebar::-webkit-scrollbar-thumb {
+			background: var(--secondary);
+			border-radius: 3px;
+		}
 	</style>
 </head>
 
@@ -530,14 +570,14 @@
 	</div>
 
 	<!-- 内容区域 -->
-	<main class="content">
-		<h1>协会培训中心</h1>
-		<div class="course-content">
-			<article class="markdown-content" id="welcome-container">
-				<!-- 内容将由JavaScript动态加载 -->
-			</article>
-		</div>
-	</main>
+	<div class="content-wrapper">
+		<aside class="sidebar">
+			<!-- 目录内容 -->
+		</aside>
+		<main class="markdown-content">
+			<!-- Markdown内容 -->
+		</main>
+	</div>
 
 	<!-- Markdown解析 -->
 	<script src="style/marked.min.js"></script>

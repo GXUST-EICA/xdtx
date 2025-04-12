@@ -1,5 +1,4 @@
-# 🎓 智能培训中心
-![banner](https://via.placeholder.com/1200x400.png/6c5ce7/ffffff?text=欢迎来到智能培训中心)
+# 🎓 嵌入式智控协会
 
 <div class="feature-badges">
   <span class="badge new">新功能 v2.1</span>
