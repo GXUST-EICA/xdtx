@@ -560,6 +560,34 @@
 			overflow: overlay; /* 智能滚动条 */
 			scroll-behavior: smooth;
 		}
+
+		/* 新增mermaid样式优化 */
+		.markdown-content .mermaid {
+			background: rgba(255,255,255,0.9);
+			padding: 1.5rem;
+			border-radius: var(--radius);
+			margin: 2rem 0;
+			overflow: auto;
+		}
+
+		/* 代码块复制按钮 */
+		.copy-btn {
+			position: absolute;
+			right: 1rem;
+			top: 0.5rem;
+			padding: 0.3rem 0.8rem;
+			background: var(--primary);
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			opacity: 0;
+			transition: opacity 0.2s ease;
+		}
+
+		pre:hover .copy-btn {
+			opacity: 1;
+		}
 	</style>
 </head>
 
@@ -744,6 +772,12 @@
 		// 修改内容加载逻辑适配PC端布局
 		document.addEventListener('click', async (e) => {
 			if (e.target.closest('.toc-subitem')) {
+				// 移动端点击后关闭目录
+				if (window.innerWidth <= 768) {
+					floatingToc.classList.remove('active');
+					tocOverlay.classList.remove('active');
+				}
+
 				const contentArea = document.querySelector('.course-content');
 				
 				// 修复：使用已定义的loading样式类
@@ -765,6 +799,11 @@
                             ${marked.parse(markdown)}
                         </article>
                     `;
+
+					// 新增mermaid初始化
+					if(typeof mermaid !== 'undefined') {
+						mermaid.init(undefined, '.markdown-content pre code.mermaid');
+					}
 
 					// PC端自动滚动到标题位置
 					if (window.innerWidth > 768) {
@@ -972,9 +1011,11 @@
 					flowchart: { 
 						curve: 'basis',
 						htmlLabels: true
-					}
+					},
+					startOnLoad: false  // 添加此配置
 				});
-				mermaid.init(undefined, '.mermaid');
+				// 使用兼容的初始化方式
+				mermaid.init(undefined, '.markdown-content .mermaid');
 			}
 		}
 
@@ -988,6 +1029,51 @@
 				});
 			}
 		}
+
+		// 修改marked渲染器添加复制按钮
+		const renderer = new marked.Renderer();
+		renderer.code = function(code, language) {
+			const isMermaid = language === 'mermaid';
+			return `
+				<div style="position: relative">
+					<pre><code class="${language}">${code}</code></pre>
+					${!isMermaid ? `<button class="copy-btn" onclick="copyCode(this)">复制</button>` : ''}
+				</div>
+			`;
+		};
+
+		// 添加复制功能
+		function copyCode(button) {
+			const code = button.previousElementSibling.textContent;
+			navigator.clipboard.writeText(code).then(() => {
+				button.textContent = '已复制!';
+				setTimeout(() => button.textContent = '复制', 2000);
+			}).catch(err => {
+				console.error('复制失败:', err);
+				button.textContent = '失败';
+			});
+		}
+
+		// 在内容加载处使用自定义渲染器
+		// 修改内容加载逻辑
+		contentArea.innerHTML = `
+			<article class="markdown-content">
+				${marked.parse(markdown, { renderer })}
+			</article>
+		`;
+
+		// 在初始化流程中调用mermaid
+		if(typeof mermaid !== 'undefined') {
+			mermaid.init(undefined, '.markdown-content pre code.mermaid');
+		}
+
+		// 修复移动端目录项点击绑定（使用事件委托）
+		document.querySelector('.mobile-toc').addEventListener('click', (e) => {
+			if (e.target.closest('.toc-subitem')) {
+				floatingToc.classList.remove('active');
+				tocOverlay.classList.remove('active');
+			}
+		});
 	</script>
 </body>
 
