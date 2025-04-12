@@ -744,6 +744,12 @@
 		// 修改内容加载逻辑适配PC端布局
 		document.addEventListener('click', async (e) => {
 			if (e.target.closest('.toc-subitem')) {
+				// 移动端点击后关闭目录
+				if (window.innerWidth <= 768) {
+					floatingToc.classList.remove('active');
+					tocOverlay.classList.remove('active');
+				}
+
 				const contentArea = document.querySelector('.course-content');
 				
 				// 修复：使用已定义的loading样式类
@@ -765,6 +771,11 @@
                             ${marked.parse(markdown)}
                         </article>
                     `;
+
+					// 新增mermaid初始化
+					if(typeof mermaid !== 'undefined') {
+						mermaid.init(undefined, '.markdown-content pre code.mermaid');
+					}
 
 					// PC端自动滚动到标题位置
 					if (window.innerWidth > 768) {
@@ -966,15 +977,15 @@
 		// 修改为独立函数
 		function initMermaid() {
 			if (typeof mermaid !== 'undefined') {
-				mermaid.initialize({ 
+				mermaid.initialize({
+					startOnLoad: false, // 改为手动初始化
 					theme: 'neutral',
 					securityLevel: 'loose',
-					flowchart: { 
+					flowchart: {
 						curve: 'basis',
 						htmlLabels: true
 					}
 				});
-				mermaid.init(undefined, '.mermaid');
 			}
 		}
 
@@ -988,6 +999,14 @@
 				});
 			}
 		}
+
+		// 修复移动端目录项点击绑定（使用事件委托）
+		document.querySelector('.mobile-toc').addEventListener('click', (e) => {
+			if (e.target.closest('.toc-subitem')) {
+				floatingToc.classList.remove('active');
+				tocOverlay.classList.remove('active');
+			}
+		});
 	</script>
 </body>
 
