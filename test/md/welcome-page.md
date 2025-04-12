@@ -51,4 +51,63 @@ graph TD
   </div>
 </div>
 
+## 📖 操作指南（全平台通用）
+
+<div class="operation-manual">
+
+### 🧭 基本导航
+<div class="step-cards">
+  <div class="step-card">
+    <i class="icon">📂</i>
+    <h4>目录访问</h4>
+    <ul>
+      <li>PC端：侧边栏常驻</li>
+      <li>移动端：右下角悬浮按钮</li>
+    </ul>
+  </div>
+</div>
+
+### ✨ 核心交互
+<div class="feature-list">
+  <div class="feature-item">
+    <i class="icon">👆</i>
+    <div>
+      <strong>内容选择</strong>
+      <p>单击条目查看详情<br>双击章节标题快速定位</p>
+    </div>
+  </div>
+  
+  <div class="feature-item">
+    <i class="icon">🖱️</i>
+    <div>
+      <strong>快捷操作</strong>
+      <p>长按目录项 2秒 添加书签<br>右键/长按图表可导出图片</p>
+    </div>
+  </div>
+</div>
+
+### 📱 设备适配
+| 操作类型 | 移动端交互       | PC端交互        |
+|----------|------------------|-----------------|
+| 缩放     | 双指捏合         | Ctrl+鼠标滚轮   |
+| 滚动     | 单指滑动         | 鼠标滚轮        |
+| 返回     | 底部导航按钮     | 浏览器返回按钮  |
+
+### 🔍 搜索技巧
+```mermaid
+flowchart TD
+  A[启动搜索] --> B{精确搜索?}
+  B -->|是| C["使用引号包裹关键词"]
+  B -->|否| D["输入自然语言描述"]
+  C --> E[查看高亮结果]
+  D --> E
+```
+
+</div>
+
+> ✅ 注意事项：<br>
+> 1. 首次使用建议完成5分钟引导教程<br>
+> 2. 手势操作需保持触控区域清洁<br>
+> 3. 复杂图表操作建议横屏使用
+
 > 📍 使用贴士：长按目录项可添加书签，双击章节快速定位 
