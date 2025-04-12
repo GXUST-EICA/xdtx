@@ -549,46 +549,28 @@
 		/* PC端布局优化 */
 		@media (min-width: 769px) {
 			.sidebar {
-				/* 隐藏滚动条但保持滚动功能 */
-				scrollbar-width: none;
-				/* Firefox */
-				-ms-overflow-style: none;
-				/* IE/Edge */
+				overflow-y: auto !important;  /* 强制独立滚动 */
 			}
-
-			.sidebar::-webkit-scrollbar {
-				display: none;
-				/* Chrome/Safari */
-			}
-
-			/* 对齐搜索框 */
-			.search-box {
-				position: sticky;
-				top: 0;
-				padding: 1.5rem;
-				margin: 0 -1.5rem;
-				/* 抵消容器padding */
-				z-index: 200;
-				background: var(--glass);
-				backdrop-filter: blur(10px);
+			.content {
+				overflow-y: auto;  /* 添加独立滚动 */
+				height: calc(100vh - 3px); /* 留出进度条空间 */
 			}
 		}
 
 		/* 移动端滚动优化 */
 		@media (max-width: 768px) {
 			.mobile-toc {
+				overflow-y: auto !important;
 				-webkit-overflow-scrolling: touch;
-				scrollbar-width: none;
-				-ms-overflow-style: none;
+				scroll-behavior: smooth;
+				overscroll-behavior: contain;
+				touch-action: pan-y; /* 优化垂直滚动 */
 			}
 
-			.mobile-toc::-webkit-scrollbar {
-				display: none;
-			}
-
-			/* 目录项优化 */
-			.toc-category {
-				min-width: fit-content;
+			/* 增大触摸区域 */
+			.toc-category, .toc-subitem {
+				min-height: 48px; /* 最小触摸高度 */
+				padding: 12px !important;
 			}
 		}
 
@@ -935,42 +917,24 @@
 		}, { passive: true });
 
 		// 触摸移动事件
-		// 修改触摸事件处理
-		mobileToc.addEventListener('touchmove', (e) => {
-			if (!isTouchingToc) return;
+		// 修改触摸事件处理逻辑
+		let lastY = 0;
+		mobileToc.addEventListener('touchstart', e => {
+			lastY = e.touches[0].clientY;
+		}, { passive: true });
 
-			const currentY = e.touches[0].clientY;
-			const deltaY = currentY - touchStartY;
-
+		mobileToc.addEventListener('touchmove', e => {
+			const deltaY = e.touches[0].clientY - lastY;
+			lastY = e.touches[0].clientY;
+			
 			// 添加惯性滑动效果
-			if (Math.abs(deltaY) > 10) {
-				e.preventDefault();
-				mobileToc.scrollTop -= deltaY * 0.5;
-			}
-
-			touchStartY = currentY;
-		}, { passive: false });
+			mobileToc.scrollTop -= deltaY * 0.6;
+		}, { passive: true });
 
 		// 触摸结束事件
 		mobileToc.addEventListener('touchend', () => {
 			isTouchingToc = false;
 		}, { passive: true });
-
-		// 优化滚动容器样式
-		mobileToc.style.webkitOverflowScrolling = 'touch';
-		mobileToc.style.overscrollBehavior = 'contain';
-
-		// 增强目录触摸处理
-		let lastScrollTime = 0;
-		mobileToc.addEventListener('scroll', () => {
-			lastScrollTime = Date.now();
-		});
-
-		document.addEventListener('touchmove', (e) => {
-			if (Date.now() - lastScrollTime < 100 && !e.target.closest('.mobile-toc')) {
-				e.preventDefault();
-			}
-		}, { passive: false });
 
 		// 配置对象（方便后续维护）
 		const CONFIG = {
