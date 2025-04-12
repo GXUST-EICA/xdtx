@@ -600,12 +600,10 @@
 		/* 移动端滚动优化 */
 		@media (max-width: 768px) {
 			.mobile-toc {
-				overflow-y: auto !important;
-				-webkit-overflow-scrolling: touch;
 				scroll-behavior: smooth;
+				-webkit-overflow-scrolling: touch;
+				/* 增加弹性效果 */
 				overscroll-behavior: contain;
-				touch-action: pan-y;
-				/* 优化垂直滚动 */
 			}
 
 			/* 增大触摸区域 */
