@@ -163,22 +163,20 @@
 			}
 
 			.content-wrapper {
+				position: relative;
+				z-index: 1;
 				display: flex;
-				height: calc(100vh - 120px); /* 减去头部高度 */
-				overflow: hidden;
+				min-height: calc(100vh - 120px);
 			}
 
 			.sidebar {
+				position: sticky;
+				top: 60px; /* 根据头部高度调整 */
+				align-self: flex-start;
+				height: calc(100vh - 120px);
 				width: 280px;
-				height: 100%;
 				overflow-y: auto;
 				padding-right: 15px; /* 补偿滚动条宽度 */
-				position: sticky;
-				top: 0;
-				transform: none !important;
-				box-shadow: 8px 0 40px rgba(108, 92, 231, 0.1);
-				border-right: 1px solid var(--secondary);
-				/* 隐藏滚动条但保持滚动功能 */
 				scrollbar-width: none; /* Firefox */
 				-ms-overflow-style: none; /* IE/Edge */
 			}
@@ -186,9 +184,10 @@
 				display: none; /* Chrome/Safari */
 			}
 
-			.markdown-content {
+			.content {
 				flex: 1;
-				height: 100%;
+				position: relative;
+				z-index: 2;
 				overflow-y: auto;
 				padding: 0 2rem;
 			}
@@ -327,6 +326,8 @@
 			background: var(--glass);
 			border-radius: var(--radius);
 			box-shadow: var(--shadow);
+			padding-right: 15px; /* 补偿滚动条宽度 */
+			margin-right: -15px;
 		}
 
 		.markdown-content h2 {
@@ -550,6 +551,39 @@
 		.sidebar::-webkit-scrollbar-thumb {
 			background: var(--secondary);
 			border-radius: 3px;
+		}
+
+		/* 修复布局层叠问题 */
+		.content-wrapper {
+			position: relative;
+			z-index: 1;
+			display: flex;
+			min-height: calc(100vh - 120px);
+		}
+
+		.sidebar {
+			position: sticky;
+			top: 60px; /* 根据头部高度调整 */
+			align-self: flex-start;
+			height: calc(100vh - 120px);
+		}
+
+		.content {
+			flex: 1;
+			position: relative;
+			z-index: 2;
+		}
+
+		/* 修复滚动条覆盖问题 */
+		.markdown-content {
+			padding-right: 15px; /* 补偿滚动条宽度 */
+			margin-right: -15px;
+		}
+
+		/* 移动端目录激活时隐藏内容区 */
+		.toc-overlay.active ~ .content {
+			visibility: hidden;
+			pointer-events: none;
 		}
 	</style>
 </head>
@@ -974,20 +1008,6 @@
 				animation: 'fade',
 				theme: 'light-border'
 			});
-		}
-
-		// 添加滚动同步逻辑（可选）
-		const syncScroll = () => {
-			const sidebar = document.querySelector('.sidebar');
-			const content = document.querySelector('.content');
-			
-			content.addEventListener('scroll', () => {
-				sidebar.scrollTop = content.scrollTop;
-			});
-		};
-
-		if(window.innerWidth >= 769) {
-			syncScroll();
 		}
 	</script>
 </body>
