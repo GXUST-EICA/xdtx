@@ -654,11 +654,9 @@
 
 		/* 新增下载按钮样式 */
 		.download-btn {
-			position: fixed;
+			z-index: 1001; /* 提升层级到最高 */
 			bottom: 2rem;
 			right: 2rem;
-			z-index: 1001;
-			/* 提升层级到最高 */
 			background: var(--primary);
 			color: white;
 			padding: 1rem 1.5rem;
@@ -684,11 +682,11 @@
 
 		@media (max-width: 768px) {
 			.download-btn {
-				bottom: 5rem;
-				/* 提升到浮动目录按钮上方 */
+				bottom: 8rem; /* 提升到浮动目录按钮上方 */
 				right: 1.5rem;
-				padding: 0.8rem 1.2rem;
-				font-size: 0.9rem;
+				padding: 1rem 1.5rem; /* 增大点击区域 */
+				font-size: 1rem;
+				box-shadow: 0 8px 24px rgba(108,92,231,0.4); /* 增强阴影 */
 			}
 		}
 
