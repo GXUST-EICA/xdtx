@@ -731,6 +731,37 @@
 			z-index: 1;
 			/* 保持默认层级 */
 		}
+
+		/* 新增外层滚动锁定 */
+		body.toc-open {
+			overflow: hidden;
+			position: fixed;
+			width: 100%;
+			height: 100%;
+		}
+
+		.toc-overlay {
+			touch-action: none; /* 完全禁用外层触摸滚动 */
+			overscroll-behavior: none;
+		}
+
+		.mobile-toc {
+			overscroll-behavior: contain;
+			touch-action: pan-y; /* 仅允许垂直滚动 */
+			scroll-snap-type: y proximity; /* 增加滚动吸附效果 */
+			max-height: 82vh; /* 视觉高度优化 */
+		}
+
+		/* 滚动条视觉优化 */
+		.mobile-toc::-webkit-scrollbar {
+			width: 6px;
+			background: rgba(108,92,231,0.05);
+		}
+
+		.mobile-toc::-webkit-scrollbar-thumb {
+			background: var(--primary);
+			border-radius: 3px;
+		}
 	</style>
 </head>
 
@@ -850,6 +881,7 @@
 			e.stopPropagation();
 			floatingToc.classList.toggle('active');
 			tocOverlay.classList.toggle('active');
+			document.body.classList.toggle('toc-open'); // 新增body状态
 		});
 
 		// 点击外部关闭
@@ -1006,52 +1038,31 @@
 		const mobileToc = document.querySelector('.mobile-toc');
 
 		// 修改触摸事件处理
-		let momentum = 0;
-		let lastTime = 0;
-
+		let startY = 0;
 		mobileToc.addEventListener('touchstart', e => {
-			lastY = e.touches[0].clientY;
-			momentum = 0;
-			lastTime = Date.now();
+			startY = e.touches[0].clientY;
 		}, { passive: true });
 
 		mobileToc.addEventListener('touchmove', e => {
-			const now = Date.now();
-			const deltaTime = now - lastTime;
-			lastTime = now;
-
+			// 阻止外层滚动
+			e.stopPropagation();
+			
 			const currentY = e.touches[0].clientY;
-			const deltaY = currentY - lastY;
-			lastY = currentY;
+			const deltaY = currentY - startY;
+			startY = currentY;
 
-			// 计算动量
-			momentum = deltaY / deltaTime;
-
-			// 应用滚动
-			mobileToc.scrollTop -= deltaY * 0.8; // 调整滚动灵敏度
-		}, { passive: true });
-
-		// 添加惯性滚动
-		mobileToc.addEventListener('touchend', () => {
-			if (Math.abs(momentum) > 0.1) {
-				const startTime = Date.now();
-				const duration = 500; // 最大惯性持续时间
-
-				const animate = () => {
-					const elapsed = Date.now() - startTime;
-					if (elapsed > duration) return;
-
-					// 应用缓动效果
-					const progress = 1 - (elapsed / duration);
-					const delta = momentum * 50 * progress;
-
-					mobileToc.scrollTop -= delta;
-					requestAnimationFrame(animate);
-				};
-
-				requestAnimationFrame(animate);
+			// 仅允许垂直滚动
+			if (Math.abs(deltaY) > 5) {
+				mobileToc.scrollTop -= deltaY;
 			}
-		}, { passive: true });
+		}, { passive: false }); // 改为非被动事件
+
+		// 关闭时恢复滚动
+		function closeToc() {
+			floatingToc.classList.remove('active');
+			tocOverlay.classList.remove('active');
+			document.body.classList.remove('toc-open');
+		}
 
 		// 配置对象（方便后续维护）
 		const CONFIG = {
