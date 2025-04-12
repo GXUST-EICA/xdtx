@@ -122,6 +122,8 @@
 				max-height: 70vh;
 				overflow-y: auto;
 				-webkit-overflow-scrolling: touch;
+				scrollbar-width: thin; /* Firefox */
+				scrollbar-color: var(--primary) rgba(0,0,0,0.1);
 			}
 
 			.toc-overlay.active .mobile-toc {
@@ -159,13 +161,21 @@
 
 			/* 优化滚动条样式 */
 			.mobile-toc::-webkit-scrollbar {
-				width: 4px;
-				background: rgba(0, 0, 0, 0.1);
+				width: 8px; /* 增大滚动条宽度 */
+				background: rgba(0, 0, 0, 0.05);
 			}
 
 			.mobile-toc::-webkit-scrollbar-thumb {
 				background: var(--primary);
-				border-radius: 2px;
+				border-radius: 4px;
+				border: 2px solid rgba(255,255,255,0.2); /* 添加边框增强可视性 */
+			}
+
+			/* 增强触摸反馈 */
+			.toc-category, .toc-subitem {
+				padding: 16px !important; /* 增大点击区域 */
+				min-height: 56px; /* 最小触摸高度 */
+				-webkit-tap-highlight-color: var(--tap-highlight);
 			}
 		}
 
@@ -201,6 +211,8 @@
 				flex: 1;
 				padding: 2rem 4rem;
 				max-width: calc(100vw - 300px);
+				overflow-y: auto; /* 添加独立滚动 */
+				height: calc(100vh - 3px); /* 留出进度条空间 */
 			}
 
 			.menu-toggle {
@@ -911,30 +923,52 @@
 		let isTouchingToc = false;
 		const mobileToc = document.querySelector('.mobile-toc');
 
-		// 触摸开始事件
-		mobileToc.addEventListener('touchstart', e => {
-			isTouchingToc = true;
-			touchStartY = e.touches[0].clientY;
-		}, { passive: true });
+		// 修改触摸事件处理
+		let momentum = 0;
+		let lastTime = 0;
 
-		// 触摸移动事件
-		// 修改触摸事件处理逻辑
-		let lastY = 0;
 		mobileToc.addEventListener('touchstart', e => {
 			lastY = e.touches[0].clientY;
+			momentum = 0;
+			lastTime = Date.now();
 		}, { passive: true });
 
 		mobileToc.addEventListener('touchmove', e => {
-			const deltaY = e.touches[0].clientY - lastY;
-			lastY = e.touches[0].clientY;
+			const now = Date.now();
+			const deltaTime = now - lastTime;
+			lastTime = now;
 			
-			// 添加惯性滑动效果
-			mobileToc.scrollTop -= deltaY * 0.6;
+			const currentY = e.touches[0].clientY;
+			const deltaY = currentY - lastY;
+			lastY = currentY;
+			
+			// 计算动量
+			momentum = deltaY / deltaTime;
+			
+			// 应用滚动
+			mobileToc.scrollTop -= deltaY * 0.8; // 调整滚动灵敏度
 		}, { passive: true });
 
-		// 触摸结束事件
+		// 添加惯性滚动
 		mobileToc.addEventListener('touchend', () => {
-			isTouchingToc = false;
+			if (Math.abs(momentum) > 0.1) {
+				const startTime = Date.now();
+				const duration = 500; // 最大惯性持续时间
+				
+				const animate = () => {
+					const elapsed = Date.now() - startTime;
+					if (elapsed > duration) return;
+					
+					// 应用缓动效果
+					const progress = 1 - (elapsed / duration);
+					const delta = momentum * 50 * progress;
+					
+					mobileToc.scrollTop -= delta;
+					requestAnimationFrame(animate);
+				};
+				
+				requestAnimationFrame(animate);
+			}
 		}, { passive: true });
 
 		// 配置对象（方便后续维护）
