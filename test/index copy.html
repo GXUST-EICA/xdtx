@@ -122,6 +122,8 @@
 				max-height: 70vh;
 				overflow-y: auto;
 				-webkit-overflow-scrolling: touch;
+				scrollbar-width: thin; /* Firefox */
+				scrollbar-color: var(--primary) rgba(0,0,0,0.1);
 			}
 
 			.toc-overlay.active .mobile-toc {
@@ -159,13 +161,21 @@
 
 			/* 优化滚动条样式 */
 			.mobile-toc::-webkit-scrollbar {
-				width: 4px;
-				background: rgba(0, 0, 0, 0.1);
+				width: 8px; /* 增大滚动条宽度 */
+				background: rgba(0, 0, 0, 0.05);
 			}
 
 			.mobile-toc::-webkit-scrollbar-thumb {
 				background: var(--primary);
-				border-radius: 2px;
+				border-radius: 4px;
+				border: 2px solid rgba(255,255,255,0.2); /* 添加边框增强可视性 */
+			}
+
+			/* 增强触摸反馈 */
+			.toc-category, .toc-subitem {
+				padding: 16px !important; /* 增大点击区域 */
+				min-height: 56px; /* 最小触摸高度 */
+				-webkit-tap-highlight-color: var(--tap-highlight);
 			}
 		}
 
@@ -201,6 +211,8 @@
 				flex: 1;
 				padding: 2rem 4rem;
 				max-width: calc(100vw - 300px);
+				overflow-y: auto; /* 添加独立滚动 */
+				height: calc(100vh - 3px); /* 留出进度条空间 */
 			}
 
 			.menu-toggle {
@@ -305,6 +317,7 @@
 
 		/* 新增阅读进度条 */
 		.progress-bar {
+			display: none; /* 隐藏进度条 */
 			position: fixed;
 			top: 0;
 			left: 0;
@@ -549,46 +562,28 @@
 		/* PC端布局优化 */
 		@media (min-width: 769px) {
 			.sidebar {
-				/* 隐藏滚动条但保持滚动功能 */
-				scrollbar-width: none;
-				/* Firefox */
-				-ms-overflow-style: none;
-				/* IE/Edge */
+				overflow-y: auto !important;  /* 强制独立滚动 */
 			}
-
-			.sidebar::-webkit-scrollbar {
-				display: none;
-				/* Chrome/Safari */
-			}
-
-			/* 对齐搜索框 */
-			.search-box {
-				position: sticky;
-				top: 0;
-				padding: 1.5rem;
-				margin: 0 -1.5rem;
-				/* 抵消容器padding */
-				z-index: 200;
-				background: var(--glass);
-				backdrop-filter: blur(10px);
+			.content {
+				overflow-y: auto;  /* 添加独立滚动 */
+				height: calc(100vh - 3px); /* 留出进度条空间 */
 			}
 		}
 
 		/* 移动端滚动优化 */
 		@media (max-width: 768px) {
 			.mobile-toc {
+				overflow-y: auto !important;
 				-webkit-overflow-scrolling: touch;
-				scrollbar-width: none;
-				-ms-overflow-style: none;
+				scroll-behavior: smooth;
+				overscroll-behavior: contain;
+				touch-action: pan-y; /* 优化垂直滚动 */
 			}
 
-			.mobile-toc::-webkit-scrollbar {
-				display: none;
-			}
-
-			/* 目录项优化 */
-			.toc-category {
-				min-width: fit-content;
+			/* 增大触摸区域 */
+			.toc-category, .toc-subitem {
+				min-height: 48px; /* 最小触摸高度 */
+				padding: 12px !important;
 			}
 		}
 
@@ -628,6 +623,94 @@
 		pre:hover .copy-btn {
 			opacity: 1;
 		}
+
+		/* 新增下载按钮样式 */
+		.download-btn {
+			position: fixed;
+			bottom: 2rem;
+			right: 2rem;
+			z-index: 1001; /* 提升层级到最高 */
+			background: var(--primary);
+			color: white;
+			padding: 1rem 1.5rem;
+			border-radius: 30px;
+			box-shadow: 0 8px 24px rgba(108, 92, 231, 0.3);
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			display: flex;
+			align-items: center;
+			gap: 0.8rem;
+		}
+
+		.download-btn:hover {
+			transform: translateY(-3px);
+			background: var(--accent);
+			box-shadow: 0 12px 32px rgba(255, 107, 107, 0.3);
+		}
+
+		.download-btn::after {
+			content: '⬇️';
+			font-size: 1.2rem;
+		}
+
+		@media (max-width: 768px) {
+			.download-btn {
+				bottom: 5rem; /* 提升到浮动目录按钮上方 */
+				right: 1.5rem;
+				padding: 0.8rem 1.2rem;
+				font-size: 0.9rem;
+			}
+		}
+
+		/* 新增格式菜单 */
+		.format-menu {
+			position: absolute;
+			bottom: 100%;
+			right: 0;
+			background: var(--glass);
+			border-radius: 12px;
+			padding: 0.5rem;
+			box-shadow: var(--shadow);
+			opacity: 0;
+			visibility: hidden;
+			transition: all 0.3s ease;
+			min-width: 140px;
+		}
+
+		.download-btn:hover .format-menu {
+			opacity: 1;
+			visibility: visible;
+		}
+
+		.format-option {
+			padding: 0.8rem 1rem;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: background 0.2s ease;
+		}
+
+		.format-option:hover {
+			background: rgba(108, 92, 231, 0.1);
+		}
+
+		/* 移动端适配 */
+		@media (max-width: 768px) {
+			.download-btn {
+				bottom: 5rem; /* 避免被浮动按钮遮挡 */
+			}
+			
+			.format-menu {
+				right: -50%;
+				bottom: auto;
+				top: 100%;
+			}
+		}
+
+		/* 确保Markdown内容不会覆盖按钮 */
+		.markdown-content {
+			position: relative;
+			z-index: 1; /* 保持默认层级 */
+		}
 	</style>
 </head>
 
@@ -652,6 +735,17 @@
 		<div class="course-content">
 			<article class="markdown-content" id="welcome-container">
 				<!-- 内容将由JavaScript动态加载 -->
+				<!-- 新增下载按钮 -->
+				<div class="download-container">
+					<div class="download-btn" onclick="toggleFormatMenu()">
+						下载本页内容
+						<div class="format-menu">
+							<div class="format-option" onclick="downloadContent('txt')">文本文件</div>
+							<div class="format-option" onclick="downloadContent('md')">Markdown</div>
+							<div class="format-option" onclick="downloadContent('doc')">Word文档</div>
+						</div>
+					</div>
+				</div>
 			</article>
 		</div>
 	</main>
@@ -855,6 +949,9 @@
 
 					// 添加历史记录
 					history.pushState({}, '', `#${encodeURIComponent(filePath)}`);
+
+					// 在内容加载时保存原始内容
+					saveContent(markdown);
 				} catch (error) {
 					contentArea.innerHTML = `
                         <div class="error">
@@ -888,49 +985,53 @@
 		let isTouchingToc = false;
 		const mobileToc = document.querySelector('.mobile-toc');
 
-		// 触摸开始事件
-		mobileToc.addEventListener('touchstart', e => {
-			isTouchingToc = true;
-			touchStartY = e.touches[0].clientY;
-		}, { passive: true });
-
-		// 触摸移动事件
 		// 修改触摸事件处理
-		mobileToc.addEventListener('touchmove', (e) => {
-			if (!isTouchingToc) return;
+		let momentum = 0;
+		let lastTime = 0;
 
-			const currentY = e.touches[0].clientY;
-			const deltaY = currentY - touchStartY;
-
-			// 添加惯性滑动效果
-			if (Math.abs(deltaY) > 10) {
-				e.preventDefault();
-				mobileToc.scrollTop -= deltaY * 0.5;
-			}
-
-			touchStartY = currentY;
-		}, { passive: false });
-
-		// 触摸结束事件
-		mobileToc.addEventListener('touchend', () => {
-			isTouchingToc = false;
+		mobileToc.addEventListener('touchstart', e => {
+			lastY = e.touches[0].clientY;
+			momentum = 0;
+			lastTime = Date.now();
 		}, { passive: true });
 
-		// 优化滚动容器样式
-		mobileToc.style.webkitOverflowScrolling = 'touch';
-		mobileToc.style.overscrollBehavior = 'contain';
+		mobileToc.addEventListener('touchmove', e => {
+			const now = Date.now();
+			const deltaTime = now - lastTime;
+			lastTime = now;
+			
+			const currentY = e.touches[0].clientY;
+			const deltaY = currentY - lastY;
+			lastY = currentY;
+			
+			// 计算动量
+			momentum = deltaY / deltaTime;
+			
+			// 应用滚动
+			mobileToc.scrollTop -= deltaY * 0.8; // 调整滚动灵敏度
+		}, { passive: true });
 
-		// 增强目录触摸处理
-		let lastScrollTime = 0;
-		mobileToc.addEventListener('scroll', () => {
-			lastScrollTime = Date.now();
-		});
-
-		document.addEventListener('touchmove', (e) => {
-			if (Date.now() - lastScrollTime < 100 && !e.target.closest('.mobile-toc')) {
-				e.preventDefault();
+		// 添加惯性滚动
+		mobileToc.addEventListener('touchend', () => {
+			if (Math.abs(momentum) > 0.1) {
+				const startTime = Date.now();
+				const duration = 500; // 最大惯性持续时间
+				
+				const animate = () => {
+					const elapsed = Date.now() - startTime;
+					if (elapsed > duration) return;
+					
+					// 应用缓动效果
+					const progress = 1 - (elapsed / duration);
+					const delta = momentum * 50 * progress;
+					
+					mobileToc.scrollTop -= delta;
+					requestAnimationFrame(animate);
+				};
+				
+				requestAnimationFrame(animate);
 			}
-		}, { passive: false });
+		}, { passive: true });
 
 		// 配置对象（方便后续维护）
 		const CONFIG = {
@@ -1097,24 +1198,71 @@
 			});
 		}
 
-		// 在内容加载完成后调用初始化
-		// 修改内容加载逻辑
-		contentArea.innerHTML = `
-			<article class="markdown-content">
-				${marked.parse(markdown, { renderer })}
-			</article>
-		`;
+		// 修改下载功能
+		let currentContent = ''; // 用于存储当前内容
 
-		// 确保在DOM更新后初始化
-		setTimeout(initMermaid, 50); // 添加延迟确保DOM渲染完成
+		// 在内容加载时保存原始内容
+		function saveContent(rawMarkdown) {
+			currentContent = rawMarkdown;
+		}
 
-		// 修复移动端目录项点击绑定（使用事件委托）
-		document.querySelector('.mobile-toc').addEventListener('click', (e) => {
-			if (e.target.closest('.toc-subitem')) {
-				floatingToc.classList.remove('active');
-				tocOverlay.classList.remove('active');
+		// 显示/隐藏格式菜单
+		function toggleFormatMenu() {
+			const menu = document.querySelector('.format-menu');
+			menu.style.opacity = menu.style.opacity === '1' ? '0' : '1';
+			menu.style.visibility = menu.style.visibility === 'visible' ? 'hidden' : 'visible';
+		}
+
+		// 增强版下载功能
+		function downloadContent(format = 'txt') {
+			let content, mimeType, extension;
+			
+			switch(format) {
+				case 'md':
+					content = currentContent;
+					mimeType = 'text/markdown';
+					extension = 'md';
+					break;
+					
+				case 'doc':
+					// 简单转换Markdown为HTML
+					const htmlContent = `
+						<html>
+							<head>
+								<meta charset="UTF-8">
+								<style>
+									body { font-family: Arial; line-height: 1.6; }
+									h1, h2 { color: #6c5ce7; }
+									pre { background: #f5f5f5; padding: 1rem; }
+								</style>
+							</head>
+							<body>
+								${marked.parse(currentContent)}
+							</body>
+						</html>
+					`;
+					content = htmlContent;
+					mimeType = 'application/msword';
+					extension = 'doc';
+					break;
+					
+				default: // txt
+					content = document.querySelector('.markdown-content').innerText;
+					mimeType = 'text/plain';
+					extension = 'txt';
 			}
-		});
+
+			const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
+			const url = URL.createObjectURL(blob);
+			
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `培训内容-${new Date().toLocaleDateString()}.${extension}`;
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		}
 	</script>
 </body>
 
