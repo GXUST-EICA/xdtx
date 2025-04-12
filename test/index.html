@@ -118,7 +118,8 @@
 				padding: 1.5rem;
 				box-shadow: var(--shadow);
 				transform: translateY(20px);
-				transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), 
+							opacity 0.2s ease;
 				max-height: 70vh;
 				overflow-y: auto;
 				-webkit-overflow-scrolling: touch;
@@ -127,6 +128,7 @@
 				scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
 				overflow-x: hidden; /* 新增横向滚动隐藏 */
 				width: calc(100% - 2rem); /* 确保宽度适配 */
+				will-change: transform;
 			}
 
 			.toc-overlay.active .mobile-toc {
@@ -760,10 +762,11 @@
 		}
 
 		.mobile-toc {
-			overscroll-behavior: contain;
-			touch-action: pan-y; /* 仅允许垂直滚动 */
-			scroll-snap-type: y proximity; /* 增加滚动吸附效果 */
-			max-height: 82vh; /* 视觉高度优化 */
+			overflow-y: auto;
+			-webkit-overflow-scrolling: touch;
+			transform: translateZ(0); /* 强制硬件加速 */
+			backface-visibility: hidden;
+			perspective: 1000px;
 		}
 
 		/* 滚动条视觉优化 */
@@ -1094,29 +1097,28 @@
 			}
 		});
 
-		// 增强移动端目录滚动处理
-		let isTouchingToc = false;
+		// 替换原有复杂触摸处理
 		const mobileToc = document.querySelector('.mobile-toc');
-
-		// 修改触摸事件处理
 		let startY = 0;
+
 		mobileToc.addEventListener('touchstart', e => {
-			startY = e.touches[0].clientY;
+			startY = e.touches[0].pageY;
 		}, { passive: true });
 
 		mobileToc.addEventListener('touchmove', e => {
-			// 阻止外层滚动
-			e.stopPropagation();
+			const deltaY = e.touches[0].pageY - startY;
+			const atTop = mobileToc.scrollTop <= 0 && deltaY > 0;
+			const atBottom = mobileToc.scrollHeight <= mobileToc.clientHeight + mobileToc.scrollTop && deltaY < 0;
 			
-			const currentY = e.touches[0].clientY;
-			const deltaY = currentY - startY;
-			startY = currentY;
-
-			// 仅允许垂直滚动
-			if (Math.abs(deltaY) > 5) {
-				mobileToc.scrollTop -= deltaY;
+			if (atTop || atBottom) {
+				e.preventDefault();
 			}
-		}, { passive: false }); // 改为非被动事件
+		}, { passive: false });
+
+		// 优化滚动条渲染
+		requestAnimationFrame(() => {
+			mobileToc.style.scrollbarWidth = 'thin';
+		});
 
 		// 关闭时恢复滚动
 		function closeToc() {
