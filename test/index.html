@@ -1005,22 +1005,17 @@
 		// 修改为独立函数
 		function initMermaid() {
 			if (typeof mermaid !== 'undefined') {
-				mermaid.initialize({
-					startOnLoad: false,
+				mermaid.initialize({ 
 					theme: 'neutral',
 					securityLevel: 'loose',
 					flowchart: { 
 						curve: 'basis',
 						htmlLabels: true
 					},
-					sequence: {
-						showSequenceNumbers: true
-					}
+					startOnLoad: false  // 添加此配置
 				});
-				mermaid.run({
-					querySelector: '.mermaid',
-					suppressErrors: true
-				});
+				// 使用兼容的初始化方式
+				mermaid.init(undefined, '.markdown-content .mermaid');
 			}
 		}
 
