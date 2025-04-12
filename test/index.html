@@ -560,6 +560,34 @@
 			overflow: overlay; /* 智能滚动条 */
 			scroll-behavior: smooth;
 		}
+
+		/* 新增mermaid样式优化 */
+		.markdown-content .mermaid {
+			background: rgba(255,255,255,0.9);
+			padding: 1.5rem;
+			border-radius: var(--radius);
+			margin: 2rem 0;
+			overflow: auto;
+		}
+
+		/* 代码块复制按钮 */
+		.copy-btn {
+			position: absolute;
+			right: 1rem;
+			top: 0.5rem;
+			padding: 0.3rem 0.8rem;
+			background: var(--primary);
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			opacity: 0;
+			transition: opacity 0.2s ease;
+		}
+
+		pre:hover .copy-btn {
+			opacity: 1;
+		}
 	</style>
 </head>
 
@@ -978,13 +1006,20 @@
 		function initMermaid() {
 			if (typeof mermaid !== 'undefined') {
 				mermaid.initialize({
-					startOnLoad: false, // 改为手动初始化
+					startOnLoad: false,
 					theme: 'neutral',
 					securityLevel: 'loose',
-					flowchart: {
+					flowchart: { 
 						curve: 'basis',
 						htmlLabels: true
+					},
+					sequence: {
+						showSequenceNumbers: true
 					}
+				});
+				mermaid.run({
+					querySelector: '.mermaid',
+					suppressErrors: true
 				});
 			}
 		}
@@ -998,6 +1033,43 @@
 					theme: 'light-border'
 				});
 			}
+		}
+
+		// 修改marked渲染器添加复制按钮
+		const renderer = new marked.Renderer();
+		renderer.code = function(code, language) {
+			const isMermaid = language === 'mermaid';
+			return `
+				<div style="position: relative">
+					<pre><code class="${language}">${code}</code></pre>
+					${!isMermaid ? `<button class="copy-btn" onclick="copyCode(this)">复制</button>` : ''}
+				</div>
+			`;
+		};
+
+		// 添加复制功能
+		function copyCode(button) {
+			const code = button.previousElementSibling.textContent;
+			navigator.clipboard.writeText(code).then(() => {
+				button.textContent = '已复制!';
+				setTimeout(() => button.textContent = '复制', 2000);
+			}).catch(err => {
+				console.error('复制失败:', err);
+				button.textContent = '失败';
+			});
+		}
+
+		// 在内容加载处使用自定义渲染器
+		// 修改内容加载逻辑
+		contentArea.innerHTML = `
+			<article class="markdown-content">
+				${marked.parse(markdown, { renderer })}
+			</article>
+		`;
+
+		// 在初始化流程中调用mermaid
+		if(typeof mermaid !== 'undefined') {
+			mermaid.init(undefined, '.markdown-content pre code.mermaid');
 		}
 
 		// 修复移动端目录项点击绑定（使用事件委托）
