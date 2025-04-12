@@ -981,57 +981,47 @@
 			}
 		});
 
-		// 增强移动端目录滚动处理
+		// 添加滚动隔离逻辑
 		let isTouchingToc = false;
 		const mobileToc = document.querySelector('.mobile-toc');
 
-		// 修改触摸事件处理
-		let momentum = 0;
-		let lastTime = 0;
-
+		// 触摸开始
 		mobileToc.addEventListener('touchstart', e => {
-			lastY = e.touches[0].clientY;
-			momentum = 0;
-			lastTime = Date.now();
+			isTouchingToc = true;
+			startY = e.touches[0].clientY;
+			lastY = startY;
 		}, { passive: true });
 
+		// 触摸移动
 		mobileToc.addEventListener('touchmove', e => {
-			const now = Date.now();
-			const deltaTime = now - lastTime;
-			lastTime = now;
+			if (!isTouchingToc) return;
 			
 			const currentY = e.touches[0].clientY;
 			const deltaY = currentY - lastY;
 			lastY = currentY;
+
+			// 计算是否需要阻止默认滚动
+			const atTop = mobileToc.scrollTop <= 0 && deltaY > 0;
+			const atBottom = mobileToc.scrollTop + mobileToc.clientHeight >= mobileToc.scrollHeight && deltaY < 0;
 			
-			// 计算动量
-			momentum = deltaY / deltaTime;
+			if (!atTop && !atBottom) {
+				e.preventDefault(); // 阻止默认滚动
+			}
 			
-			// 应用滚动
-			mobileToc.scrollTop -= deltaY * 0.8; // 调整滚动灵敏度
+			mobileToc.scrollTop -= deltaY;
+		}, { passive: false });
+
+		// 触摸结束
+		mobileToc.addEventListener('touchend', () => {
+			isTouchingToc = false;
 		}, { passive: true });
 
-		// 添加惯性滚动
-		mobileToc.addEventListener('touchend', () => {
-			if (Math.abs(momentum) > 0.1) {
-				const startTime = Date.now();
-				const duration = 500; // 最大惯性持续时间
-				
-				const animate = () => {
-					const elapsed = Date.now() - startTime;
-					if (elapsed > duration) return;
-					
-					// 应用缓动效果
-					const progress = 1 - (elapsed / duration);
-					const delta = momentum * 50 * progress;
-					
-					mobileToc.scrollTop -= delta;
-					requestAnimationFrame(animate);
-				};
-				
-				requestAnimationFrame(animate);
+		// 阻止页面滚动穿透
+		document.body.addEventListener('touchmove', e => {
+			if (isTouchingToc) {
+				e.preventDefault();
 			}
-		}, { passive: true });
+		}, { passive: false });
 
 		// 配置对象（方便后续维护）
 		const CONFIG = {
