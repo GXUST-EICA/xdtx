@@ -628,6 +628,44 @@
 		pre:hover .copy-btn {
 			opacity: 1;
 		}
+
+		/* 新增下载按钮样式 */
+		.download-btn {
+			position: fixed;
+			bottom: 2rem;
+			right: 2rem;
+			background: var(--primary);
+			color: white;
+			padding: 1rem 1.5rem;
+			border-radius: 30px;
+			box-shadow: 0 8px 24px rgba(108, 92, 231, 0.3);
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			z-index: 1000;
+			display: flex;
+			align-items: center;
+			gap: 0.8rem;
+		}
+
+		.download-btn:hover {
+			transform: translateY(-3px);
+			background: var(--accent);
+			box-shadow: 0 12px 32px rgba(255, 107, 107, 0.3);
+		}
+
+		.download-btn::after {
+			content: '⬇️';
+			font-size: 1.2rem;
+		}
+
+		@media (max-width: 768px) {
+			.download-btn {
+				bottom: 1.5rem;
+				right: 1.5rem;
+				padding: 0.8rem 1.2rem;
+				font-size: 0.9rem;
+			}
+		}
 	</style>
 </head>
 
@@ -652,6 +690,8 @@
 		<div class="course-content">
 			<article class="markdown-content" id="welcome-container">
 				<!-- 内容将由JavaScript动态加载 -->
+				<!-- 新增下载按钮 -->
+				<div class="download-btn" onclick="downloadContent()">下载本页内容</div>
 			</article>
 		</div>
 	</main>
@@ -1097,24 +1137,29 @@
 			});
 		}
 
-		// 在内容加载完成后调用初始化
+		// 新增下载功能
+		function downloadContent() {
+			const content = document.querySelector('.markdown-content').innerText;
+			const blob = new Blob([content], { type: 'text/plain' });
+			const url = URL.createObjectURL(blob);
+			
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `培训内容-${new Date().toLocaleDateString()}.txt`;
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		}
+
+		// 在动态加载内容后保持按钮可见
 		// 修改内容加载逻辑
 		contentArea.innerHTML = `
 			<article class="markdown-content">
-				${marked.parse(markdown, { renderer })}
+				${marked.parse(markdown)}
+				<div class="download-btn" onclick="downloadContent()">下载本页内容</div>
 			</article>
 		`;
-
-		// 确保在DOM更新后初始化
-		setTimeout(initMermaid, 50); // 添加延迟确保DOM渲染完成
-
-		// 修复移动端目录项点击绑定（使用事件委托）
-		document.querySelector('.mobile-toc').addEventListener('click', (e) => {
-			if (e.target.closest('.toc-subitem')) {
-				floatingToc.classList.remove('active');
-				tocOverlay.classList.remove('active');
-			}
-		});
 	</script>
 </body>
 
