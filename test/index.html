@@ -819,6 +819,33 @@
 				overflow-y: scroll;
 			}
 		}
+
+		/* 重写下载按钮定位 */
+		.download-container {
+			position: fixed;
+			z-index: 9999; /* 最高优先级 */
+			bottom: 2rem;
+			right: 2rem;
+			pointer-events: none; /* 允许穿透点击 */
+		}
+
+		.download-btn {
+			position: relative;
+			pointer-events: auto; /* 恢复点击 */
+			/* 保持原有样式... */
+		}
+
+		@media (max-width: 768px) {
+			.download-container {
+				bottom: calc(100vh - 120px); /* 动态定位 */
+				right: 1rem;
+			}
+		}
+
+		/* 确保遮罩层不会覆盖 */
+		.toc-overlay {
+			z-index: 1000; /* 低于下载按钮 */
+		}
 	</style>
 </head>
 
@@ -1388,6 +1415,21 @@
 		document.addEventListener('DOMContentLoaded', () => {
 			initContentScroll();
 		});
+
+		// 在窗口变化时调整位置
+		function adjustDownloadPosition() {
+			const container = document.querySelector('.download-container');
+			if (window.innerWidth <= 768) {
+				const viewportHeight = window.innerHeight;
+				const tocHeight = document.querySelector('.floating-toc').clientHeight;
+				container.style.bottom = `${viewportHeight - tocHeight - 160}px`;
+			}
+		}
+
+		// 添加监听事件
+		window.addEventListener('resize', adjustDownloadPosition);
+		window.addEventListener('scroll', adjustDownloadPosition);
+		document.addEventListener('DOMContentLoaded', adjustDownloadPosition);
 	</script>
 </body>
 
