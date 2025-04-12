@@ -3,6 +3,9 @@
 
 <head>
 	<meta charset="UTF-8">
+	<meta http-equiv="Cache-Control" content="max-age=604800, public">
+    <link rel="preload" href="style/marked.min.js" as="script">
+    <link rel="preload" href="test/md/welcome-page.md" as="fetch">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 	<title>协会培训中心</title>
 	<style>
@@ -18,15 +21,30 @@
 		}
 
 		/* 动态目录生成样式 */
+		/* 合并.toc-category样式 */
 		.toc-category {
-			background: var(--glass);
-			backdrop-filter: blur(12px);
-			border-radius: 12px;
-			margin: 1rem 0;
-			padding: 1rem;
-			box-shadow: var(--shadow);
-			transition: transform 0.2s ease;
-			position: relative;
+		    background: var(--glass);
+		    backdrop-filter: blur(12px);
+		    border-radius: var(--radius);
+		    margin: 1rem 0;
+		    padding: 1rem;
+		    box-shadow: var(--shadow);
+		    transition: transform 0.2s ease;
+		    position: relative;
+		    -webkit-tap-highlight-color: var(--tap-highlight);
+		}
+		
+		/* 合并后的媒体查询 */
+		@media (max-width: 768px) {
+		    .toc-category {
+		        margin: 0.5rem 0;
+		        background: rgba(255,255,255,0.9);
+		    }
+		}
+		@media (min-width: 769px) {
+		    .toc-category {
+		        margin: 0.5rem 1rem;
+		    }
 		}
 
 		/* 移动端优化 */
@@ -555,20 +573,43 @@
 			}
 		});
 
-		// 移动端搜索功能
-		document.getElementById('mobile-search').addEventListener('input', (e) => {
-			const term = e.target.value.trim().toLowerCase();
-			document.querySelectorAll('.toc-subitem').forEach(item => {
-				const text = item.textContent;
-				const regex = new RegExp(`(${term})`, 'gi');
-				item.innerHTML = term ? 
-					text.replace(regex, '<span class="highlight">$1</span>') : 
-					text;
-				item.style.display = term ? 
-					(text.toLowerCase().includes(term) ? 'block' : 'none') : 
-					'block';
-			});
+		// 修改搜索功能，添加防抖和缓存
+		// 修改搜索功能，添加防抖
+		function debounce(func, wait) {
+		    let timeout;
+		    return function(...args) {
+		        clearTimeout(timeout);
+		        timeout = setTimeout(() => func.apply(this, args), wait);
+		    };
+		}
+		
+		document.getElementById('mobile-search').addEventListener('input', debounce((e) => {
+		    const term = e.target.value.trim().toLowerCase();
+		    document.querySelectorAll('.toc-subitem').forEach(item => {
+		        const text = item.textContent;
+		        const regex = new RegExp(`(${term})`, 'gi');
+		        item.innerHTML = term ? 
+		            text.replace(regex, '<span class="highlight">$1</span>') : 
+		            text;
+		        item.style.display = term ? 
+		            (text.toLowerCase().includes(term) ? 'block' : 'none') : 
+		            'block';
+		    });
 		});
+		
+		// 添加文件缓存
+		const fileCache = new Map();
+		async function loadFile(path) {
+		    if(fileCache.has(path)) return fileCache.get(path);
+		    try {
+		        const response = await fetch(path);
+		        const content = await response.text();
+		        fileCache.set(path, content);
+		        return content;
+		    } catch(error) {
+		        throw error;
+		    }
+		}
 
 		// 优化移动端点击体验
 		document.querySelectorAll('.toc-subitem').forEach(item => {
@@ -600,10 +641,25 @@
 			if (e.target.closest('.toc-subitem')) {
 				const contentArea = document.querySelector('.course-content');
 				contentArea.innerHTML = `
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p>正在加载内容...</p>
-                    </div>
+                    /* 在样式部分添加 */
+                    .loading {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        min-height: 200px;
+                    }
+                    .spinner {
+                        width: 40px;
+                        height: 40px;
+                        border: 4px solid rgba(108, 92, 231, 0.2);
+                        border-radius: 50%;
+                        border-top-color: var(--primary);
+                        animation: spin 1s ease-in-out infinite;
+                    }
+                    @keyframes spin {
+                        to { transform: rotate(360deg); }
+                    }
                 `;
 				
 				const item = e.target.closest('.toc-subitem');
@@ -668,23 +724,20 @@
 		}, { passive: true });
 
 		// 触摸移动事件
-		mobileToc.addEventListener('touchmove', e => {
-			if (!isTouchingToc) return;
-			
-			const currentY = e.touches[0].clientY;
-			const deltaY = currentY - touchStartY;
-			const isScrollingUp = deltaY < 0;
-			
-			// 检测滚动边界
-			const atTop = mobileToc.scrollTop === 0;
-			const atBottom = mobileToc.scrollHeight - mobileToc.scrollTop === mobileToc.clientHeight;
-			
-			// 阻止父容器滚动
-			if ((atTop && !isScrollingUp) || (atBottom && isScrollingUp)) {
-				e.preventDefault();
-			}
-			
-			touchStartY = currentY;
+		// 修改触摸事件处理
+		mobileToc.addEventListener('touchmove', (e) => {
+		    if (!isTouchingToc) return;
+		    
+		    const currentY = e.touches[0].clientY;
+		    const deltaY = currentY - touchStartY;
+		    
+		    // 添加惯性滑动效果
+		    if(Math.abs(deltaY) > 10) {
+		        e.preventDefault();
+		        mobileToc.scrollTop -= deltaY * 0.5;
+		    }
+		    
+		    touchStartY = currentY;
 		}, { passive: false });
 
 		// 触摸结束事件
