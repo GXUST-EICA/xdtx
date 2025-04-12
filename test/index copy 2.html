@@ -715,9 +715,6 @@
 			border-radius: 8px;
 			cursor: pointer;
 			transition: background 0.2s ease;
-			display: flex;
-			gap: 0.8rem;
-			align-items: center;
 		}
 
 		.format-option:hover {
@@ -867,19 +864,9 @@
 		</div>
 	</div>
 
-	<!-- 修改下载按钮容器 -->
+	<!-- 新增下载按钮容器 -->
 	<div class="download-container">
-		<button class="download-btn" id="download-md">
-			⬇️ 下载文档
-			<div class="format-menu">
-				<div class="format-option" data-format="md">
-					<span>📝 Markdown</span>
-				</div>
-				<div class="format-option" data-format="docx">
-					<span>📄 Word</span>
-				</div>
-			</div>
-		</button>
+		<button class="download-btn" id="download-md">下载当前文档</button>
 	</div>
 
 	<!-- 内容区域 -->
@@ -901,9 +888,6 @@
 	<!-- 工具提示库 -->
 	<script src="style/popper.min.js"></script>
 	<script src="style/tippy-bundle.umd.js"></script>
-
-	<!-- 在head中添加docx转换库 -->
-	<script src="style/mammoth.browser.min.js"></script>
 
 	<script>
 		// 动态生成目录
@@ -1369,59 +1353,17 @@
 		});
 
 		// 在脚本部分添加下载功能
-		document.getElementById('download-md').addEventListener('click', (e) => {
-			e.stopPropagation(); // 阻止事件冒泡
-		});
-
-		// 添加格式选择处理
-		document.querySelectorAll('.format-option').forEach(option => {
-			option.addEventListener('click', (e) => {
-				const format = e.currentTarget.dataset.format;
-				let blob, filename, mimeType;
-
-				const title = document.querySelector('.markdown-content h1')?.textContent.trim() || 'document';
-				
-				if(format === 'md') {
-					blob = new Blob([currentContent], { type: 'text/markdown' });
-					filename = `${title}.md`;
-					mimeType = 'text/markdown';
-				} else {
-					// 修改docx生成逻辑
-					async function generateDocx(content) {
-						const html = marked.parse(content);
-						const result = await mammoth.convertToHtml({ text: html });
-						return result.value;
-					}
-
-					// 然后使用专业库生成docx文件
-					generateDocx(currentContent).then(docxContent => {
-						blob = new Blob([docxContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-						filename = `${title}.doc`;
-						mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-					});
-				}
-
-				const url = URL.createObjectURL(blob);
-				const a = document.createElement('a');
-				a.href = url;
-				a.download = filename;
-				document.body.appendChild(a);
-				a.click();
-				document.body.removeChild(a);
-				URL.revokeObjectURL(url);
-				
-				// 关闭菜单
-				document.querySelector('.format-menu').style.opacity = 0;
-				document.querySelector('.format-menu').style.visibility = 'hidden';
-			});
-		});
-
-		// 点击外部关闭菜单
-		document.addEventListener('click', (e) => {
-			if(!e.target.closest('.download-btn')) {
-				document.querySelector('.format-menu').style.opacity = 0;
-				document.querySelector('.format-menu').style.visibility = 'hidden';
-			}
+		document.getElementById('download-md').addEventListener('click', () => {
+			const blob = new Blob([currentContent], { type: 'text/markdown' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			
+			a.href = url;
+			a.download = document.querySelector('.markdown-content h1')?.textContent.trim() || 'document.md';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
 		});
 	</script>
 </body>
