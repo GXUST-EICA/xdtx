@@ -163,20 +163,22 @@
 			}
 
 			.content-wrapper {
-				position: relative;
-				z-index: 1;
 				display: flex;
-				min-height: calc(100vh - 120px);
+				height: calc(100vh - 120px); /* 减去头部高度 */
+				overflow: hidden;
 			}
 
 			.sidebar {
-				position: sticky;
-				top: 60px; /* 根据头部高度调整 */
-				align-self: flex-start;
-				height: calc(100vh - 120px);
 				width: 280px;
+				height: 100%;
 				overflow-y: auto;
 				padding-right: 15px; /* 补偿滚动条宽度 */
+				position: sticky;
+				top: 0;
+				transform: none !important;
+				box-shadow: 8px 0 40px rgba(108, 92, 231, 0.1);
+				border-right: 1px solid var(--secondary);
+				/* 隐藏滚动条但保持滚动功能 */
 				scrollbar-width: none; /* Firefox */
 				-ms-overflow-style: none; /* IE/Edge */
 			}
@@ -184,10 +186,9 @@
 				display: none; /* Chrome/Safari */
 			}
 
-			.content {
+			.markdown-content {
 				flex: 1;
-				position: relative;
-				z-index: 2;
+				height: 100%;
 				overflow-y: auto;
 				padding: 0 2rem;
 			}
@@ -326,8 +327,6 @@
 			background: var(--glass);
 			border-radius: var(--radius);
 			box-shadow: var(--shadow);
-			padding-right: 15px; /* 补偿滚动条宽度 */
-			margin-right: -15px;
 		}
 
 		.markdown-content h2 {
@@ -552,39 +551,6 @@
 			background: var(--secondary);
 			border-radius: 3px;
 		}
-
-		/* 修复布局层叠问题 */
-		.content-wrapper {
-			position: relative;
-			z-index: 1;
-			display: flex;
-			min-height: calc(100vh - 120px);
-		}
-
-		.sidebar {
-			position: sticky;
-			top: 60px; /* 根据头部高度调整 */
-			align-self: flex-start;
-			height: calc(100vh - 120px);
-		}
-
-		.content {
-			flex: 1;
-			position: relative;
-			z-index: 2;
-		}
-
-		/* 修复滚动条覆盖问题 */
-		.markdown-content {
-			padding-right: 15px; /* 补偿滚动条宽度 */
-			margin-right: -15px;
-		}
-
-		/* 移动端目录激活时隐藏内容区 */
-		.toc-overlay.active ~ .content {
-			visibility: hidden;
-			pointer-events: none;
-		}
 	</style>
 </head>
 
@@ -605,11 +571,17 @@
 
 	<!-- 内容区域 -->
 	<div class="content-wrapper">
-		<aside class="sidebar">
-			<!-- 目录内容 -->
-		</aside>
-		<main class="markdown-content">
-			<!-- Markdown内容 -->
+		<!-- 侧边栏目录 -->
+		<nav class="sidebar" id="main-sidebar">
+			<div class="search-box">
+				<input type="text" id="search" placeholder="搜索课程...">
+			</div>
+			<div class="toc"></div>
+		</nav>
+
+		<!-- 主内容区 -->
+		<main class="content">
+			<article class="markdown-content" id="content-container"></article>
 		</main>
 	</div>
 
