@@ -582,8 +582,8 @@
 	<main class="content">
 		<h1>协会培训中心</h1>
 		<div class="course-content">
-			<article class="markdown-content">
-				${await loadWelcomePage()}
+			<article class="markdown-content" id="welcome-container">
+				<!-- 内容将由JavaScript动态加载 -->
 			</article>
 		</div>
 	</main>
@@ -984,18 +984,6 @@
 				animation: 'fade',
 				theme: 'light-border'
 			});
-		}
-
-		// 新增欢迎页加载函数
-		async function loadWelcomePage() {
-			try {
-				const response = await fetch('test/md/welcome-page.md');
-				const markdown = await response.text();
-				return marked.parse(markdown);
-			} catch (error) {
-				console.error('欢迎页加载失败:', error);
-				return marked.parse(`# ⚠️ 欢迎信息加载失败\n请检查网络连接或联系管理员`);
-			}
 		}
 	</script>
 </body>
