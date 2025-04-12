@@ -983,8 +983,8 @@
 				container.innerHTML = content;
 
 				// 初始化可视化组件
-				initMermaid();  // 移除非必要的this
-				initTooltips(); // 使用独立函数
+				initMermaid();  
+				initTooltips();
 
 			} catch (error) {
 				container.innerHTML = `
@@ -1002,7 +1002,7 @@
 			}
 		});
 
-		// 修改为独立函数
+		// 修改mermaid初始化逻辑
 		function initMermaid() {
 			if (typeof mermaid !== 'undefined') {
 				mermaid.initialize({ 
@@ -1012,34 +1012,30 @@
 						curve: 'basis',
 						htmlLabels: true
 					},
-					startOnLoad: false  // 添加此配置
+					startOnLoad: false
 				});
-				// 使用兼容的初始化方式
-				mermaid.init(undefined, '.markdown-content .mermaid');
+				
+				// 使用更可靠的选择器并添加延迟
+				setTimeout(() => {
+					mermaid.init({
+						noteMargin: 10,
+						useMaxWidth: true
+					}, '.markdown-content pre.mermaid');
+				}, 100);
 			}
 		}
 
-		// 修改为独立函数
-		function initTooltips() {
-			if (typeof tippy !== 'undefined') {
-				tippy('[data-tippy-content]', {
-					arrow: true,
-					animation: 'fade',
-					theme: 'light-border'
-				});
-			}
-		}
-
-		// 修改marked渲染器添加复制按钮
+		// 修改marked渲染器
 		const renderer = new marked.Renderer();
 		renderer.code = function(code, language) {
 			const isMermaid = language === 'mermaid';
-			return `
-				<div style="position: relative">
+			// 添加mermaid专用容器
+			return isMermaid ? 
+				`<pre class="mermaid">${code}</pre>` :
+				`<div style="position: relative">
 					<pre><code class="${language}">${code}</code></pre>
-					${!isMermaid ? `<button class="copy-btn" onclick="copyCode(this)">复制</button>` : ''}
-				</div>
-			`;
+					<button class="copy-btn" onclick="copyCode(this)">复制</button>
+				</div>`;
 		};
 
 		// 添加复制功能
@@ -1054,18 +1050,39 @@
 			});
 		}
 
-		// 在内容加载处使用自定义渲染器
-		// 修改内容加载逻辑
+		// 在内容加载完成后重新初始化mermaid
+		const contentArea = document.querySelector('.course-content');
 		contentArea.innerHTML = `
 			<article class="markdown-content">
 				${marked.parse(markdown, { renderer })}
 			</article>
 		`;
 
-		// 在初始化流程中调用mermaid
-		if(typeof mermaid !== 'undefined') {
-			mermaid.init(undefined, '.markdown-content pre code.mermaid');
-		}
+		// 确保重新初始化
+		setTimeout(initMermaid, 50);
+
+		// 修改marked渲染器
+		const renderer = new marked.Renderer();
+		renderer.code = function(code, language) {
+			const isMermaid = language === 'mermaid';
+			// 添加mermaid专用容器
+			return isMermaid ? 
+				`<pre class="mermaid">${code}</pre>` :
+				`<div style="position: relative">
+					<pre><code class="${language}">${code}</code></pre>
+					<button class="copy-btn" onclick="copyCode(this)">复制</button>
+				</div>`;
+		};
+
+		// 在内容加载完成后重新初始化mermaid
+		contentArea.innerHTML = `
+			<article class="markdown-content">
+				${marked.parse(markdown, { renderer })}
+			</article>
+		`;
+
+		// 确保重新初始化
+		setTimeout(initMermaid, 50);
 
 		// 修复移动端目录项点击绑定（使用事件委托）
 		document.querySelector('.mobile-toc').addEventListener('click', (e) => {
