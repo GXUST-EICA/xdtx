@@ -595,6 +595,7 @@
 	<script src="style/mermaid.min.js"></script>
 
 	<!-- 工具提示库 -->
+	<script src="style/popper.min.js"></script>
 	<script src="style/tippy-bundle.umd.js"></script>
 
 	<script>
@@ -978,13 +979,20 @@
 		}
 
 		// 初始化工具提示
-		function _initTooltips() {
-			tippy('[data-tippy-content]', {
-				arrow: true,
-				animation: 'fade',
-				theme: 'light-border'
-			});
+		function initTooltips() {
+		    if(typeof tippy !== 'undefined') {
+		        tippy('[data-tippy-content]', {
+		            arrow: true,
+		            animation: 'fade',
+		            theme: 'light-border'
+		        });
+		    } else {
+		        console.warn('tippy.js 未加载，工具提示功能不可用');
+		    }
 		}
+
+		// 在DOM加载完成后调用
+		document.addEventListener('DOMContentLoaded', initTooltips);
 	</script>
 </body>
 
