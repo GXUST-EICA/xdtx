@@ -853,7 +853,7 @@
 
 	<!-- 修改后的目录结构 -->
 	<div class="toc-overlay">
-		<div class="mobile-toc">
+		<div class="mobile-toc" id="mobile-toc-container">
 			<div class="search-box">
 				<input type="text" id="mobile-search" placeholder="搜索课程..."
 					style="width:100%; border-radius:12px; border:1px solid var(--secondary)">
@@ -1149,7 +1149,10 @@
 					}
 
 					// 发起网络请求
-					const response = await fetch(CONFIG.WELCOME_PAGE_PATH);
+					const response = await fetch(CONFIG.WELCOME_PAGE_PATH, {
+						mode: 'cors', // 明确指定跨域模式
+						credentials: 'same-origin' // 根据服务器配置调整
+					});
 
 					// HTTP状态检查
 					if (!response.ok) {
@@ -1426,6 +1429,40 @@
 				menu.style.visibility = 'hidden';
 			}, 5000); // 5秒后自动隐藏
 		});
+
+		// 修复事件监听器空指针问题
+		document.addEventListener('DOMContentLoaded', () => {
+			// 确保元素存在再绑定事件
+			const mobileToc = document.querySelector('.mobile-toc');
+			if (mobileToc) {
+				mobileToc.addEventListener('scroll', handleTocScroll);
+				mobileToc.addEventListener('touchstart', handleTouchStart, { passive: true });
+				mobileToc.addEventListener('touchmove', handleTouchMove, { passive: false });
+			}
+		});
+
+		// 优化后的触摸处理函数
+		function handleTouchStart(e) {
+			startY = e.touches[0].pageY;
+		}
+
+		function handleTouchMove(e) {
+			const deltaY = e.touches[0].pageY - startY;
+			const atTop = this.scrollTop <= 0 && deltaY > 0;
+			const atBottom = this.scrollHeight <= this.clientHeight + this.scrollTop && deltaY < 0;
+			
+			if (atTop || atBottom) {
+				e.preventDefault();
+			}
+		}
+
+		function handleTocScroll() {
+			this.classList.add('scrolling');
+			clearTimeout(scrollTimeout);
+			scrollTimeout = setTimeout(() => {
+				this.classList.remove('scrolling');
+			}, 500);
+		}
 	</script>
 </body>
 
