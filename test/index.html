@@ -870,17 +870,6 @@
 		<div class="course-content">
 			<article class="markdown-content" id="welcome-container">
 				<!-- 内容将由JavaScript动态加载 -->
-				<!-- 新增下载按钮 -->
-				<div class="download-container">
-					<div class="download-btn" onclick="toggleFormatMenu()">
-						下载本页内容
-						<div class="format-menu">
-							<div class="format-option" onclick="downloadContent('txt')">文本文件</div>
-							<div class="format-option" onclick="downloadContent('md')">Markdown</div>
-							<div class="format-option" onclick="downloadContent('doc')">Word文档</div>
-						</div>
-					</div>
-				</div>
 			</article>
 		</div>
 	</main>
@@ -1321,64 +1310,6 @@
 			currentContent = rawMarkdown;
 		}
 
-		// 显示/隐藏格式菜单
-		function toggleFormatMenu() {
-			const menu = document.querySelector('.format-menu');
-			menu.style.opacity = menu.style.opacity === '1' ? '0' : '1';
-			menu.style.visibility = menu.style.visibility === 'visible' ? 'hidden' : 'visible';
-		}
-
-		// 增强版下载功能
-		function downloadContent(format = 'txt') {
-			let content, mimeType, extension;
-
-			switch (format) {
-				case 'md':
-					content = currentContent;
-					mimeType = 'text/markdown';
-					extension = 'md';
-					break;
-
-				case 'doc':
-					// 简单转换Markdown为HTML
-					const htmlContent = `
-						<html>
-							<head>
-								<meta charset="UTF-8">
-								<style>
-									body { font-family: Arial; line-height: 1.6; }
-									h1, h2 { color: #6c5ce7; }
-									pre { background: #f5f5f5; padding: 1rem; }
-								</style>
-							</head>
-							<body>
-								${marked.parse(currentContent)}
-							</body>
-						</html>
-					`;
-					content = htmlContent;
-					mimeType = 'application/msword';
-					extension = 'doc';
-					break;
-
-				default: // txt
-					content = document.querySelector('.markdown-content').innerText;
-					mimeType = 'text/plain';
-					extension = 'txt';
-			}
-
-			const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
-			const url = URL.createObjectURL(blob);
-
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = `培训内容-${new Date().toLocaleDateString()}.${extension}`;
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
-			URL.revokeObjectURL(url);
-		}
-
 		// 添加滚动状态检测
 		let scrollTimeout;
 		mobileToc.addEventListener('scroll', () => {
@@ -1415,21 +1346,6 @@
 		document.addEventListener('DOMContentLoaded', () => {
 			initContentScroll();
 		});
-
-		// 在窗口变化时调整位置
-		function adjustDownloadPosition() {
-			const container = document.querySelector('.download-container');
-			if (window.innerWidth <= 768) {
-				const viewportHeight = window.innerHeight;
-				const tocHeight = document.querySelector('.floating-toc').clientHeight;
-				container.style.bottom = `${viewportHeight - tocHeight - 160}px`;
-			}
-		}
-
-		// 添加监听事件
-		window.addEventListener('resize', adjustDownloadPosition);
-		window.addEventListener('scroll', adjustDownloadPosition);
-		document.addEventListener('DOMContentLoaded', adjustDownloadPosition);
 	</script>
 </body>
 
