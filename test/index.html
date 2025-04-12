@@ -99,6 +99,7 @@
 				opacity: 0;
 				visibility: hidden;
 				transition: 0.3s ease;
+				touch-action: none; /* 阻止外层滚动 */
 			}
 
 			.toc-overlay.active {
@@ -119,16 +120,46 @@
 				box-shadow: var(--shadow);
 				transform: translateY(20px);
 				transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-				max-height: 70vh;
-				overflow-y: auto;
+				max-height: 80vh; /* 改为固定高度 */
+				overflow-y: auto; /* 保持滚动 */
+				overscroll-behavior: contain; /* 阻止滚动传播 */
+				touch-action: pan-y; /* 仅允许垂直滚动 */
+				/* 增加弹性滚动效果 */
+				scroll-behavior: smooth;
 				-webkit-overflow-scrolling: touch;
 				scrollbar-width: thin;
 				/* Firefox */
 				scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
-				overflow-x: hidden;
-				/* 新增横向滚动隐藏 */
-				width: calc(100% - 2rem);
-				/* 确保宽度适配 */
+				overflow-x: hidden; /* 新增横向滚动隐藏 */
+				width: calc(100% - 2rem); /* 确保宽度适配 */
+			}
+
+			/* 隐藏横向滚动条 */
+			.mobile-toc::-webkit-scrollbar:horizontal {
+				display: none;
+				height: 0;
+			}
+
+			/* 增加滚动边界反馈 */
+			.mobile-toc::after {
+				content: '';
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				width: 4px;
+				right: 0;
+				background: linear-gradient(
+					to bottom, 
+					rgba(108,92,231,0.1) 0%, 
+					var(--primary) 50%, 
+					rgba(108,92,231,0.1) 100%
+				);
+				opacity: 0;
+				transition: opacity 0.2s;
+			}
+
+			.mobile-toc.scrolling::after {
+				opacity: 0.6;
 			}
 
 			.toc-overlay.active .mobile-toc {
@@ -148,8 +179,7 @@
 				font-size: 0.95rem;
 				border-radius: 12px;
 				margin: 4px 0;
-				white-space: normal;
-				/* 确保文本换行 */
+				white-space: normal; /* 确保文本换行 */
 				max-width: 100%;
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -195,10 +225,35 @@
 				-webkit-tap-highlight-color: var(--tap-highlight);
 			}
 
-			/* 隐藏横向滚动条 */
-			.mobile-toc::-webkit-scrollbar:horizontal {
-				display: none;
-				height: 0;
+			/* 新增外层滚动锁定 */
+			body.toc-open {
+				overflow: hidden;
+				position: fixed;
+				width: 100%;
+				height: 100%;
+			}
+
+			.toc-overlay {
+				touch-action: none; /* 完全禁用外层触摸滚动 */
+				overscroll-behavior: none;
+			}
+
+			.mobile-toc {
+				overscroll-behavior: contain;
+				touch-action: pan-y; /* 仅允许垂直滚动 */
+				scroll-snap-type: y proximity; /* 增加滚动吸附效果 */
+				max-height: 82vh; /* 视觉高度优化 */
+			}
+
+			/* 滚动条视觉优化 */
+			.mobile-toc::-webkit-scrollbar {
+				width: 6px;
+				background: rgba(108,92,231,0.05);
+			}
+
+			.mobile-toc::-webkit-scrollbar-thumb {
+				background: var(--primary);
+				border-radius: 3px;
 			}
 		}
 
@@ -758,117 +813,316 @@
 		}
 
 		.toc-overlay {
-			touch-action: none;
-			/* 完全禁用外层触摸滚动 */
+			touch-action: none; /* 完全禁用外层触摸滚动 */
 			overscroll-behavior: none;
 		}
 
 		.mobile-toc {
 			overscroll-behavior: contain;
-			touch-action: pan-y;
-			/* 仅允许垂直滚动 */
-			scroll-snap-type: y proximity;
-			/* 增加滚动吸附效果 */
-			max-height: 82vh;
-			/* 视觉高度优化 */
+			touch-action: pan-y; /* 仅允许垂直滚动 */
+			scroll-snap-type: y proximity; /* 增加滚动吸附效果 */
+			max-height: 82vh; /* 视觉高度优化 */
+			overflow-x: hidden; /* 隐藏横向滚动条 */
 		}
 
 		/* 滚动条视觉优化 */
 		.mobile-toc::-webkit-scrollbar {
 			width: 6px;
-			background: rgba(108, 92, 231, 0.05);
+			background: rgba(108,92,231,0.05);
 		}
 
 		.mobile-toc::-webkit-scrollbar-thumb {
 			background: var(--primary);
 			border-radius: 3px;
 		}
+	}
 
-		/* 修复内容区域滚动 */
-		.content {
-			overflow-y: auto !important;
-			-webkit-overflow-scrolling: touch;
-			height: calc(100vh - 60px);
-			/* 留出顶部空间 */
-			padding: 1rem !important;
-		}
+	/* 新增交互逻辑 */
+	<script>
+		const floatingToc = document.querySelector('.floating-toc');
+		const tocOverlay = document.querySelector('.toc-overlay');
+		const mobileToc = document.querySelector('.mobile-toc');
 
-		.markdown-content {
-			min-height: 120vh;
-			/* 确保可滚动区域 */
-			overflow: visible !important;
-		}
+		// 修改浮动按钮点击逻辑
+		floatingToc.addEventListener('click', (e) => {
+			e.stopPropagation();
+			floatingToc.classList.toggle('active');
+			tocOverlay.classList.toggle('active');
+			document.body.classList.toggle('toc-open'); // 新增body状态
+		});
 
-		/* 增强触摸滚动 */
-		.course-content {
-			overscroll-behavior: contain;
-			touch-action: pan-y;
-		}
+		// 增强触摸事件处理
+		let startY = 0;
+		mobileToc.addEventListener('touchstart', e => {
+			startY = e.touches[0].clientY;
+		}, { passive: true });
 
-		@media (max-width: 768px) {
-			.content {
-				scroll-behavior: smooth;
-				-webkit-overflow-scrolling: touch;
-				/* 增加滚动阻力 */
-				scroll-snap-type: y mandatory;
-				overscroll-behavior-y: contain;
+		mobileToc.addEventListener('touchmove', e => {
+			// 阻止外层滚动
+			e.stopPropagation();
+			
+			const currentY = e.touches[0].clientY;
+			const deltaY = currentY - startY;
+			startY = currentY;
+
+			// 仅允许垂直滚动
+			if (Math.abs(deltaY) > 5) {
+				mobileToc.scrollTop -= deltaY;
 			}
+		}, { passive: false }); // 改为非被动事件
 
-			.markdown-content {
-				/* 增加滚动惯性 */
-				scroll-snap-stop: always;
-				scroll-snap-align: start;
+		// 关闭时恢复滚动
+		function closeToc() {
+			floatingToc.classList.remove('active');
+			tocOverlay.classList.remove('active');
+			document.body.classList.remove('toc-open');
+		}
+	</script>
+</style>
 
-				/* 优化段落间距 */
-				p,
-				pre,
-				table {
-					margin: 1.2rem 0;
-					scroll-snap-align: start;
+<body>
+	<div class="search-box">
+		<input type="text" id="mobile-search" placeholder="搜索...">
+	</div>
+
+	<div class="content">
+		<div class="markdown-content" id="markdown-content"></div>
+	</div>
+
+	<div class="floating-toc">
+		<div class="toc-overlay" onclick="closeToc()"></div>
+		<div class="mobile-toc">
+			<div class="search-box">
+				<input type="text" id="search" placeholder="搜索...">
+			</div>
+			<div class="toc" id="toc"></div>
+		</div>
+	</div>
+
+	<div class="download-btn">
+		<div class="format-menu">
+			<div class="format-option" data-format="pdf">PDF</div>
+			<div class="format-option" data-format="epub">EPUB</div>
+			<div class="format-option" data-format="mobi">MOBI</div>
+		</div>
+	</div>
+
+	<script src="style/marked.min.js"></script>
+	<script>
+		const toc = document.getElementById('toc');
+		const searchInput = document.getElementById('search');
+		const mobileSearchInput = document.getElementById('mobile-search');
+		const markdownContent = document.getElementById('markdown-content');
+		const downloadBtn = document.querySelector('.download-btn');
+		const formatMenu = document.querySelector('.format-menu');
+		const formatOptions = document.querySelectorAll('.format-option');
+
+		let currentUrl = 'test/md/welcome-page.md';
+		let currentFormat = 'pdf';
+
+		// 加载Markdown文件
+		async function loadMarkdown(url) {
+			try {
+				const response = await fetch(url);
+				const text = await response.text();
+				return text;
+			} catch (error) {
+				console.error('Error loading Markdown:', error);
+				return null;
+			}
+		}
+
+		// 渲染Markdown
+		function renderMarkdown(text) {
+			const html = marked.parse(text);
+			markdownContent.innerHTML = html;
+			highlightCode();
+			renderMermaid();
+			updateProgressBar();
+		}
+
+		// 生成目录
+		function generateToc(text) {
+			const tokens = marked.lexer(text);
+			const headings = tokens.filter(token => token.type === 'heading');
+
+			let currentCategory = null;
+			const tocHtml = headings.map(heading => {
+				const { text, depth } = heading;
+				if (depth === 1) {
+					currentCategory = { text, items: [] };
+					return `<div class="toc-category" data-fold="false">
+								<h3>${text}</h3>
+								<div class="toc-subitems"></div>
+							</div>`;
+				} else if (depth === 2 && currentCategory) {
+					currentCategory.items.push(text);
+					return '';
 				}
+				return '';
+			}).filter(html => html !== '').join('');
+
+			toc.innerHTML = tocHtml;
+
+			const categoryElements = document.querySelectorAll('.toc-category');
+			categoryElements.forEach(category => {
+				const subitems = category.querySelector('.toc-subitems');
+				const categoryText = category.querySelector('h3').textContent;
+				const items = headings.filter(heading => heading.text === categoryText)[0].items;
+
+				items.forEach(item => {
+					const subitem = document.createElement('div');
+					subitem.className = 'toc-subitem';
+					subitem.textContent = item;
+					subitem.addEventListener('click', () => {
+						scrollToHeading(item);
+						closeToc();
+					});
+					subitems.appendChild(subitem);
+				});
+
+				category.addEventListener('click', () => {
+					const isFolded = category.getAttribute('data-fold') === 'true';
+					category.setAttribute('data-fold', !isFolded);
+				});
+			});
+		}
+
+		// 滚动到指定标题
+		function scrollToHeading(text) {
+			const heading = document.querySelector(`h2:contains(${text})`);
+			if (heading) {
+				heading.scrollIntoView({ behavior: 'smooth' });
 			}
 		}
 
-		/* 增加动量滚动效果 */
-		@supports (-webkit-overflow-scrolling: touch) {
-			.content {
-				overflow-y: scroll;
+		// 搜索功能
+		function search(query) {
+			const regex = new RegExp(query, 'gi');
+			const highlightedText = markdownContent.innerHTML.replace(regex, match => `<span class="highlight">${match}</span>`);
+			markdownContent.innerHTML = highlightedText;
+		}
+
+		// 高亮代码块
+		function highlightCode() {
+			const codeBlocks = document.querySelectorAll('pre code');
+			codeBlocks.forEach(codeBlock => {
+				hljs.highlightBlock(codeBlock);
+				const copyBtn = document.createElement('button');
+				copyBtn.className = 'copy-btn';
+				copyBtn.textContent = '复制';
+				copyBtn.addEventListener('click', () => {
+					navigator.clipboard.writeText(codeBlock.textContent);
+					copyBtn.textContent = '已复制';
+					setTimeout(() => {
+						copyBtn.textContent = '复制';
+					}, 2000);
+				});
+				codeBlock.parentElement.appendChild(copyBtn);
+			});
+		}
+
+		// 渲染Mermaid图表
+		function renderMermaid() {
+			const mermaidElements = document.querySelectorAll('.language-mermaid');
+			mermaidElements.forEach(mermaidElement => {
+				const { innerText } = mermaidElement;
+				mermaid.mermaidAPI.render(`mermaid-${Date.now()}`, innerText, svgCode => {
+					mermaidElement.outerHTML = svgCode;
+				});
+			});
+		}
+
+		// 更新阅读进度条
+		function updateProgressBar() {
+			const progressBar = document.querySelector('.progress-bar');
+			const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+			const scrollTop = window.scrollY;
+			const progress = (scrollTop / scrollHeight) * 100;
+			progressBar.style.width = `${progress}%`;
+		}
+
+		// 下载文件
+		async function downloadFile(url, format) {
+			try {
+				const response = await fetch(url);
+				const blob = await response.blob();
+				const downloadUrl = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = downloadUrl;
+				a.download = `document.${format}`;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				URL.revokeObjectURL(downloadUrl);
+			} catch (error) {
+				console.error('Error downloading file:', error);
 			}
 		}
 
-		/* 重写下载按钮定位 */
-		.download-container {
-			position: fixed;
-			z-index: 9999;
-			/* 最高优先级 */
-			bottom: 2rem;
-			right: 2rem;
-			pointer-events: none;
-			/* 允许穿透点击 */
-		}
-
-		.download-btn {
-			position: relative;
-			pointer-events: auto;
-			/* 恢复点击 */
-			/* 保持原有样式... */
-		}
-
-		@media (max-width: 768px) {
-			.download-container {
-				bottom: calc(100vh - 120px);
-				/* 动态定位 */
-				right: 1rem;
+		// 初始加载
+		async function init() {
+			const text = await loadMarkdown(currentUrl);
+			if (text) {
+				renderMarkdown(text);
+				generateToc(text);
 			}
 		}
 
-		/* 确保遮罩层不会覆盖 */
-		.toc-overlay {
-			z-index: 1000;
-			/* 低于下载按钮 */
+		init();
+
+		// 事件监听
+		searchInput.addEventListener('input', () => {
+			search(searchInput.value);
+		});
+
+		mobileSearchInput.addEventListener('input', () => {
+			search(mobileSearchInput.value);
+		});
+
+		downloadBtn.addEventListener('click', () => {
+			formatMenu.classList.toggle('active');
+		});
+
+		formatOptions.forEach(option => {
+			option.addEventListener('click', () => {
+				currentFormat = option.dataset.format;
+				downloadFile(currentUrl, currentFormat);
+				formatMenu.classList.remove('active');
+			});
+		});
+
+		window.addEventListener('scroll', updateProgressBar);
+
+		// 在内容加载完成后执行
+		function initContentScroll() {
+			const content = document.querySelector('.content');
+			let startY = 0;
+
+			content.addEventListener('touchstart', e => {
+				startY = e.touches[0].clientY;
+			}, { passive: true });
+
+			content.addEventListener('touchmove', e => {
+				const currentY = e.touches[0].clientY;
+				const deltaY = currentY - startY;
+				
+				// 允许垂直滚动
+				if (Math.abs(deltaY) > 5) {
+					content.scrollTop -= deltaY;
+					e.preventDefault();
+				}
+			}, { passive: false });
 		}
-	</style>
-</head>
+
+		// 在DOM加载完成后调用
+		document.addEventListener('DOMContentLoaded', () => {
+			initContentScroll();
+		});
+	</script>
+</body>
+
+</html>
 
 <body>
 	<!-- 新增浮动按钮 -->
@@ -1356,16 +1610,22 @@
 		// 简化的触摸处理
 		function initContentScroll() {
 			const content = document.querySelector('.content');
+			let startY = 0;
 
-			// 仅保留必要的事件监听
 			content.addEventListener('touchstart', e => {
-				// 记录初始触摸位置
-				content.startY = e.touches[0].clientY;
+				startY = e.touches[0].clientY;
 			}, { passive: true });
 
 			content.addEventListener('touchmove', e => {
-				// 允许浏览器处理滚动
-			}, { passive: true });
+				const currentY = e.touches[0].clientY;
+				const deltaY = currentY - startY;
+				
+				// 允许垂直滚动
+				if (Math.abs(deltaY) > 5) {
+					content.scrollTop -= deltaY;
+					e.preventDefault();
+				}
+			}, { passive: false });
 		}
 
 		// 在DOM加载完成后调用
