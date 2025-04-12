@@ -795,6 +795,34 @@
 			overscroll-behavior: contain;
 			touch-action: pan-y;
 		}
+
+		@media (max-width: 768px) {
+			.content {
+				scroll-behavior: smooth;
+				-webkit-overflow-scrolling: touch;
+				/* 增加滚动阻力 */
+				scroll-snap-type: y mandatory;
+				overscroll-behavior-y: contain;
+			}
+
+			.markdown-content {
+				/* 增加滚动惯性 */
+				scroll-snap-stop: always;
+				scroll-snap-align: start;
+				/* 优化段落间距 */
+				p, pre, table {
+					margin: 1.2rem 0;
+					scroll-snap-align: start;
+				}
+			}
+		}
+
+		/* 增加动量滚动效果 */
+		@supports (-webkit-overflow-scrolling: touch) {
+			.content {
+				overflow-y: scroll;
+			}
+		}
 	</style>
 </head>
 
@@ -1345,25 +1373,50 @@
 			}
 		}, { passive: true });
 
-		// 在内容加载完成后执行
+		// 优化后的触摸处理
 		function initContentScroll() {
 			const content = document.querySelector('.content');
 			let startY = 0;
+			let velocity = 0;
+			let lastY = 0;
+			let timestamp = 0;
 
 			content.addEventListener('touchstart', e => {
 				startY = e.touches[0].clientY;
+				lastY = startY;
+				timestamp = Date.now();
+				velocity = 0;
 			}, { passive: true });
 
 			content.addEventListener('touchmove', e => {
 				const currentY = e.touches[0].clientY;
 				const deltaY = currentY - startY;
+				const now = Date.now();
+				const dt = now - timestamp;
 				
-				// 允许垂直滚动
-				if (Math.abs(deltaY) > 5) {
-					content.scrollTop -= deltaY;
-					e.preventDefault();
-				}
+				// 计算速度
+				velocity = (currentY - lastY) / dt;
+				lastY = currentY;
+				timestamp = now;
+
+				// 应用惯性阻尼
+				const dampedDelta = deltaY * 0.7; // 增加阻尼系数
+				content.scrollTop += dampedDelta;
+				e.preventDefault();
 			}, { passive: false });
+
+			// 动量滚动延续
+			function momentumScroll() {
+				if (Math.abs(velocity) > 0.1) {
+					velocity *= 0.95; // 增加摩擦力
+					content.scrollTop += velocity * 16;
+					requestAnimationFrame(momentumScroll);
+				}
+			}
+
+			content.addEventListener('touchend', () => {
+				requestAnimationFrame(momentumScroll);
+			});
 		}
 
 		// 在DOM加载完成后调用
