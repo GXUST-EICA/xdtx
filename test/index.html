@@ -122,8 +122,9 @@
 				max-height: 70vh;
 				overflow-y: auto;
 				-webkit-overflow-scrolling: touch;
-				scrollbar-width: thin; /* Firefox */
-				scrollbar-color: var(--primary) rgba(0,0,0,0.1);
+				scrollbar-width: thin;
+				/* Firefox */
+				scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
 			}
 
 			.toc-overlay.active .mobile-toc {
@@ -161,20 +162,25 @@
 
 			/* 优化滚动条样式 */
 			.mobile-toc::-webkit-scrollbar {
-				width: 8px; /* 增大滚动条宽度 */
+				width: 8px;
+				/* 增大滚动条宽度 */
 				background: rgba(0, 0, 0, 0.05);
 			}
 
 			.mobile-toc::-webkit-scrollbar-thumb {
 				background: var(--primary);
 				border-radius: 4px;
-				border: 2px solid rgba(255,255,255,0.2); /* 添加边框增强可视性 */
+				border: 2px solid rgba(255, 255, 255, 0.2);
+				/* 添加边框增强可视性 */
 			}
 
 			/* 增强触摸反馈 */
-			.toc-category, .toc-subitem {
-				padding: 16px !important; /* 增大点击区域 */
-				min-height: 56px; /* 最小触摸高度 */
+			.toc-category,
+			.toc-subitem {
+				padding: 16px !important;
+				/* 增大点击区域 */
+				min-height: 56px;
+				/* 最小触摸高度 */
 				-webkit-tap-highlight-color: var(--tap-highlight);
 			}
 		}
@@ -211,8 +217,10 @@
 				flex: 1;
 				padding: 2rem 4rem;
 				max-width: calc(100vw - 300px);
-				overflow-y: auto; /* 添加独立滚动 */
-				height: calc(100vh - 3px); /* 留出进度条空间 */
+				overflow-y: auto;
+				/* 添加独立滚动 */
+				height: calc(100vh - 3px);
+				/* 留出进度条空间 */
 			}
 
 			.menu-toggle {
@@ -317,7 +325,8 @@
 
 		/* 新增阅读进度条 */
 		.progress-bar {
-			display: none; /* 隐藏进度条 */
+			display: none;
+			/* 隐藏进度条 */
 			position: fixed;
 			top: 0;
 			left: 0;
@@ -562,11 +571,15 @@
 		/* PC端布局优化 */
 		@media (min-width: 769px) {
 			.sidebar {
-				overflow-y: auto !important;  /* 强制独立滚动 */
+				overflow-y: auto !important;
+				/* 强制独立滚动 */
 			}
+
 			.content {
-				overflow-y: auto;  /* 添加独立滚动 */
-				height: calc(100vh - 3px); /* 留出进度条空间 */
+				overflow-y: auto;
+				/* 添加独立滚动 */
+				height: calc(100vh - 3px);
+				/* 留出进度条空间 */
 			}
 		}
 
@@ -577,12 +590,15 @@
 				-webkit-overflow-scrolling: touch;
 				scroll-behavior: smooth;
 				overscroll-behavior: contain;
-				touch-action: pan-y; /* 优化垂直滚动 */
+				touch-action: pan-y;
+				/* 优化垂直滚动 */
 			}
 
 			/* 增大触摸区域 */
-			.toc-category, .toc-subitem {
-				min-height: 48px; /* 最小触摸高度 */
+			.toc-category,
+			.toc-subitem {
+				min-height: 48px;
+				/* 最小触摸高度 */
 				padding: 12px !important;
 			}
 		}
@@ -629,7 +645,8 @@
 			position: fixed;
 			bottom: 2rem;
 			right: 2rem;
-			z-index: 1001; /* 提升层级到最高 */
+			z-index: 1001;
+			/* 提升层级到最高 */
 			background: var(--primary);
 			color: white;
 			padding: 1rem 1.5rem;
@@ -655,7 +672,8 @@
 
 		@media (max-width: 768px) {
 			.download-btn {
-				bottom: 5rem; /* 提升到浮动目录按钮上方 */
+				bottom: 5rem;
+				/* 提升到浮动目录按钮上方 */
 				right: 1.5rem;
 				padding: 0.8rem 1.2rem;
 				font-size: 0.9rem;
@@ -696,9 +714,10 @@
 		/* 移动端适配 */
 		@media (max-width: 768px) {
 			.download-btn {
-				bottom: 5rem; /* 避免被浮动按钮遮挡 */
+				bottom: 5rem;
+				/* 避免被浮动按钮遮挡 */
 			}
-			
+
 			.format-menu {
 				right: -50%;
 				bottom: auto;
@@ -709,33 +728,8 @@
 		/* 确保Markdown内容不会覆盖按钮 */
 		.markdown-content {
 			position: relative;
-			z-index: 1; /* 保持默认层级 */
-		}
-
-		@media (max-width: 768px) {
-			.toc-overlay.active {
-				opacity: 1;
-				visibility: visible;
-				/* 新增滚动锁定 */
-				position: fixed;
-				overflow: hidden;
-			}
-
-			/* 新增页面滚动锁定 */
-			body.toc-active {
-				overflow: hidden;
-				position: fixed;
-				width: 100%;
-				height: 100%;
-			}
-
-			.mobile-toc {
-				/* 修改滚动容器高度 */
-				max-height: 70vh;
-				/* 增强滚动隔离 */
-				overscroll-behavior: contain;
-				touch-action: pan-y;
-			}
+			z-index: 1;
+			/* 保持默认层级 */
 		}
 	</style>
 </head>
@@ -854,44 +848,15 @@
 
 		floatingToc.addEventListener('click', (e) => {
 			e.stopPropagation();
-			const wasActive = floatingToc.classList.toggle('active');
-			tocOverlay.classList.toggle('active', wasActive);
-			
-			// 优化滚动锁定逻辑
-			document.body.classList.toggle('toc-active', wasActive);
-			document.documentElement.style.overflow = wasActive ? 'hidden' : '';
-			
-			// 新增布局修正
-			if (!wasActive) {
-				setTimeout(() => {
-					document.body.style.position = 'static';
-					window.scrollTo(0, scrollPosition);
-				}, 10);
-			}
+			floatingToc.classList.toggle('active');
+			tocOverlay.classList.toggle('active');
 		});
 
-		// 修正后的触摸事件处理
-		const mobileToc = document.querySelector('.mobile-toc'); // 确保选择器正确
-
-		// 新增初始化检查
-		if (mobileToc) {
-			mobileToc.addEventListener('touchstart', handleTouchStart, { passive: true });
-			mobileToc.addEventListener('touchmove', handleTouchMove, { passive: false });
-		}
-
-		// 优化后的关闭逻辑
+		// 点击外部关闭
 		tocOverlay.addEventListener('click', (e) => {
 			if (e.target === tocOverlay) {
-				scrollPosition = window.scrollY;
 				floatingToc.classList.remove('active');
 				tocOverlay.classList.remove('active');
-				document.body.classList.remove('toc-active');
-				document.documentElement.style.overflow = '';
-				
-				// 强制重绘修复
-				document.body.style.display = 'none';
-				document.body.offsetHeight; // 触发重绘
-				document.body.style.display = '';
 			}
 		});
 
@@ -1036,6 +1001,168 @@
 			}
 		});
 
+		// 增强移动端目录滚动处理
+		let isTouchingToc = false;
+		const mobileToc = document.querySelector('.mobile-toc');
+
+		// 修改触摸事件处理
+		let momentum = 0;
+		let lastTime = 0;
+
+		mobileToc.addEventListener('touchstart', e => {
+			lastY = e.touches[0].clientY;
+			momentum = 0;
+			lastTime = Date.now();
+		}, { passive: true });
+
+		mobileToc.addEventListener('touchmove', e => {
+			const now = Date.now();
+			const deltaTime = now - lastTime;
+			lastTime = now;
+
+			const currentY = e.touches[0].clientY;
+			const deltaY = currentY - lastY;
+			lastY = currentY;
+
+			// 计算动量
+			momentum = deltaY / deltaTime;
+
+			// 应用滚动
+			mobileToc.scrollTop -= deltaY * 0.8; // 调整滚动灵敏度
+		}, { passive: true });
+
+		// 添加惯性滚动
+		mobileToc.addEventListener('touchend', () => {
+			if (Math.abs(momentum) > 0.1) {
+				const startTime = Date.now();
+				const duration = 500; // 最大惯性持续时间
+
+				const animate = () => {
+					const elapsed = Date.now() - startTime;
+					if (elapsed > duration) return;
+
+					// 应用缓动效果
+					const progress = 1 - (elapsed / duration);
+					const delta = momentum * 50 * progress;
+
+					mobileToc.scrollTop -= delta;
+					requestAnimationFrame(animate);
+				};
+
+				requestAnimationFrame(animate);
+			}
+		}, { passive: true });
+
+		// 配置对象（方便后续维护）
+		const CONFIG = {
+			WELCOME_PAGE_PATH: '/test/md/welcome-page.md', // 注意路径前缀
+			CACHE_TTL: 300000, // 5分钟缓存
+			FALLBACK_CONTENT: `# 🎉 欢迎使用\n暂时无法加载最新内容，显示缓存版本`
+		};
+
+		// 增强版内容加载器
+		class ContentLoader {
+			constructor() {
+				this.cache = null;
+				this.lastFetch = 0;
+			}
+
+			async loadWelcomePage() {
+				try {
+					// 优先使用有效缓存
+					if (this._isCacheValid()) {
+						return this.cache;
+					}
+
+					// 发起网络请求
+					const response = await fetch(CONFIG.WELCOME_PAGE_PATH);
+
+					// HTTP状态检查
+					if (!response.ok) {
+						throw new Error(`HTTP错误 ${response.status}`);
+					}
+
+					// 解析内容
+					const markdown = await response.text();
+					const html = marked.parse(markdown);
+
+					// 更新缓存
+					this._updateCache(html);
+					return html;
+
+				} catch (error) {
+					console.error('内容加载失败:', error);
+					return this._handleError(error);
+				}
+			}
+
+			_isCacheValid() {
+				return this.cache && (Date.now() - this.lastFetch < CONFIG.CACHE_TTL);
+			}
+
+			_updateCache(content) {
+				this.cache = content;
+				this.lastFetch = Date.now();
+				localStorage.setItem('welcomeCache', JSON.stringify({
+					content: content,
+					timestamp: this.lastFetch
+				}));
+			}
+
+			_loadFromStorage() {
+				const stored = localStorage.getItem('welcomeCache');
+				if (stored) {
+					const { content, timestamp } = JSON.parse(stored);
+					this.cache = content;
+					this.lastFetch = timestamp;
+				}
+			}
+
+			_handleError(error) {
+				// 尝试加载本地缓存
+				this._loadFromStorage();
+				return this.cache || CONFIG.FALLBACK_CONTENT;
+			}
+		}
+
+		// 修改初始化流程
+		document.addEventListener('DOMContentLoaded', async () => {
+			const container = document.getElementById('welcome-container');
+			const loader = new ContentLoader();
+
+			// 显示加载状态
+			container.innerHTML = `
+				<div class="loading-state">
+					<div class="spinner"></div>
+					<p>正在加载最新内容...</p>
+				</div>
+			`;
+
+			try {
+				// 异步加载内容
+				const content = await loader.loadWelcomePage();
+				container.innerHTML = content;
+
+				// 初始化可视化组件
+				initMermaid();  // 移除非必要的this
+				initTooltips(); // 使用独立函数
+
+			} catch (error) {
+				container.innerHTML = `
+					<div class="error-state">
+						<h3>⚠️ 内容加载失败</h3>
+						<p>${error.message}</p>
+						<button class="retry-btn">点击重试</button>
+					</div>
+				`;
+
+				// 绑定重试按钮
+				document.querySelector('.retry-btn').addEventListener('click', () => {
+					location.reload();
+				});
+			}
+		});
+
 		// 修改为独立函数
 		function initMermaid() {
 			if (typeof mermaid !== 'undefined') {
@@ -1109,14 +1236,14 @@
 		// 增强版下载功能
 		function downloadContent(format = 'txt') {
 			let content, mimeType, extension;
-			
-			switch(format) {
+
+			switch (format) {
 				case 'md':
 					content = currentContent;
 					mimeType = 'text/markdown';
 					extension = 'md';
 					break;
-					
+
 				case 'doc':
 					// 简单转换Markdown为HTML
 					const htmlContent = `
@@ -1138,7 +1265,7 @@
 					mimeType = 'application/msword';
 					extension = 'doc';
 					break;
-					
+
 				default: // txt
 					content = document.querySelector('.markdown-content').innerText;
 					mimeType = 'text/plain';
@@ -1147,7 +1274,7 @@
 
 			const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
 			const url = URL.createObjectURL(blob);
-			
+
 			const a = document.createElement('a');
 			a.href = url;
 			a.download = `培训内容-${new Date().toLocaleDateString()}.${extension}`;
@@ -1156,6 +1283,23 @@
 			document.body.removeChild(a);
 			URL.revokeObjectURL(url);
 		}
+
+		// 添加滚动状态检测
+		let scrollTimeout;
+		mobileToc.addEventListener('scroll', () => {
+			mobileToc.classList.add('scrolling');
+			clearTimeout(scrollTimeout);
+			scrollTimeout = setTimeout(() => {
+				mobileToc.classList.remove('scrolling');
+			}, 500);
+		});
+
+		// 阻止外层滚动传播
+		document.querySelector('.toc-overlay').addEventListener('wheel', (e) => {
+			if(e.target.closest('.mobile-toc')) {
+				e.stopPropagation();
+			}
+		}, { passive: true });
 	</script>
 </body>
 
