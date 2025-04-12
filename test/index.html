@@ -209,14 +209,14 @@
 			body {
 				display: flex;
 				min-height: 100vh;
+				overflow: hidden; /* 禁止外层滚动 */
 			}
 
 			.sidebar {
 				width: 300px;
 				height: 100vh;
-				position: sticky;
-				top: 0;
-				overflow-y: auto;
+				position: fixed; /* 改为固定定位 */
+				overflow-y: auto !important; /* 强制独立滚动 */
 				transform: none !important;
 				box-shadow: 8px 0 40px rgba(108, 92, 231, 0.1);
 				border-right: 1px solid var(--secondary);
@@ -234,12 +234,12 @@
 
 			.content {
 				flex: 1;
+				margin-left: 300px; /* 留出侧边栏空间 */
+				height: 100vh; /* 全屏高度 */
+				overflow-y: auto; /* 独立滚动 */
 				padding: 2rem 4rem;
-				max-width: calc(100vw - 300px);
-				overflow-y: auto;
-				/* 添加独立滚动 */
-				height: calc(100vh - 3px);
-				/* 留出进度条空间 */
+				position: relative;
+				z-index: 1; /* 确保内容在侧边栏上方 */
 			}
 
 			.menu-toggle {
