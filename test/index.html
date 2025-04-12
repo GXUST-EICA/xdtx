@@ -711,6 +711,32 @@
 			position: relative;
 			z-index: 1; /* 保持默认层级 */
 		}
+
+		@media (max-width: 768px) {
+			.toc-overlay.active {
+				opacity: 1;
+				visibility: visible;
+				/* 新增滚动锁定 */
+				position: fixed;
+				overflow: hidden;
+			}
+
+			/* 新增页面滚动锁定 */
+			body.toc-active {
+				overflow: hidden;
+				position: fixed;
+				width: 100%;
+				height: 100%;
+			}
+
+			.mobile-toc {
+				/* 修改滚动容器高度 */
+				max-height: 70vh;
+				/* 增强滚动隔离 */
+				overscroll-behavior: contain;
+				touch-action: pan-y;
+			}
+		}
 	</style>
 </head>
 
@@ -830,13 +856,59 @@
 			e.stopPropagation();
 			floatingToc.classList.toggle('active');
 			tocOverlay.classList.toggle('active');
+			
+			// 新增滚动锁定逻辑
+			if (tocOverlay.classList.contains('active')) {
+				document.body.classList.add('toc-active');
+				document.documentElement.style.overflow = 'hidden';
+			} else {
+				document.body.classList.remove('toc-active');
+				document.documentElement.style.overflow = '';
+			}
 		});
 
-		// 点击外部关闭
+		// 修改触摸事件处理逻辑
+		let startY = 0;
+		let lastY = 0;
+
+		// 触摸开始
+		mobileToc.addEventListener('touchstart', e => {
+			startY = e.touches[0].clientY;
+			lastY = startY;
+		}, { passive: true });
+
+		// 触摸移动
+		mobileToc.addEventListener('touchmove', e => {
+			const currentY = e.touches[0].clientY;
+			const deltaY = currentY - lastY;
+			lastY = currentY;
+
+			// 计算滚动边界
+			const atTop = mobileToc.scrollTop <= 0 && deltaY > 0;
+			const atBottom = mobileToc.scrollTop + mobileToc.clientHeight >= mobileToc.scrollHeight && deltaY < 0;
+
+			// 仅在需要时阻止默认滚动
+			if (!atTop && !atBottom) {
+				e.preventDefault();
+			}
+			
+			mobileToc.scrollTop -= deltaY;
+		}, { passive: false });
+
+		// 新增：关闭时恢复滚动位置
+		let scrollPosition = 0;
 		tocOverlay.addEventListener('click', (e) => {
 			if (e.target === tocOverlay) {
-				floatingToc.classList.remove('active');
-				tocOverlay.classList.remove('active');
+				scrollPosition = window.scrollY;
+				document.body.classList.remove('toc-active');
+				document.documentElement.style.overflow = '';
+			}
+		});
+
+		// 新增：防止页面滚动恢复
+		window.addEventListener('scroll', () => {
+			if (document.body.classList.contains('toc-active')) {
+				window.scrollTo(0, scrollPosition);
 			}
 		});
 
@@ -978,158 +1050,6 @@
 				!e.target.closest('.sidebar') &&
 				!e.target.closest('.menu-toggle')) {
 				document.querySelector('.sidebar').classList.remove('active');
-			}
-		});
-
-		// 添加滚动隔离逻辑
-		let isTouchingToc = false;
-		const mobileToc = document.querySelector('.mobile-toc');
-
-		// 触摸开始
-		mobileToc.addEventListener('touchstart', e => {
-			isTouchingToc = true;
-			startY = e.touches[0].clientY;
-			lastY = startY;
-		}, { passive: true });
-
-		// 触摸移动
-		mobileToc.addEventListener('touchmove', e => {
-			if (!isTouchingToc) return;
-			
-			const currentY = e.touches[0].clientY;
-			const deltaY = currentY - lastY;
-			lastY = currentY;
-
-			// 计算是否需要阻止默认滚动
-			const atTop = mobileToc.scrollTop <= 0 && deltaY > 0;
-			const atBottom = mobileToc.scrollTop + mobileToc.clientHeight >= mobileToc.scrollHeight && deltaY < 0;
-			
-			if (!atTop && !atBottom) {
-				e.preventDefault(); // 阻止默认滚动
-			}
-			
-			mobileToc.scrollTop -= deltaY;
-		}, { passive: false });
-
-		// 触摸结束
-		mobileToc.addEventListener('touchend', () => {
-			isTouchingToc = false;
-		}, { passive: true });
-
-		// 阻止页面滚动穿透
-		document.body.addEventListener('touchmove', e => {
-			if (isTouchingToc) {
-				e.preventDefault();
-			}
-		}, { passive: false });
-
-		// 配置对象（方便后续维护）
-		const CONFIG = {
-			WELCOME_PAGE_PATH: '/test/md/welcome-page.md', // 注意路径前缀
-			CACHE_TTL: 300000, // 5分钟缓存
-			FALLBACK_CONTENT: `# 🎉 欢迎使用\n暂时无法加载最新内容，显示缓存版本`
-		};
-
-		// 增强版内容加载器
-		class ContentLoader {
-			constructor() {
-				this.cache = null;
-				this.lastFetch = 0;
-			}
-
-			async loadWelcomePage() {
-				try {
-					// 优先使用有效缓存
-					if (this._isCacheValid()) {
-						return this.cache;
-					}
-
-					// 发起网络请求
-					const response = await fetch(CONFIG.WELCOME_PAGE_PATH);
-
-					// HTTP状态检查
-					if (!response.ok) {
-						throw new Error(`HTTP错误 ${response.status}`);
-					}
-
-					// 解析内容
-					const markdown = await response.text();
-					const html = marked.parse(markdown);
-
-					// 更新缓存
-					this._updateCache(html);
-					return html;
-
-				} catch (error) {
-					console.error('内容加载失败:', error);
-					return this._handleError(error);
-				}
-			}
-
-			_isCacheValid() {
-				return this.cache && (Date.now() - this.lastFetch < CONFIG.CACHE_TTL);
-			}
-
-			_updateCache(content) {
-				this.cache = content;
-				this.lastFetch = Date.now();
-				localStorage.setItem('welcomeCache', JSON.stringify({
-					content: content,
-					timestamp: this.lastFetch
-				}));
-			}
-
-			_loadFromStorage() {
-				const stored = localStorage.getItem('welcomeCache');
-				if (stored) {
-					const { content, timestamp } = JSON.parse(stored);
-					this.cache = content;
-					this.lastFetch = timestamp;
-				}
-			}
-
-			_handleError(error) {
-				// 尝试加载本地缓存
-				this._loadFromStorage();
-				return this.cache || CONFIG.FALLBACK_CONTENT;
-			}
-		}
-
-		// 修改初始化流程
-		document.addEventListener('DOMContentLoaded', async () => {
-			const container = document.getElementById('welcome-container');
-			const loader = new ContentLoader();
-
-			// 显示加载状态
-			container.innerHTML = `
-				<div class="loading-state">
-					<div class="spinner"></div>
-					<p>正在加载最新内容...</p>
-				</div>
-			`;
-
-			try {
-				// 异步加载内容
-				const content = await loader.loadWelcomePage();
-				container.innerHTML = content;
-
-				// 初始化可视化组件
-				initMermaid();  // 移除非必要的this
-				initTooltips(); // 使用独立函数
-
-			} catch (error) {
-				container.innerHTML = `
-					<div class="error-state">
-						<h3>⚠️ 内容加载失败</h3>
-						<p>${error.message}</p>
-						<button class="retry-btn">点击重试</button>
-					</div>
-				`;
-
-				// 绑定重试按钮
-				document.querySelector('.retry-btn').addEventListener('click', () => {
-					location.reload();
-				});
 			}
 		});
 
