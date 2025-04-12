@@ -776,6 +776,25 @@
 			background: var(--primary);
 			border-radius: 3px;
 		}
+
+		/* 修复内容区域滚动 */
+		.content {
+			overflow-y: auto !important;
+			-webkit-overflow-scrolling: touch;
+			height: calc(100vh - 60px); /* 留出顶部空间 */
+			padding: 1rem !important;
+		}
+
+		.markdown-content {
+			min-height: 120vh; /* 确保可滚动区域 */
+			overflow: visible !important;
+		}
+
+		/* 增强触摸滚动 */
+		.course-content {
+			overscroll-behavior: contain;
+			touch-action: pan-y;
+		}
 	</style>
 </head>
 
@@ -1325,6 +1344,32 @@
 				e.stopPropagation();
 			}
 		}, { passive: true });
+
+		// 在内容加载完成后执行
+		function initContentScroll() {
+			const content = document.querySelector('.content');
+			let startY = 0;
+
+			content.addEventListener('touchstart', e => {
+				startY = e.touches[0].clientY;
+			}, { passive: true });
+
+			content.addEventListener('touchmove', e => {
+				const currentY = e.touches[0].clientY;
+				const deltaY = currentY - startY;
+				
+				// 允许垂直滚动
+				if (Math.abs(deltaY) > 5) {
+					content.scrollTop -= deltaY;
+					e.preventDefault();
+				}
+			}, { passive: false });
+		}
+
+		// 在DOM加载完成后调用
+		document.addEventListener('DOMContentLoaded', () => {
+			initContentScroll();
+		});
 	</script>
 </body>
 
