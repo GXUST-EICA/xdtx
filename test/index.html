@@ -464,6 +464,56 @@
 			background: rgba(108, 92, 231, 0.1);
 			border-radius: 8px;
 		}
+
+		/* 加载状态指示器 */
+		.loading-indicator {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 2rem;
+			min-height: 300px;
+		}
+
+		.spinner {
+			width: 40px;
+			height: 40px;
+			border: 4px solid rgba(108, 92, 231, 0.2);
+			border-top-color: var(--primary);
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+		}
+
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+
+		/* 错误提示样式 */
+		.error-message {
+			text-align: center;
+			padding: 2rem;
+			background: rgba(255, 0, 0, 0.05);
+			border-radius: 8px;
+			
+			button {
+				margin-top: 1rem;
+				padding: 0.5rem 1rem;
+				background: var(--primary);
+				color: white;
+				border: none;
+				border-radius: 4px;
+				cursor: pointer;
+			}
+		}
+
+		/* Markdown内容渐显动画 */
+		.markdown-content {
+			animation: fadeIn 0.5s ease-out;
+		}
+
+		@keyframes fadeIn {
+			from { opacity: 0; transform: translateY(20px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
 	</style>
 </head>
 
@@ -486,8 +536,8 @@
 	<main class="content">
 		<h1>协会培训中心</h1>
 		<div class="course-content">
-			<article class="markdown-content">
-				${await loadWelcomePage()}
+			<article class="markdown-content" id="welcome-container">
+				<!-- 内容将由JavaScript动态加载 -->
 			</article>
 		</div>
 	</main>
@@ -595,8 +645,8 @@
 		            (text.toLowerCase().includes(term) ? 'block' : 'none') : 
 		            'block';
 		    });
-		});
-		
+		}, 300));
+
 		// 添加文件缓存
 		const fileCache = new Map();
 		async function loadFile(path) {
@@ -761,16 +811,138 @@
 			}
 		}, { passive: false });
 
-		// 新增欢迎页加载函数
-		async function loadWelcomePage() {
-			try {
-				const response = await fetch('test/md/welcome-page.md');
-				const markdown = await response.text();
-				return marked.parse(markdown);
-			} catch (error) {
-				console.error('欢迎页加载失败:', error);
-				return marked.parse(`# ⚠️ 欢迎信息加载失败\n请检查网络连接或联系管理员`);
+		// 配置对象（方便后续维护）
+		const CONFIG = {
+			WELCOME_PAGE_PATH: '/test/md/welcome-page.md', // 注意路径前缀
+			CACHE_TTL: 300000, // 5分钟缓存
+			FALLBACK_CONTENT: `# 🎉 欢迎使用\n暂时无法加载最新内容，显示缓存版本`
+		};
+
+		// 增强版内容加载器
+		class ContentLoader {
+			constructor() {
+				this.cache = null;
+				this.lastFetch = 0;
 			}
+
+			async loadWelcomePage() {
+				try {
+					// 优先使用有效缓存
+					if(this._isCacheValid()) {
+						return this.cache;
+					}
+
+					// 发起网络请求
+					const response = await fetch(CONFIG.WELCOME_PAGE_PATH);
+					
+					// HTTP状态检查
+					if (!response.ok) {
+						throw new Error(`HTTP错误 ${response.status}`);
+					}
+
+					// 解析内容
+					const markdown = await response.text();
+					const html = marked.parse(markdown);
+
+					// 更新缓存
+					this._updateCache(html);
+					return html;
+
+				} catch (error) {
+					console.error('内容加载失败:', error);
+					return this._handleError(error);
+				}
+			}
+
+			_isCacheValid() {
+				return this.cache && (Date.now() - this.lastFetch < CONFIG.CACHE_TTL);
+			}
+
+			_updateCache(content) {
+				this.cache = content;
+				this.lastFetch = Date.now();
+				localStorage.setItem('welcomeCache', JSON.stringify({
+					content: content,
+					timestamp: this.lastFetch
+				}));
+			}
+
+			_loadFromStorage() {
+				const stored = localStorage.getItem('welcomeCache');
+				if (stored) {
+					const { content, timestamp } = JSON.parse(stored);
+					this.cache = content;
+					this.lastFetch = timestamp;
+				}
+			}
+
+			_handleError(error) {
+				// 尝试加载本地缓存
+				this._loadFromStorage();
+				return this.cache || CONFIG.FALLBACK_CONTENT;
+			}
+		}
+
+		// 初始化加载流程
+		document.addEventListener('DOMContentLoaded', async () => {
+			const container = document.getElementById('welcome-container');
+			const loader = new ContentLoader();
+
+			// 显示加载状态
+			container.innerHTML = `
+				<div class="loading-state">
+					<div class="spinner"></div>
+					<p>正在加载最新内容...</p>
+				</div>
+			`;
+
+			try {
+				// 异步加载内容
+				const content = await loader.loadWelcomePage();
+				container.innerHTML = content;
+
+				// 初始化可视化组件
+				this._initMermaid();
+				this._initTooltips();
+
+			} catch (error) {
+				container.innerHTML = `
+					<div class="error-state">
+						<h3>⚠️ 内容加载失败</h3>
+						<p>${error.message}</p>
+						<button class="retry-btn">点击重试</button>
+					</div>
+				`;
+				
+				// 绑定重试按钮
+				document.querySelector('.retry-btn').addEventListener('click', () => {
+					location.reload();
+				});
+			}
+		});
+
+		// 初始化Mermaid流程图
+		function _initMermaid() {
+			if (typeof mermaid !== 'undefined') {
+				mermaid.initialize({
+					theme: 'neutral',
+					securityLevel: 'loose',
+					flowchart: { 
+						curve: 'basis',
+						htmlLabels: true
+					}
+				});
+				mermaid.init(undefined, '.mermaid');
+			}
+		}
+
+		// 初始化工具提示
+		function _initTooltips() {
+			tippy('[data-tippy-content]', {
+				arrow: true,
+				animation: 'fade',
+				theme: 'light-border'
+			});
 		}
 	</script>
 </body>
