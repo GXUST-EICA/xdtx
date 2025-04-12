@@ -660,7 +660,7 @@
 	<script src="style/marked.min.js"></script>
 
 	<!-- 流程图支持 -->
-	<script src="style/mermaid.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
 
 	<!-- 工具提示库 -->
 	<script src="style/popper.min.js"></script>
@@ -1052,10 +1052,13 @@
 						curve: 'basis',
 						htmlLabels: true
 					},
-					startOnLoad: false  // 添加此配置
+					startOnLoad: true  // 必须设置为true
 				});
-				// 使用兼容的初始化方式
-				mermaid.init(undefined, '.markdown-content .mermaid');
+				// 使用正确的选择器
+				mermaid.init({
+					noteMargin: 10,
+					useMaxWidth: true
+				}, '.markdown-content pre code.language-mermaid'); // 匹配实际生成的class
 			}
 		}
 
@@ -1070,13 +1073,13 @@
 			}
 		}
 
-		// 修改marked渲染器添加复制按钮
+		// 修改marked渲染器确保正确添加mermaid类
 		const renderer = new marked.Renderer();
 		renderer.code = function (code, language) {
 			const isMermaid = language === 'mermaid';
 			return `
 				<div style="position: relative">
-					<pre><code class="${language}">${code}</code></pre>
+					<pre class="${isMermaid ? 'mermaid' : ''}"><code class="language-${language}">${isMermaid ? code : escape(code)}</code></pre>
 					${!isMermaid ? `<button class="copy-btn" onclick="copyCode(this)">复制</button>` : ''}
 				</div>
 			`;
@@ -1094,7 +1097,7 @@
 			});
 		}
 
-		// 在内容加载处使用自定义渲染器
+		// 在内容加载完成后调用初始化
 		// 修改内容加载逻辑
 		contentArea.innerHTML = `
 			<article class="markdown-content">
@@ -1102,10 +1105,8 @@
 			</article>
 		`;
 
-		// 在初始化流程中调用mermaid
-		if (typeof mermaid !== 'undefined') {
-			mermaid.init(undefined, '.markdown-content pre code.mermaid');
-		}
+		// 确保在DOM更新后初始化
+		setTimeout(initMermaid, 50); // 添加延迟确保DOM渲染完成
 
 		// 修复移动端目录项点击绑定（使用事件委托）
 		document.querySelector('.mobile-toc').addEventListener('click', (e) => {
