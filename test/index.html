@@ -125,6 +125,10 @@
 				scrollbar-width: thin;
 				/* Firefox */
 				scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
+				overflow-x: hidden;
+				/* 新增横向滚动隐藏 */
+				width: calc(100% - 2rem);
+				/* 确保宽度适配 */
 			}
 
 			.toc-overlay.active .mobile-toc {
@@ -135,6 +139,8 @@
 			.toc-category {
 				margin: 0.5rem 0;
 				background: rgba(255, 255, 255, 0.9);
+				width: 100%;
+				box-sizing: border-box;
 			}
 
 			.toc-subitem {
@@ -142,6 +148,11 @@
 				font-size: 0.95rem;
 				border-radius: 12px;
 				margin: 4px 0;
+				white-space: normal;
+				/* 确保文本换行 */
+				max-width: 100%;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 
 			/* 搜索框优化 */
@@ -182,6 +193,12 @@
 				min-height: 56px;
 				/* 最小触摸高度 */
 				-webkit-tap-highlight-color: var(--tap-highlight);
+			}
+
+			/* 隐藏横向滚动条 */
+			.mobile-toc::-webkit-scrollbar:horizontal {
+				display: none;
+				height: 0;
 			}
 		}
 
@@ -586,12 +603,10 @@
 		/* 移动端滚动优化 */
 		@media (max-width: 768px) {
 			.mobile-toc {
-				overflow-y: auto !important;
-				-webkit-overflow-scrolling: touch;
 				scroll-behavior: smooth;
+				-webkit-overflow-scrolling: touch;
+				/* 增加弹性效果 */
 				overscroll-behavior: contain;
-				touch-action: pan-y;
-				/* 优化垂直滚动 */
 			}
 
 			/* 增大触摸区域 */
@@ -642,11 +657,10 @@
 
 		/* 新增下载按钮样式 */
 		.download-btn {
-			position: fixed;
-			bottom: 2rem;
-			right: 2rem;
 			z-index: 1001;
 			/* 提升层级到最高 */
+			bottom: 2rem;
+			right: 2rem;
 			background: var(--primary);
 			color: white;
 			padding: 1rem 1.5rem;
@@ -672,11 +686,14 @@
 
 		@media (max-width: 768px) {
 			.download-btn {
-				bottom: 5rem;
+				bottom: 8rem;
 				/* 提升到浮动目录按钮上方 */
 				right: 1.5rem;
-				padding: 0.8rem 1.2rem;
-				font-size: 0.9rem;
+				padding: 1rem 1.5rem;
+				/* 增大点击区域 */
+				font-size: 1rem;
+				box-shadow: 0 8px 24px rgba(108, 92, 231, 0.4);
+				/* 增强阴影 */
 			}
 		}
 
@@ -731,6 +748,125 @@
 			z-index: 1;
 			/* 保持默认层级 */
 		}
+
+		/* 新增外层滚动锁定 */
+		body.toc-open {
+			overflow: hidden;
+			position: fixed;
+			width: 100%;
+			height: 100%;
+		}
+
+		.toc-overlay {
+			touch-action: none;
+			/* 完全禁用外层触摸滚动 */
+			overscroll-behavior: none;
+		}
+
+		.mobile-toc {
+			overscroll-behavior: contain;
+			touch-action: pan-y;
+			/* 仅允许垂直滚动 */
+			scroll-snap-type: y proximity;
+			/* 增加滚动吸附效果 */
+			max-height: 82vh;
+			/* 视觉高度优化 */
+		}
+
+		/* 滚动条视觉优化 */
+		.mobile-toc::-webkit-scrollbar {
+			width: 6px;
+			background: rgba(108, 92, 231, 0.05);
+		}
+
+		.mobile-toc::-webkit-scrollbar-thumb {
+			background: var(--primary);
+			border-radius: 3px;
+		}
+
+		/* 修复内容区域滚动 */
+		.content {
+			overflow-y: auto !important;
+			-webkit-overflow-scrolling: touch;
+			height: calc(100vh - 60px);
+			/* 留出顶部空间 */
+			padding: 1rem !important;
+		}
+
+		.markdown-content {
+			min-height: 120vh;
+			/* 确保可滚动区域 */
+			overflow: visible !important;
+		}
+
+		/* 增强触摸滚动 */
+		.course-content {
+			overscroll-behavior: contain;
+			touch-action: pan-y;
+		}
+
+		@media (max-width: 768px) {
+			.content {
+				scroll-behavior: smooth;
+				-webkit-overflow-scrolling: touch;
+				/* 增加滚动阻力 */
+				scroll-snap-type: y mandatory;
+				overscroll-behavior-y: contain;
+			}
+
+			.markdown-content {
+				/* 增加滚动惯性 */
+				scroll-snap-stop: always;
+				scroll-snap-align: start;
+
+				/* 优化段落间距 */
+				p,
+				pre,
+				table {
+					margin: 1.2rem 0;
+					scroll-snap-align: start;
+				}
+			}
+		}
+
+		/* 增加动量滚动效果 */
+		@supports (-webkit-overflow-scrolling: touch) {
+			.content {
+				overflow-y: scroll;
+			}
+		}
+
+		/* 重写下载按钮定位 */
+		.download-container {
+			position: fixed;
+			z-index: 9999;
+			/* 最高优先级 */
+			bottom: 2rem;
+			right: 2rem;
+			pointer-events: none;
+			/* 允许穿透点击 */
+		}
+
+		.download-btn {
+			position: relative;
+			pointer-events: auto;
+			/* 恢复点击 */
+			/* 保持原有样式... */
+		}
+
+		@media (max-width: 768px) {
+			.download-container {
+				bottom: calc(100vh - 120px);
+				/* 动态定位 */
+				right: 1rem;
+			}
+		}
+
+		/* 确保遮罩层不会覆盖 */
+		.toc-overlay {
+			z-index: 1000;
+			/* 低于下载按钮 */
+		}
 	</style>
 </head>
 
@@ -742,11 +878,16 @@
 	<div class="toc-overlay">
 		<div class="mobile-toc">
 			<div class="search-box">
-				<input type="text" id="mobile-search" placeholder="🔍 搜索课程..."
+				<input type="text" id="mobile-search" placeholder="搜索课程..."
 					style="width:100%; border-radius:12px; border:1px solid var(--secondary)">
 			</div>
 			<div class="toc" id="mobile-toc"></div>
 		</div>
+	</div>
+
+	<!-- 新增下载按钮容器 -->
+	<div class="download-container">
+		<button class="download-btn" id="download-md">下载当前文档</button>
 	</div>
 
 	<!-- 内容区域 -->
@@ -755,17 +896,6 @@
 		<div class="course-content">
 			<article class="markdown-content" id="welcome-container">
 				<!-- 内容将由JavaScript动态加载 -->
-				<!-- 新增下载按钮 -->
-				<div class="download-container">
-					<div class="download-btn" onclick="toggleFormatMenu()">
-						下载本页内容
-						<div class="format-menu">
-							<div class="format-option" onclick="downloadContent('txt')">文本文件</div>
-							<div class="format-option" onclick="downloadContent('md')">Markdown</div>
-							<div class="format-option" onclick="downloadContent('doc')">Word文档</div>
-						</div>
-					</div>
-				</div>
 			</article>
 		</div>
 	</main>
@@ -850,6 +980,7 @@
 			e.stopPropagation();
 			floatingToc.classList.toggle('active');
 			tocOverlay.classList.toggle('active');
+			document.body.classList.toggle('toc-open'); // 新增body状态
 		});
 
 		// 点击外部关闭
@@ -1006,52 +1137,31 @@
 		const mobileToc = document.querySelector('.mobile-toc');
 
 		// 修改触摸事件处理
-		let momentum = 0;
-		let lastTime = 0;
-
+		let startY = 0;
 		mobileToc.addEventListener('touchstart', e => {
-			lastY = e.touches[0].clientY;
-			momentum = 0;
-			lastTime = Date.now();
+			startY = e.touches[0].clientY;
 		}, { passive: true });
 
 		mobileToc.addEventListener('touchmove', e => {
-			const now = Date.now();
-			const deltaTime = now - lastTime;
-			lastTime = now;
+			// 阻止外层滚动
+			e.stopPropagation();
 
 			const currentY = e.touches[0].clientY;
-			const deltaY = currentY - lastY;
-			lastY = currentY;
+			const deltaY = currentY - startY;
+			startY = currentY;
 
-			// 计算动量
-			momentum = deltaY / deltaTime;
-
-			// 应用滚动
-			mobileToc.scrollTop -= deltaY * 0.8; // 调整滚动灵敏度
-		}, { passive: true });
-
-		// 添加惯性滚动
-		mobileToc.addEventListener('touchend', () => {
-			if (Math.abs(momentum) > 0.1) {
-				const startTime = Date.now();
-				const duration = 500; // 最大惯性持续时间
-
-				const animate = () => {
-					const elapsed = Date.now() - startTime;
-					if (elapsed > duration) return;
-
-					// 应用缓动效果
-					const progress = 1 - (elapsed / duration);
-					const delta = momentum * 50 * progress;
-
-					mobileToc.scrollTop -= delta;
-					requestAnimationFrame(animate);
-				};
-
-				requestAnimationFrame(animate);
+			// 仅允许垂直滚动
+			if (Math.abs(deltaY) > 5) {
+				mobileToc.scrollTop -= deltaY;
 			}
-		}, { passive: true });
+		}, { passive: false }); // 改为非被动事件
+
+		// 关闭时恢复滚动
+		function closeToc() {
+			floatingToc.classList.remove('active');
+			tocOverlay.classList.remove('active');
+			document.body.classList.remove('toc-open');
+		}
 
 		// 配置对象（方便后续维护）
 		const CONFIG = {
@@ -1226,63 +1336,56 @@
 			currentContent = rawMarkdown;
 		}
 
-		// 显示/隐藏格式菜单
-		function toggleFormatMenu() {
-			const menu = document.querySelector('.format-menu');
-			menu.style.opacity = menu.style.opacity === '1' ? '0' : '1';
-			menu.style.visibility = menu.style.visibility === 'visible' ? 'hidden' : 'visible';
+		// 添加滚动状态检测
+		let scrollTimeout;
+		mobileToc.addEventListener('scroll', () => {
+			mobileToc.classList.add('scrolling');
+			clearTimeout(scrollTimeout);
+			scrollTimeout = setTimeout(() => {
+				mobileToc.classList.remove('scrolling');
+			}, 500);
+		});
+
+		// 阻止外层滚动传播
+		document.querySelector('.toc-overlay').addEventListener('wheel', (e) => {
+			if (e.target.closest('.mobile-toc')) {
+				e.stopPropagation();
+			}
+		}, { passive: true });
+
+		// 简化的触摸处理
+		function initContentScroll() {
+			const content = document.querySelector('.content');
+
+			// 仅保留必要的事件监听
+			content.addEventListener('touchstart', e => {
+				// 记录初始触摸位置
+				content.startY = e.touches[0].clientY;
+			}, { passive: true });
+
+			content.addEventListener('touchmove', e => {
+				// 允许浏览器处理滚动
+			}, { passive: true });
 		}
 
-		// 增强版下载功能
-		function downloadContent(format = 'txt') {
-			let content, mimeType, extension;
+		// 在DOM加载完成后调用
+		document.addEventListener('DOMContentLoaded', () => {
+			initContentScroll();
+		});
 
-			switch (format) {
-				case 'md':
-					content = currentContent;
-					mimeType = 'text/markdown';
-					extension = 'md';
-					break;
-
-				case 'doc':
-					// 简单转换Markdown为HTML
-					const htmlContent = `
-						<html>
-							<head>
-								<meta charset="UTF-8">
-								<style>
-									body { font-family: Arial; line-height: 1.6; }
-									h1, h2 { color: #6c5ce7; }
-									pre { background: #f5f5f5; padding: 1rem; }
-								</style>
-							</head>
-							<body>
-								${marked.parse(currentContent)}
-							</body>
-						</html>
-					`;
-					content = htmlContent;
-					mimeType = 'application/msword';
-					extension = 'doc';
-					break;
-
-				default: // txt
-					content = document.querySelector('.markdown-content').innerText;
-					mimeType = 'text/plain';
-					extension = 'txt';
-			}
-
-			const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
+		// 在脚本部分添加下载功能
+		document.getElementById('download-md').addEventListener('click', () => {
+			const blob = new Blob([currentContent], { type: 'text/markdown' });
 			const url = URL.createObjectURL(blob);
-
 			const a = document.createElement('a');
+
 			a.href = url;
-			a.download = `培训内容-${new Date().toLocaleDateString()}.${extension}`;
+			a.download = document.querySelector('.markdown-content h1')?.textContent.trim() || 'document.md';
 			document.body.appendChild(a);
 			a.click();
 			document.body.removeChild(a);
 			URL.revokeObjectURL(url);
-		}
+		});
 	</script>
 </body>
 
