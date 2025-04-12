@@ -99,7 +99,6 @@
 				opacity: 0;
 				visibility: hidden;
 				transition: 0.3s ease;
-				touch-action: none; /* 阻止外层滚动 */
 			}
 
 			.toc-overlay.active {
@@ -119,47 +118,19 @@
 				padding: 1.5rem;
 				box-shadow: var(--shadow);
 				transform: translateY(20px);
-				transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-				max-height: 80vh; /* 改为固定高度 */
-				overflow-y: auto; /* 保持滚动 */
-				overscroll-behavior: contain; /* 阻止滚动传播 */
-				touch-action: pan-y; /* 仅允许垂直滚动 */
-				/* 增加弹性滚动效果 */
-				scroll-behavior: smooth;
+				transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28),
+					opacity 0.2s ease;
+				max-height: 70vh;
+				overflow-y: auto;
 				-webkit-overflow-scrolling: touch;
 				scrollbar-width: thin;
 				/* Firefox */
 				scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
-				overflow-x: hidden; /* 新增横向滚动隐藏 */
-				width: calc(100% - 2rem); /* 确保宽度适配 */
-			}
-
-			/* 隐藏横向滚动条 */
-			.mobile-toc::-webkit-scrollbar:horizontal {
-				display: none;
-				height: 0;
-			}
-
-			/* 增加滚动边界反馈 */
-			.mobile-toc::after {
-				content: '';
-				position: absolute;
-				top: 0;
-				bottom: 0;
-				width: 4px;
-				right: 0;
-				background: linear-gradient(
-					to bottom, 
-					rgba(108,92,231,0.1) 0%, 
-					var(--primary) 50%, 
-					rgba(108,92,231,0.1) 100%
-				);
-				opacity: 0;
-				transition: opacity 0.2s;
-			}
-
-			.mobile-toc.scrolling::after {
-				opacity: 0.6;
+				overflow-x: hidden;
+				/* 新增横向滚动隐藏 */
+				width: calc(100% - 2rem);
+				/* 确保宽度适配 */
+				will-change: transform;
 			}
 
 			.toc-overlay.active .mobile-toc {
@@ -179,7 +150,8 @@
 				font-size: 0.95rem;
 				border-radius: 12px;
 				margin: 4px 0;
-				white-space: normal; /* 确保文本换行 */
+				white-space: normal;
+				/* 确保文本换行 */
 				max-width: 100%;
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -225,35 +197,10 @@
 				-webkit-tap-highlight-color: var(--tap-highlight);
 			}
 
-			/* 新增外层滚动锁定 */
-			body.toc-open {
-				overflow: hidden;
-				position: fixed;
-				width: 100%;
-				height: 100%;
-			}
-
-			.toc-overlay {
-				touch-action: none; /* 完全禁用外层触摸滚动 */
-				overscroll-behavior: none;
-			}
-
-			.mobile-toc {
-				overscroll-behavior: contain;
-				touch-action: pan-y; /* 仅允许垂直滚动 */
-				scroll-snap-type: y proximity; /* 增加滚动吸附效果 */
-				max-height: 82vh; /* 视觉高度优化 */
-			}
-
-			/* 滚动条视觉优化 */
-			.mobile-toc::-webkit-scrollbar {
-				width: 6px;
-				background: rgba(108,92,231,0.05);
-			}
-
-			.mobile-toc::-webkit-scrollbar-thumb {
-				background: var(--primary);
-				border-radius: 3px;
+			/* 隐藏横向滚动条 */
+			.mobile-toc::-webkit-scrollbar:horizontal {
+				display: none;
+				height: 0;
 			}
 		}
 
@@ -749,6 +696,8 @@
 				font-size: 1rem;
 				box-shadow: 0 8px 24px rgba(108, 92, 231, 0.4);
 				/* 增强阴影 */
+				border-radius: 28px;
+				/* 更圆润的形状 */
 			}
 		}
 
@@ -777,6 +726,9 @@
 			border-radius: 8px;
 			cursor: pointer;
 			transition: background 0.2s ease;
+			display: flex;
+			gap: 0.8rem;
+			align-items: center;
 		}
 
 		.format-option:hover {
@@ -813,316 +765,120 @@
 		}
 
 		.toc-overlay {
-			touch-action: none; /* 完全禁用外层触摸滚动 */
+			touch-action: none;
+			/* 完全禁用外层触摸滚动 */
 			overscroll-behavior: none;
 		}
 
 		.mobile-toc {
-			overscroll-behavior: contain;
-			touch-action: pan-y; /* 仅允许垂直滚动 */
-			scroll-snap-type: y proximity; /* 增加滚动吸附效果 */
-			max-height: 82vh; /* 视觉高度优化 */
-			overflow-x: hidden; /* 隐藏横向滚动条 */
+			overflow-y: auto;
+			-webkit-overflow-scrolling: touch;
+			transform: translateZ(0);
+			/* 强制硬件加速 */
+			backface-visibility: hidden;
+			perspective: 1000px;
 		}
 
 		/* 滚动条视觉优化 */
 		.mobile-toc::-webkit-scrollbar {
 			width: 6px;
-			background: rgba(108,92,231,0.05);
+			background: rgba(108, 92, 231, 0.05);
 		}
 
 		.mobile-toc::-webkit-scrollbar-thumb {
 			background: var(--primary);
 			border-radius: 3px;
 		}
-	}
 
-	/* 新增交互逻辑 */
-	<script>
-		const floatingToc = document.querySelector('.floating-toc');
-		const tocOverlay = document.querySelector('.toc-overlay');
-		const mobileToc = document.querySelector('.mobile-toc');
+		/* 修复内容区域滚动 */
+		.content {
+			overflow-y: auto !important;
+			-webkit-overflow-scrolling: touch;
+			height: calc(100vh - 60px);
+			/* 留出顶部空间 */
+			padding: 1rem !important;
+		}
 
-		// 修改浮动按钮点击逻辑
-		floatingToc.addEventListener('click', (e) => {
-			e.stopPropagation();
-			floatingToc.classList.toggle('active');
-			tocOverlay.classList.toggle('active');
-			document.body.classList.toggle('toc-open'); // 新增body状态
-		});
+		.markdown-content {
+			min-height: 120vh;
+			/* 确保可滚动区域 */
+			overflow: visible !important;
+		}
 
-		// 增强触摸事件处理
-		let startY = 0;
-		mobileToc.addEventListener('touchstart', e => {
-			startY = e.touches[0].clientY;
-		}, { passive: true });
+		/* 增强触摸滚动 */
+		.course-content {
+			overscroll-behavior: contain;
+			touch-action: pan-y;
+		}
 
-		mobileToc.addEventListener('touchmove', e => {
-			// 阻止外层滚动
-			e.stopPropagation();
-			
-			const currentY = e.touches[0].clientY;
-			const deltaY = currentY - startY;
-			startY = currentY;
-
-			// 仅允许垂直滚动
-			if (Math.abs(deltaY) > 5) {
-				mobileToc.scrollTop -= deltaY;
+		@media (max-width: 768px) {
+			.content {
+				scroll-behavior: smooth;
+				-webkit-overflow-scrolling: touch;
+				/* 增加滚动阻力 */
+				scroll-snap-type: y mandatory;
+				overscroll-behavior-y: contain;
 			}
-		}, { passive: false }); // 改为非被动事件
 
-		// 关闭时恢复滚动
-		function closeToc() {
-			floatingToc.classList.remove('active');
-			tocOverlay.classList.remove('active');
-			document.body.classList.remove('toc-open');
-		}
-	</script>
-</style>
+			.markdown-content {
+				/* 增加滚动惯性 */
+				scroll-snap-stop: always;
+				scroll-snap-align: start;
 
-<body>
-	<div class="search-box">
-		<input type="text" id="mobile-search" placeholder="搜索...">
-	</div>
-
-	<div class="content">
-		<div class="markdown-content" id="markdown-content"></div>
-	</div>
-
-	<div class="floating-toc">
-		<div class="toc-overlay" onclick="closeToc()"></div>
-		<div class="mobile-toc">
-			<div class="search-box">
-				<input type="text" id="search" placeholder="搜索...">
-			</div>
-			<div class="toc" id="toc"></div>
-		</div>
-	</div>
-
-	<div class="download-btn">
-		<div class="format-menu">
-			<div class="format-option" data-format="pdf">PDF</div>
-			<div class="format-option" data-format="epub">EPUB</div>
-			<div class="format-option" data-format="mobi">MOBI</div>
-		</div>
-	</div>
-
-	<script src="style/marked.min.js"></script>
-	<script>
-		const toc = document.getElementById('toc');
-		const searchInput = document.getElementById('search');
-		const mobileSearchInput = document.getElementById('mobile-search');
-		const markdownContent = document.getElementById('markdown-content');
-		const downloadBtn = document.querySelector('.download-btn');
-		const formatMenu = document.querySelector('.format-menu');
-		const formatOptions = document.querySelectorAll('.format-option');
-
-		let currentUrl = 'test/md/welcome-page.md';
-		let currentFormat = 'pdf';
-
-		// 加载Markdown文件
-		async function loadMarkdown(url) {
-			try {
-				const response = await fetch(url);
-				const text = await response.text();
-				return text;
-			} catch (error) {
-				console.error('Error loading Markdown:', error);
-				return null;
-			}
-		}
-
-		// 渲染Markdown
-		function renderMarkdown(text) {
-			const html = marked.parse(text);
-			markdownContent.innerHTML = html;
-			highlightCode();
-			renderMermaid();
-			updateProgressBar();
-		}
-
-		// 生成目录
-		function generateToc(text) {
-			const tokens = marked.lexer(text);
-			const headings = tokens.filter(token => token.type === 'heading');
-
-			let currentCategory = null;
-			const tocHtml = headings.map(heading => {
-				const { text, depth } = heading;
-				if (depth === 1) {
-					currentCategory = { text, items: [] };
-					return `<div class="toc-category" data-fold="false">
-								<h3>${text}</h3>
-								<div class="toc-subitems"></div>
-							</div>`;
-				} else if (depth === 2 && currentCategory) {
-					currentCategory.items.push(text);
-					return '';
+				/* 优化段落间距 */
+				p,
+				pre,
+				table {
+					margin: 1.2rem 0;
+					scroll-snap-align: start;
 				}
-				return '';
-			}).filter(html => html !== '').join('');
-
-			toc.innerHTML = tocHtml;
-
-			const categoryElements = document.querySelectorAll('.toc-category');
-			categoryElements.forEach(category => {
-				const subitems = category.querySelector('.toc-subitems');
-				const categoryText = category.querySelector('h3').textContent;
-				const items = headings.filter(heading => heading.text === categoryText)[0].items;
-
-				items.forEach(item => {
-					const subitem = document.createElement('div');
-					subitem.className = 'toc-subitem';
-					subitem.textContent = item;
-					subitem.addEventListener('click', () => {
-						scrollToHeading(item);
-						closeToc();
-					});
-					subitems.appendChild(subitem);
-				});
-
-				category.addEventListener('click', () => {
-					const isFolded = category.getAttribute('data-fold') === 'true';
-					category.setAttribute('data-fold', !isFolded);
-				});
-			});
-		}
-
-		// 滚动到指定标题
-		function scrollToHeading(text) {
-			const heading = document.querySelector(`h2:contains(${text})`);
-			if (heading) {
-				heading.scrollIntoView({ behavior: 'smooth' });
 			}
 		}
 
-		// 搜索功能
-		function search(query) {
-			const regex = new RegExp(query, 'gi');
-			const highlightedText = markdownContent.innerHTML.replace(regex, match => `<span class="highlight">${match}</span>`);
-			markdownContent.innerHTML = highlightedText;
-		}
-
-		// 高亮代码块
-		function highlightCode() {
-			const codeBlocks = document.querySelectorAll('pre code');
-			codeBlocks.forEach(codeBlock => {
-				hljs.highlightBlock(codeBlock);
-				const copyBtn = document.createElement('button');
-				copyBtn.className = 'copy-btn';
-				copyBtn.textContent = '复制';
-				copyBtn.addEventListener('click', () => {
-					navigator.clipboard.writeText(codeBlock.textContent);
-					copyBtn.textContent = '已复制';
-					setTimeout(() => {
-						copyBtn.textContent = '复制';
-					}, 2000);
-				});
-				codeBlock.parentElement.appendChild(copyBtn);
-			});
-		}
-
-		// 渲染Mermaid图表
-		function renderMermaid() {
-			const mermaidElements = document.querySelectorAll('.language-mermaid');
-			mermaidElements.forEach(mermaidElement => {
-				const { innerText } = mermaidElement;
-				mermaid.mermaidAPI.render(`mermaid-${Date.now()}`, innerText, svgCode => {
-					mermaidElement.outerHTML = svgCode;
-				});
-			});
-		}
-
-		// 更新阅读进度条
-		function updateProgressBar() {
-			const progressBar = document.querySelector('.progress-bar');
-			const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-			const scrollTop = window.scrollY;
-			const progress = (scrollTop / scrollHeight) * 100;
-			progressBar.style.width = `${progress}%`;
-		}
-
-		// 下载文件
-		async function downloadFile(url, format) {
-			try {
-				const response = await fetch(url);
-				const blob = await response.blob();
-				const downloadUrl = URL.createObjectURL(blob);
-				const a = document.createElement('a');
-				a.href = downloadUrl;
-				a.download = `document.${format}`;
-				document.body.appendChild(a);
-				a.click();
-				document.body.removeChild(a);
-				URL.revokeObjectURL(downloadUrl);
-			} catch (error) {
-				console.error('Error downloading file:', error);
+		/* 增加动量滚动效果 */
+		@supports (-webkit-overflow-scrolling: touch) {
+			.content {
+				overflow-y: scroll;
 			}
 		}
 
-		// 初始加载
-		async function init() {
-			const text = await loadMarkdown(currentUrl);
-			if (text) {
-				renderMarkdown(text);
-				generateToc(text);
+		/* 重写下载按钮定位 */
+		.download-container {
+			position: fixed;
+			z-index: 9999;
+			/* 最高优先级 */
+			bottom: 2rem;
+			right: 2rem;
+		}
+
+		/* 优化移动端按钮尺寸 */
+		@media (max-width: 768px) {
+			.download-btn {
+				padding: 0.8rem 1.2rem;
+				font-size: 0.9rem;
+				border-radius: 16px;
+				bottom: 6rem;
+				/* 调整位置避免遮挡 */
 			}
 		}
 
-		init();
-
-		// 事件监听
-		searchInput.addEventListener('input', () => {
-			search(searchInput.value);
-		});
-
-		mobileSearchInput.addEventListener('input', () => {
-			search(mobileSearchInput.value);
-		});
-
-		downloadBtn.addEventListener('click', () => {
-			formatMenu.classList.toggle('active');
-		});
-
-		formatOptions.forEach(option => {
-			option.addEventListener('click', () => {
-				currentFormat = option.dataset.format;
-				downloadFile(currentUrl, currentFormat);
-				formatMenu.classList.remove('active');
-			});
-		});
-
-		window.addEventListener('scroll', updateProgressBar);
-
-		// 在内容加载完成后执行
-		function initContentScroll() {
-			const content = document.querySelector('.content');
-			let startY = 0;
-
-			content.addEventListener('touchstart', e => {
-				startY = e.touches[0].clientY;
-			}, { passive: true });
-
-			content.addEventListener('touchmove', e => {
-				const currentY = e.touches[0].clientY;
-				const deltaY = currentY - startY;
-				
-				// 允许垂直滚动
-				if (Math.abs(deltaY) > 5) {
-					content.scrollTop -= deltaY;
-					e.preventDefault();
-				}
-			}, { passive: false });
+		#error-container {
+			position: fixed;
+			bottom: 1rem;
+			right: 1rem;
+			max-width: 300px;
+			z-index: 9999;
 		}
 
-		// 在DOM加载完成后调用
-		document.addEventListener('DOMContentLoaded', () => {
-			initContentScroll();
-		});
-	</script>
-</body>
-
-</html>
+		.error-toast {
+			background: rgba(255, 0, 0, 0.1);
+			padding: 1rem;
+			border-radius: 8px;
+			margin: 0.5rem;
+			animation: slideIn 0.3s ease;
+		}
+	</style>
+</head>
 
 <body>
 	<!-- 新增浮动按钮 -->
@@ -1130,18 +886,13 @@
 
 	<!-- 修改后的目录结构 -->
 	<div class="toc-overlay">
-		<div class="mobile-toc">
+		<div class="mobile-toc" id="mobile-toc-container">
 			<div class="search-box">
 				<input type="text" id="mobile-search" placeholder="搜索课程..."
 					style="width:100%; border-radius:12px; border:1px solid var(--secondary)">
 			</div>
 			<div class="toc" id="mobile-toc"></div>
 		</div>
-	</div>
-
-	<!-- 新增下载按钮容器 -->
-	<div class="download-container">
-		<button class="download-btn" id="download-md">下载当前文档</button>
 	</div>
 
 	<!-- 内容区域 -->
@@ -1163,6 +914,8 @@
 	<!-- 工具提示库 -->
 	<script src="style/popper.min.js"></script>
 	<script src="style/tippy-bundle.umd.js"></script>
+
+	<div id="error-container" aria-live="polite"></div>
 
 	<script>
 		// 动态生成目录
@@ -1354,16 +1107,8 @@
 
 					// 添加历史记录
 					history.pushState({}, '', `#${encodeURIComponent(filePath)}`);
-
-					// 在内容加载时保存原始内容
-					saveContent(markdown);
 				} catch (error) {
-					contentArea.innerHTML = `
-                        <div class="error">
-                            <h3>⚠️ 内容加载失败</h3>
-                            <p>${error.message}</p>
-                        </div>
-                    `;
+					console.error('内容加载失败:', error);
 				}
 			}
 		});
@@ -1377,38 +1122,38 @@
 			if (lastScroll) window.scrollTo(0, lastScroll);
 		});
 
-		// 移动端点击外部关闭菜单
+		// 修改后的移动端点击外部关闭菜单逻辑
 		document.addEventListener('click', (e) => {
 			if (window.innerWidth <= 768 &&
-				!e.target.closest('.sidebar') &&
-				!e.target.closest('.menu-toggle')) {
-				document.querySelector('.sidebar').classList.remove('active');
+				!e.target.closest('.mobile-toc') &&
+				!e.target.closest('.floating-toc')) {
+				document.querySelector('.toc-overlay').classList.remove('active');
+				document.body.classList.remove('toc-open');
 			}
 		});
 
-		// 增强移动端目录滚动处理
-		let isTouchingToc = false;
+		// 替换原有复杂触摸处理
 		const mobileToc = document.querySelector('.mobile-toc');
-
-		// 修改触摸事件处理
 		let startY = 0;
+
 		mobileToc.addEventListener('touchstart', e => {
-			startY = e.touches[0].clientY;
+			startY = e.touches[0].pageY;
 		}, { passive: true });
 
 		mobileToc.addEventListener('touchmove', e => {
-			// 阻止外层滚动
-			e.stopPropagation();
+			const deltaY = e.touches[0].pageY - startY;
+			const atTop = mobileToc.scrollTop <= 0 && deltaY > 0;
+			const atBottom = mobileToc.scrollHeight <= mobileToc.clientHeight + mobileToc.scrollTop && deltaY < 0;
 
-			const currentY = e.touches[0].clientY;
-			const deltaY = currentY - startY;
-			startY = currentY;
-
-			// 仅允许垂直滚动
-			if (Math.abs(deltaY) > 5) {
-				mobileToc.scrollTop -= deltaY;
+			if (atTop || atBottom) {
+				e.preventDefault();
 			}
-		}, { passive: false }); // 改为非被动事件
+		}, { passive: false });
+
+		// 优化滚动条渲染
+		requestAnimationFrame(() => {
+			mobileToc.style.scrollbarWidth = 'thin';
+		});
 
 		// 关闭时恢复滚动
 		function closeToc() {
@@ -1439,7 +1184,14 @@
 					}
 
 					// 发起网络请求
-					const response = await fetch(CONFIG.WELCOME_PAGE_PATH);
+					const response = await fetch(CONFIG.WELCOME_PAGE_PATH, {
+						mode: 'cors',
+						credentials: 'same-origin', // 明确凭证策略
+						headers: {
+							'Content-Type': 'text/markdown',
+							'X-Requested-With': 'XMLHttpRequest' // 帮助服务器识别AJAX请求
+						}
+					});
 
 					// HTTP状态检查
 					if (!response.ok) {
@@ -1489,14 +1241,15 @@
 			}
 		}
 
-		// 修改初始化流程
+		// 修复初始化流程：添加目录生成和欢迎页加载
 		document.addEventListener('DOMContentLoaded', async () => {
+			generateTOC(); // 确保生成目录
 			const container = document.getElementById('welcome-container');
 			const loader = new ContentLoader();
 
 			// 显示加载状态
 			container.innerHTML = `
-				<div class="loading-state">
+				<div class="loading-indicator">
 					<div class="spinner"></div>
 					<p>正在加载最新内容...</p>
 				</div>
@@ -1527,23 +1280,15 @@
 			}
 		});
 
-		// 修改为独立函数
+		// 修复mermaid初始化逻辑
 		function initMermaid() {
 			if (typeof mermaid !== 'undefined') {
 				mermaid.initialize({
 					theme: 'neutral',
-					securityLevel: 'loose',
-					flowchart: {
-						curve: 'basis',
-						htmlLabels: true
-					},
-					startOnLoad: true  // 必须设置为true
+					startOnLoad: true
 				});
-				// 使用正确的选择器
-				mermaid.init({
-					noteMargin: 10,
-					useMaxWidth: true
-				}, '.markdown-content pre code.language-mermaid'); // 匹配实际生成的class
+				// 使用更可靠的选择器
+				mermaid.init(undefined, '.markdown-content pre code.language-mermaid');
 			}
 		}
 
@@ -1583,11 +1328,14 @@
 		}
 
 		// 修改下载功能
-		let currentContent = ''; // 用于存储当前内容
+		let currentContent = '';
+		const downloadContainer = document.querySelector('.download-container');
 
 		// 在内容加载时保存原始内容
 		function saveContent(rawMarkdown) {
 			currentContent = rawMarkdown;
+			// 保持下载按钮可见
+			downloadContainer.style.display = 'block';
 		}
 
 		// 添加滚动状态检测
@@ -1610,22 +1358,16 @@
 		// 简化的触摸处理
 		function initContentScroll() {
 			const content = document.querySelector('.content');
-			let startY = 0;
 
+			// 仅保留必要的事件监听
 			content.addEventListener('touchstart', e => {
-				startY = e.touches[0].clientY;
+				// 记录初始触摸位置
+				content.startY = e.touches[0].clientY;
 			}, { passive: true });
 
 			content.addEventListener('touchmove', e => {
-				const currentY = e.touches[0].clientY;
-				const deltaY = currentY - startY;
-				
-				// 允许垂直滚动
-				if (Math.abs(deltaY) > 5) {
-					content.scrollTop -= deltaY;
-					e.preventDefault();
-				}
-			}, { passive: false });
+				// 允许浏览器处理滚动
+			}, { passive: true });
 		}
 
 		// 在DOM加载完成后调用
@@ -1634,18 +1376,172 @@
 		});
 
 		// 在脚本部分添加下载功能
-		document.getElementById('download-md').addEventListener('click', () => {
-			const blob = new Blob([currentContent], { type: 'text/markdown' });
+		document.getElementById('download-md').addEventListener('click', (e) => {
+			const menu = e.currentTarget.querySelector('.format-menu');
+			menu.style.opacity = menu.style.opacity === '1' ? '0' : '1';
+			menu.style.visibility = menu.style.visibility === 'visible' ? 'hidden' : 'visible';
+		});
+
+		// 增强版下载处理
+		document.querySelectorAll('.format-option').forEach(option => {
+			option.addEventListener('click', async (e) => {
+				const btn = document.getElementById('download-md');
+				const originalHTML = btn.innerHTML;
+
+				// 添加加载状态
+				btn.classList.add('loading');
+				btn.querySelector('.btn-text').innerHTML = '⏳ 生成文件中...';
+
+				try {
+					const format = e.currentTarget.dataset.format;
+					const title = document.querySelector('.markdown-content h1')?.textContent.trim() || 'document';
+
+					if (format === 'md') {
+						// Markdown下载
+						const blob = new Blob([currentContent], { type: 'text/markdown' });
+						triggerDownload(blob, `${title}.md`);
+					} else {
+						// Word文档生成
+						const htmlContent = marked.parse(currentContent);
+						const docxBlob = await convertToDocx(htmlContent);
+						triggerDownload(docxBlob, `${title}.docx`);
+					}
+				} catch (error) {
+					showErrorToast('下载失败: ' + error.message);
+				} finally {
+					btn.classList.remove('loading');
+					btn.querySelector('.btn-text').innerHTML = '⬇️ 下载文档';
+				}
+			});
+		});
+
+		// 通用下载触发方法
+		function triggerDownload(blob, filename) {
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement('a');
-
 			a.href = url;
-			a.download = document.querySelector('.markdown-content h1')?.textContent.trim() || 'document.md';
+			a.download = filename;
 			document.body.appendChild(a);
 			a.click();
 			document.body.removeChild(a);
 			URL.revokeObjectURL(url);
+		}
+
+		// 显示错误提示
+		function showErrorToast(message) {
+			const toast = document.createElement('div');
+			toast.className = 'download-toast';
+			toast.textContent = message;
+			document.body.appendChild(toast);
+
+			setTimeout(() => {
+				toast.remove();
+			}, 3000);
+		}
+
+		// 修复格式菜单交互
+		document.getElementById('download-md').addEventListener('click', (e) => {
+			const menu = e.currentTarget.querySelector('.format-menu');
+			menu.style.opacity = menu.style.opacity === '1' ? '0' : '1';
+			menu.style.visibility = menu.style.visibility === 'visible' ? 'hidden' : 'visible';
 		});
+
+		// 修复DOCX转换功能
+		async function convertToDocx(htmlContent) {
+			try {
+				const result = await htmlDocx.asBlob(htmlContent);
+				return result;
+			} catch (error) {
+				throw new Error('DOCX转换失败: ' + error.message);
+			}
+		}
+
+		// 修复移动端菜单交互
+		let menuTimeout;
+		document.getElementById('download-md').addEventListener('touchstart', (e) => {
+			const menu = e.currentTarget.querySelector('.format-menu');
+			clearTimeout(menuTimeout);
+			menu.style.opacity = '1';
+			menu.style.visibility = 'visible';
+			menuTimeout = setTimeout(() => {
+				menu.style.opacity = '0';
+				menu.style.visibility = 'hidden';
+			}, 5000); // 5秒后自动隐藏
+		});
+
+		// 修复事件监听器空指针问题
+		document.addEventListener('DOMContentLoaded', () => {
+			// 确保元素存在再绑定事件
+			const mobileToc = document.querySelector('.mobile-toc');
+			if (mobileToc) {
+				mobileToc.addEventListener('scroll', handleTocScroll);
+				mobileToc.addEventListener('touchstart', handleTouchStart, { passive: true });
+				mobileToc.addEventListener('touchmove', handleTouchMove, { passive: false });
+			}
+		});
+
+		// 优化后的触摸处理函数
+		function handleTouchStart(e) {
+			startY = e.touches[0].pageY;
+		}
+
+		function handleTouchMove(e) {
+			const deltaY = e.touches[0].pageY - startY;
+			const atTop = this.scrollTop <= 0 && deltaY > 0;
+			const atBottom = this.scrollHeight <= this.clientHeight + this.scrollTop && deltaY < 0;
+
+			if (atTop || atBottom) {
+				e.preventDefault();
+			}
+		}
+
+		function handleTocScroll() {
+			this.classList.add('scrolling');
+			clearTimeout(scrollTimeout);
+			scrollTimeout = setTimeout(() => {
+				this.classList.remove('scrolling');
+			}, 500);
+		}
+
+		// 修复空指针错误的核心代码
+		function safeAddEventListener(selector, eventType, handler, options) {
+			const element = document.querySelector(selector);
+			if (element) {
+				element.addEventListener(eventType, handler, options);
+			} else {
+				console.warn(`元素 ${selector} 不存在，无法绑定 ${eventType} 事件`);
+			}
+		}
+
+		// 安全初始化事件监听
+		document.addEventListener('DOMContentLoaded', () => {
+			// 目录相关事件
+			safeAddEventListener('.mobile-toc', 'scroll', handleTocScroll);
+			safeAddEventListener('.mobile-toc', 'touchstart', handleTouchStart, { passive: true });
+			safeAddEventListener('.mobile-toc', 'touchmove', handleTouchMove, { passive: false });
+
+			// 其他关键事件初始化
+			safeAddEventListener('.floating-toc', 'click', toggleTocOverlay);
+			safeAddEventListener('.toc-overlay', 'click', closeTocOnOutsideClick);
+		});
+
+		// 增强型错误处理
+		document.addEventListener('click', async (e) => {
+			if (e.target.closest('.toc-subitem')) {
+				try {
+					// ... 加载逻辑 ...
+				} catch (error) {
+					console.error('内容加载失败:', error);
+					showErrorToast(`加载失败: ${error.message}`);
+				}
+			}
+		});
+
+		// 添加全局错误处理
+		window.onerror = function (message, source, lineno, colno, error) {
+			console.error(`全局错误: ${message}@${source}:${lineno}`);
+			return true; // 阻止默认错误提示
+		};
 	</script>
 </body>
 
