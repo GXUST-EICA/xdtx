@@ -1069,16 +1069,8 @@
 
 					// 添加历史记录
 					history.pushState({}, '', `#${encodeURIComponent(filePath)}`);
-
-					// 在内容加载时保存原始内容
-					saveContent(markdown);
 				} catch (error) {
-					contentArea.innerHTML = `
-                        <div class="error">
-                            <h3>⚠️ 内容加载失败</h3>
-                            <p>${error.message}</p>
-                        </div>
-                    `;
+					console.error('内容加载失败:', error);
 				}
 			}
 		});
@@ -1402,11 +1394,6 @@
 			}, 3000);
 		}
 
-		// 修复下载功能逻辑
-		// 移除以下两行：
-		// let currentContent = '';
-		// const downloadContainer = document.querySelector('.download-container');
-
 		// 修复格式菜单交互
 		document.getElementById('download-md').addEventListener('click', (e) => {
 			const menu = e.currentTarget.querySelector('.format-menu');
@@ -1436,9 +1423,6 @@
 				menu.style.visibility = 'hidden';
 			}, 5000); // 5秒后自动隐藏
 		});
-
-		// 确保按钮始终存在
-		document.body.appendChild(downloadContainer);
 	</script>
 </body>
 
