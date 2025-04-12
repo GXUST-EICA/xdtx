@@ -687,6 +687,7 @@
 				padding: 1rem 1.5rem; /* 增大点击区域 */
 				font-size: 1rem;
 				box-shadow: 0 8px 24px rgba(108,92,231,0.4); /* 增强阴影 */
+				border-radius: 28px; /* 更圆润的形状 */
 			}
 		}
 
@@ -848,6 +849,42 @@
 		/* 确保遮罩层不会覆盖 */
 		.toc-overlay {
 			z-index: 1000; /* 低于下载按钮 */
+		}
+
+		/* 移动端下载按钮优化 */
+		@media (max-width: 768px) {
+			.download-container {
+				bottom: 8rem; /* 提升到浮动目录按钮上方 */
+				right: 1rem;
+			}
+
+			.download-btn {
+				padding: 1rem 1.5rem; /* 增大点击区域 */
+				font-size: 1rem;
+				box-shadow: 0 8px 24px rgba(108,92,231,0.4); /* 增强阴影 */
+				border-radius: 28px; /* 更圆润的形状 */
+			}
+
+			/* 格式菜单移动端适配 */
+			.format-menu {
+				right: 0;
+				left: auto;
+				top: 100%;
+				bottom: auto;
+				min-width: 160px;
+				transform: scale(0.95);
+				transform-origin: 85% top;
+			}
+
+			.format-option {
+				padding: 1rem;
+				font-size: 0.9rem;
+			}
+
+			/* 点击反馈效果 */
+			.format-option:active {
+				background: rgba(108,92,231,0.2);
+			}
 		}
 	</style>
 </head>
@@ -1413,6 +1450,95 @@
 				// 关闭菜单
 				document.querySelector('.format-menu').style.opacity = 0;
 				document.querySelector('.format-menu').style.visibility = 'hidden';
+			});
+		});
+
+		// 点击外部关闭菜单
+		document.addEventListener('click', (e) => {
+			if(!e.target.closest('.download-btn')) {
+				document.querySelector('.format-menu').style.opacity = 0;
+				document.querySelector('.format-menu').style.visibility = 'hidden';
+			}
+		});
+
+		// 修改移动端触摸处理
+		let menuVisible = false;
+
+		// 添加触摸事件监听
+		document.getElementById('download-md').addEventListener('touchstart', (e) => {
+			if(window.innerWidth <= 768) {
+				e.preventDefault();
+				const menu = document.querySelector('.format-menu');
+				menuVisible = !menuVisible;
+				
+				menu.style.opacity = menuVisible ? 1 : 0;
+				menu.style.visibility = menuVisible ? 'visible' : 'hidden';
+				menu.style.transform = menuVisible ? 'scale(1)' : 'scale(0.95)';
+			}
+		}, { passive: false });
+
+		// 移动端点击外部关闭
+		document.addEventListener('touchstart', (e) => {
+			if(menuVisible && !e.target.closest('.download-container')) {
+				const menu = document.querySelector('.format-menu');
+				menuVisible = false;
+				menu.style.opacity = 0;
+				menu.style.visibility = 'hidden';
+			}
+		});
+
+		// 优化Word生成流程（使用mammoth库）
+		async function generateDocx(content) {
+			try {
+				const html = marked.parse(content);
+				const result = await mammoth.convertToHtml({ text: html });
+				return result.value;
+			} catch (error) {
+				console.error('DOCX转换失败:', error);
+				return `<h1>转换失败</h1><p>${error.message}</p>`;
+			}
+		}
+
+		// 修改后的下载处理
+		document.querySelectorAll('.format-option').forEach(option => {
+			option.addEventListener('click', async (e) => {
+				const format = e.currentTarget.dataset.format;
+				const title = document.querySelector('.markdown-content h1')?.textContent.trim() || 'document';
+				
+				// 显示加载状态
+				const originalHTML = document.getElementById('download-md').innerHTML;
+				document.getElementById('download-md').innerHTML = '⏳ 生成中...';
+
+				try {
+					let blob, filename;
+					
+					if(format === 'md') {
+						blob = new Blob([currentContent], { type: 'text/markdown' });
+						filename = `${title}.md`;
+					} else {
+						const docxContent = await generateDocx(currentContent);
+						blob = new Blob(['\ufeff', docxContent], {
+							type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+						});
+						filename = `${title}.docx`;
+					}
+
+					// 触发下载
+					const url = URL.createObjectURL(blob);
+					const a = document.createElement('a');
+					a.href = url;
+					a.download = filename;
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+					URL.revokeObjectURL(url);
+
+				} catch (error) {
+					alert(`下载失败: ${error.message}`);
+				} finally {
+					document.getElementById('download-md').innerHTML = originalHTML;
+					menuVisible = false;
+				}
 			});
 		});
 
