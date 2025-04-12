@@ -19,6 +19,9 @@
 			--radius: 16px; /* 统一圆角 */
 			--tap-highlight: rgba(108, 92, 231, 0.1); /* 点击反馈色 */
 		}
+
+		/* 动态目录生成样式 */
+		/* 合并.toc-category样式 */
 		.toc-category {
 		    background: var(--glass);
 		    backdrop-filter: blur(12px);
@@ -162,19 +165,12 @@
 				min-height: 100vh;
 			}
 
-			.content-wrapper {
-				display: flex;
-				height: calc(100vh - 120px); /* 减去头部高度 */
-				overflow: hidden;
-			}
-
 			.sidebar {
-				width: 280px;
-				height: 100%;
-				overflow-y: auto;
-				padding-right: 15px; /* 补偿滚动条宽度 */
+				width: 300px;
+				height: 100vh;
 				position: sticky;
 				top: 0;
+				overflow-y: auto;
 				transform: none !important;
 				box-shadow: 8px 0 40px rgba(108, 92, 231, 0.1);
 				border-right: 1px solid var(--secondary);
@@ -186,11 +182,10 @@
 				display: none; /* Chrome/Safari */
 			}
 
-			.markdown-content {
+			.content {
 				flex: 1;
-				height: 100%;
-				overflow-y: auto;
-				padding: 0 2rem;
+				padding: 2rem 4rem;
+				max-width: calc(100vw - 300px);
 			}
 
 			.menu-toggle {
@@ -520,36 +515,50 @@
 			to { opacity: 1; transform: translateY(0); }
 		}
 
-		/* 移动端布局优化 */
+		/* PC端布局优化 */
+		@media (min-width: 769px) {
+			.sidebar {
+				/* 隐藏滚动条但保持滚动功能 */
+				scrollbar-width: none; /* Firefox */
+				-ms-overflow-style: none; /* IE/Edge */
+			}
+			.sidebar::-webkit-scrollbar {
+				display: none; /* Chrome/Safari */
+			}
+
+			/* 对齐搜索框 */
+			.search-box {
+				position: sticky;
+				top: 0;
+				padding: 1.5rem;
+				margin: 0 -1.5rem; /* 抵消容器padding */
+				z-index: 200;
+				background: var(--glass);
+				backdrop-filter: blur(10px);
+			}
+		}
+
+		/* 移动端滚动优化 */
 		@media (max-width: 768px) {
 			.mobile-toc {
-				max-height: 70vh;
-				overflow-y: auto;
-			}
-
-			.markdown-content {
-				max-height: calc(100vh - 160px); /* 动态高度调整 */
-				overflow-y: auto;
 				-webkit-overflow-scrolling: touch;
+				scrollbar-width: none;
+				-ms-overflow-style: none;
+			}
+			.mobile-toc::-webkit-scrollbar {
+				display: none;
 			}
 
-			/* 当目录打开时隐藏内容区滚动 */
-			.toc-overlay.active + .content {
-				overflow: hidden;
+			/* 目录项优化 */
+			.toc-category {
+				min-width: fit-content;
 			}
 		}
 
 		/* 通用滚动优化 */
-		.markdown-content::-webkit-scrollbar,
-		.sidebar::-webkit-scrollbar {
-			width: 6px;
-			height: 6px;
-		}
-
-		.markdown-content::-webkit-scrollbar-thumb,
-		.sidebar::-webkit-scrollbar-thumb {
-			background: var(--secondary);
-			border-radius: 3px;
+		.toc, .mobile-toc, .sidebar {
+			overflow: overlay; /* 智能滚动条 */
+			scroll-behavior: smooth;
 		}
 	</style>
 </head>
@@ -562,7 +571,7 @@
 	<div class="toc-overlay">
 		<div class="mobile-toc">
 			<div class="search-box">
-				<input type="text" id="mobile-search" placeholder="搜索课程..." 
+				<input type="text" id="mobile-search" placeholder="🔍 搜索课程..." 
 					style="width:100%; border-radius:12px; border:1px solid var(--secondary)">
 			</div>
 			<div class="toc" id="mobile-toc"></div>
@@ -570,20 +579,14 @@
 	</div>
 
 	<!-- 内容区域 -->
-	<div class="content-wrapper">
-		<!-- 侧边栏目录 -->
-		<nav class="sidebar" id="main-sidebar">
-			<div class="search-box">
-				<input type="text" id="search" placeholder="搜索课程...">
-			</div>
-			<div class="toc"></div>
-		</nav>
-
-		<!-- 主内容区 -->
-		<main class="content">
-			<article class="markdown-content" id="content-container"></article>
-		</main>
-	</div>
+	<main class="content">
+		<h1>协会培训中心</h1>
+		<div class="course-content">
+			<article class="markdown-content">
+				${await loadWelcomePage()}
+			</article>
+		</div>
+	</main>
 
 	<!-- Markdown解析 -->
 	<script src="style/marked.min.js"></script>
@@ -592,7 +595,6 @@
 	<script src="style/mermaid.min.js"></script>
 
 	<!-- 工具提示库 -->
-	<script src="style/popper.min.js"></script>
 	<script src="style/tippy-bundle.umd.js"></script>
 
 	<script>
@@ -742,6 +744,8 @@
 		document.addEventListener('click', async (e) => {
 			if (e.target.closest('.toc-subitem')) {
 				const contentArea = document.querySelector('.course-content');
+				
+				// 修复：使用已定义的loading样式类
 				contentArea.innerHTML = `
 					<div class="loading-indicator">
 						<div class="spinner"></div>
@@ -756,10 +760,10 @@
 					const response = await fetch(filePath);
 					const markdown = await response.text();
 					contentArea.innerHTML = `
-						<article class="markdown-content">
-							${marked.parse(markdown)}
-						</article>
-					`;
+                        <article class="markdown-content">
+                            ${marked.parse(markdown)}
+                        </article>
+                    `;
 
 					// PC端自动滚动到标题位置
 					if (window.innerWidth > 768) {
@@ -773,11 +777,11 @@
 					history.pushState({}, '', `#${encodeURIComponent(filePath)}`);
 				} catch (error) {
 					contentArea.innerHTML = `
-						<div class="error">
-							<h3>⚠️ 内容加载失败</h3>
-							<p>${error.message}</p>
-						</div>
-					`;
+                        <div class="error">
+                            <h3>⚠️ 内容加载失败</h3>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
 				}
 			}
 		});
@@ -980,6 +984,18 @@
 				animation: 'fade',
 				theme: 'light-border'
 			});
+		}
+
+		// 新增欢迎页加载函数
+		async function loadWelcomePage() {
+			try {
+				const response = await fetch('test/md/welcome-page.md');
+				const markdown = await response.text();
+				return marked.parse(markdown);
+			} catch (error) {
+				console.error('欢迎页加载失败:', error);
+				return marked.parse(`# ⚠️ 欢迎信息加载失败\n请检查网络连接或联系管理员`);
+			}
 		}
 	</script>
 </body>
