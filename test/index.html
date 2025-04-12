@@ -844,6 +844,22 @@
 				bottom: 6rem; /* 调整位置避免遮挡 */
 			}
 		}
+
+		#error-container {
+			position: fixed;
+			bottom: 1rem;
+			right: 1rem;
+			max-width: 300px;
+			z-index: 9999;
+		}
+		
+		.error-toast {
+			background: rgba(255,0,0,0.1);
+			padding: 1rem;
+			border-radius: 8px;
+			margin: 0.5rem;
+			animation: slideIn 0.3s ease;
+		}
 	</style>
 </head>
 
@@ -881,6 +897,8 @@
 	<!-- 工具提示库 -->
 	<script src="style/popper.min.js"></script>
 	<script src="style/tippy-bundle.umd.js"></script>
+
+	<div id="error-container" aria-live="polite"></div>
 
 	<script>
 		// 动态生成目录
@@ -1150,8 +1168,12 @@
 
 					// 发起网络请求
 					const response = await fetch(CONFIG.WELCOME_PAGE_PATH, {
-						mode: 'cors', // 明确指定跨域模式
-						credentials: 'same-origin' // 根据服务器配置调整
+						mode: 'cors',
+						credentials: 'same-origin', // 明确凭证策略
+						headers: {
+							'Content-Type': 'text/markdown',
+							'X-Requested-With': 'XMLHttpRequest' // 帮助服务器识别AJAX请求
+						}
 					});
 
 					// HTTP状态检查
@@ -1463,6 +1485,46 @@
 				this.classList.remove('scrolling');
 			}, 500);
 		}
+
+		// 修复空指针错误的核心代码
+		function safeAddEventListener(selector, eventType, handler, options) {
+			const element = document.querySelector(selector);
+			if (element) {
+				element.addEventListener(eventType, handler, options);
+			} else {
+				console.warn(`元素 ${selector} 不存在，无法绑定 ${eventType} 事件`);
+			}
+		}
+
+		// 安全初始化事件监听
+		document.addEventListener('DOMContentLoaded', () => {
+			// 目录相关事件
+			safeAddEventListener('.mobile-toc', 'scroll', handleTocScroll);
+			safeAddEventListener('.mobile-toc', 'touchstart', handleTouchStart, { passive: true });
+			safeAddEventListener('.mobile-toc', 'touchmove', handleTouchMove, { passive: false });
+
+			// 其他关键事件初始化
+			safeAddEventListener('.floating-toc', 'click', toggleTocOverlay);
+			safeAddEventListener('.toc-overlay', 'click', closeTocOnOutsideClick);
+		});
+
+		// 增强型错误处理
+		document.addEventListener('click', async (e) => {
+			if (e.target.closest('.toc-subitem')) {
+				try {
+					// ... 加载逻辑 ...
+				} catch (error) {
+					console.error('内容加载失败:', error);
+					showErrorToast(`加载失败: ${error.message}`);
+				}
+			}
+		});
+
+		// 添加全局错误处理
+		window.onerror = function(message, source, lineno, colno, error) {
+			console.error(`全局错误: ${message}@${source}:${lineno}`);
+			return true; // 阻止默认错误提示
+		};
 	</script>
 </body>
 
