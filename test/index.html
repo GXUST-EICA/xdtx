@@ -1218,14 +1218,15 @@
 			}
 		}
 
-		// 修改初始化流程
+		// 修复初始化流程：添加目录生成和欢迎页加载
 		document.addEventListener('DOMContentLoaded', async () => {
+			generateTOC(); // 确保生成目录
 			const container = document.getElementById('welcome-container');
 			const loader = new ContentLoader();
 
 			// 显示加载状态
 			container.innerHTML = `
-				<div class="loading-state">
+				<div class="loading-indicator">
 					<div class="spinner"></div>
 					<p>正在加载最新内容...</p>
 				</div>
@@ -1256,23 +1257,15 @@
 			}
 		});
 
-		// 修改为独立函数
+		// 修复mermaid初始化逻辑
 		function initMermaid() {
 			if (typeof mermaid !== 'undefined') {
-				mermaid.initialize({
+				mermaid.initialize({ 
 					theme: 'neutral',
-					securityLevel: 'loose',
-					flowchart: {
-						curve: 'basis',
-						htmlLabels: true
-					},
-					startOnLoad: true  // 必须设置为true
+					startOnLoad: true
 				});
-				// 使用正确的选择器
-				mermaid.init({
-					noteMargin: 10,
-					useMaxWidth: true
-				}, '.markdown-content pre code.language-mermaid'); // 匹配实际生成的class
+				// 使用更可靠的选择器
+				mermaid.init(undefined, '.markdown-content pre code.language-mermaid');
 			}
 		}
 
@@ -1424,15 +1417,9 @@
 		}
 
 		// 修复下载功能逻辑
-		let currentContent = '';
-		const downloadContainer = document.querySelector('.download-container');
-
-		// 在内容加载时保持下载按钮
-		function saveContent(rawMarkdown) {
-			currentContent = rawMarkdown;
-			// 保持下载按钮可见
-			downloadContainer.style.display = 'block';
-		}
+		// 移除以下两行：
+		// let currentContent = '';
+		// const downloadContainer = document.querySelector('.download-container');
 
 		// 修复格式菜单交互
 		document.getElementById('download-md').addEventListener('click', (e) => {
