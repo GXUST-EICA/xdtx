@@ -854,61 +854,44 @@
 
 		floatingToc.addEventListener('click', (e) => {
 			e.stopPropagation();
-			floatingToc.classList.toggle('active');
-			tocOverlay.classList.toggle('active');
+			const wasActive = floatingToc.classList.toggle('active');
+			tocOverlay.classList.toggle('active', wasActive);
 			
-			// 新增滚动锁定逻辑
-			if (tocOverlay.classList.contains('active')) {
-				document.body.classList.add('toc-active');
-				document.documentElement.style.overflow = 'hidden';
-			} else {
-				document.body.classList.remove('toc-active');
-				document.documentElement.style.overflow = '';
+			// 优化滚动锁定逻辑
+			document.body.classList.toggle('toc-active', wasActive);
+			document.documentElement.style.overflow = wasActive ? 'hidden' : '';
+			
+			// 新增布局修正
+			if (!wasActive) {
+				setTimeout(() => {
+					document.body.style.position = 'static';
+					window.scrollTo(0, scrollPosition);
+				}, 10);
 			}
 		});
 
-		// 修改触摸事件处理逻辑
-		let startY = 0;
-		let lastY = 0;
+		// 修正后的触摸事件处理
+		const mobileToc = document.querySelector('.mobile-toc'); // 确保选择器正确
 
-		// 触摸开始
-		mobileToc.addEventListener('touchstart', e => {
-			startY = e.touches[0].clientY;
-			lastY = startY;
-		}, { passive: true });
+		// 新增初始化检查
+		if (mobileToc) {
+			mobileToc.addEventListener('touchstart', handleTouchStart, { passive: true });
+			mobileToc.addEventListener('touchmove', handleTouchMove, { passive: false });
+		}
 
-		// 触摸移动
-		mobileToc.addEventListener('touchmove', e => {
-			const currentY = e.touches[0].clientY;
-			const deltaY = currentY - lastY;
-			lastY = currentY;
-
-			// 计算滚动边界
-			const atTop = mobileToc.scrollTop <= 0 && deltaY > 0;
-			const atBottom = mobileToc.scrollTop + mobileToc.clientHeight >= mobileToc.scrollHeight && deltaY < 0;
-
-			// 仅在需要时阻止默认滚动
-			if (!atTop && !atBottom) {
-				e.preventDefault();
-			}
-			
-			mobileToc.scrollTop -= deltaY;
-		}, { passive: false });
-
-		// 新增：关闭时恢复滚动位置
-		let scrollPosition = 0;
+		// 优化后的关闭逻辑
 		tocOverlay.addEventListener('click', (e) => {
 			if (e.target === tocOverlay) {
 				scrollPosition = window.scrollY;
+				floatingToc.classList.remove('active');
+				tocOverlay.classList.remove('active');
 				document.body.classList.remove('toc-active');
 				document.documentElement.style.overflow = '';
-			}
-		});
-
-		// 新增：防止页面滚动恢复
-		window.addEventListener('scroll', () => {
-			if (document.body.classList.contains('toc-active')) {
-				window.scrollTo(0, scrollPosition);
+				
+				// 强制重绘修复
+				document.body.style.display = 'none';
+				document.body.offsetHeight; // 触发重绘
+				document.body.style.display = '';
 			}
 		});
 
