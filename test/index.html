@@ -886,6 +886,42 @@
 				background: rgba(108,92,231,0.2);
 			}
 		}
+
+		/* 移除固定定位相关样式 */
+		.download-container {
+			margin: 3rem auto 2rem;
+			text-align: center;
+			max-width: 300px;
+		}
+
+		.download-btn {
+			/* 保持原有按钮样式 */
+			display: inline-flex;
+			align-items: center;
+			gap: 0.8rem;
+			padding: 1rem 2rem;
+			border-radius: 30px;
+			background: var(--primary);
+			color: white;
+			border: none;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			box-shadow: 0 8px 24px rgba(108, 92, 231, 0.3);
+		}
+
+		/* 移动端适配 */
+		@media (max-width: 768px) {
+			.download-container {
+				margin: 2rem 1rem;
+				max-width: none;
+			}
+			
+			.download-btn {
+				width: 100%;
+				justify-content: center;
+				padding: 1.2rem;
+			}
+		}
 	</style>
 </head>
 
@@ -904,21 +940,6 @@
 		</div>
 	</div>
 
-	<!-- 修改下载按钮容器 -->
-	<div class="download-container">
-		<button class="download-btn" id="download-md">
-			⬇️ 下载文档
-			<div class="format-menu">
-				<div class="format-option" data-format="md">
-					<span>📝 Markdown</span>
-				</div>
-				<div class="format-option" data-format="docx">
-					<span>📄 Word</span>
-				</div>
-			</div>
-		</button>
-	</div>
-
 	<!-- 内容区域 -->
 	<main class="content">
 		<h1>协会培训中心</h1>
@@ -926,6 +947,21 @@
 			<article class="markdown-content" id="welcome-container">
 				<!-- 内容将由JavaScript动态加载 -->
 			</article>
+			
+			<!-- 将下载按钮移到内容区域底部 -->
+			<div class="download-container">
+				<button class="download-btn" id="download-md">
+					⬇️ 下载文档
+					<div class="format-menu">
+						<div class="format-option" data-format="md">
+							<span>📝 Markdown</span>
+						</div>
+						<div class="format-option" data-format="docx">
+							<span>📄 Word</span>
+						</div>
+					</div>
+				</button>
+			</div>
 		</div>
 	</main>
 
