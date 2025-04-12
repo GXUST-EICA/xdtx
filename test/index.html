@@ -864,6 +864,11 @@
 		</div>
 	</div>
 
+	<!-- 新增下载按钮容器 -->
+	<div class="download-container">
+		<button class="download-btn" id="download-md">下载当前文档</button>
+	</div>
+
 	<!-- 内容区域 -->
 	<main class="content">
 		<h1>协会培训中心</h1>
@@ -1345,6 +1350,20 @@
 		// 在DOM加载完成后调用
 		document.addEventListener('DOMContentLoaded', () => {
 			initContentScroll();
+		});
+
+		// 在脚本部分添加下载功能
+		document.getElementById('download-md').addEventListener('click', () => {
+			const blob = new Blob([currentContent], { type: 'text/markdown' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			
+			a.href = url;
+			a.download = document.querySelector('.markdown-content h1')?.textContent.trim() || 'document.md';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
 		});
 	</script>
 </body>
