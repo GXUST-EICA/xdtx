@@ -975,6 +975,20 @@
 				theme: 'light-border'
 			});
 		}
+
+		// 添加滚动同步逻辑（可选）
+		const syncScroll = () => {
+			const sidebar = document.querySelector('.sidebar');
+			const content = document.querySelector('.content');
+			
+			content.addEventListener('scroll', () => {
+				sidebar.scrollTop = content.scrollTop;
+			});
+		};
+
+		if(window.innerWidth >= 769) {
+			syncScroll();
+		}
 	</script>
 </body>
 
