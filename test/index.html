@@ -699,26 +699,11 @@
 			if (e.target.closest('.toc-subitem')) {
 				const contentArea = document.querySelector('.course-content');
 				contentArea.innerHTML = `
-                    /* 在样式部分添加 */
-                    .loading {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        min-height: 200px;
-                    }
-                    .spinner {
-                        width: 40px;
-                        height: 40px;
-                        border: 4px solid rgba(108, 92, 231, 0.2);
-                        border-radius: 50%;
-                        border-top-color: var(--primary);
-                        animation: spin 1s ease-in-out infinite;
-                    }
-                    @keyframes spin {
-                        to { transform: rotate(360deg); }
-                    }
-                `;
+					<div class="loading-indicator">
+						<div class="spinner"></div>
+						<p>正在加载课程内容...</p>
+					</div>
+				`;
 				
 				const item = e.target.closest('.toc-subitem');
 				const filePath = item.dataset.file;
@@ -727,10 +712,10 @@
 					const response = await fetch(filePath);
 					const markdown = await response.text();
 					contentArea.innerHTML = `
-                        <article class="markdown-content">
-                            ${marked.parse(markdown)}
-                        </article>
-                    `;
+						<article class="markdown-content">
+							${marked.parse(markdown)}
+						</article>
+					`;
 
 					// PC端自动滚动到标题位置
 					if (window.innerWidth > 768) {
@@ -744,11 +729,11 @@
 					history.pushState({}, '', `#${encodeURIComponent(filePath)}`);
 				} catch (error) {
 					contentArea.innerHTML = `
-                        <div class="error">
-                            <h3>⚠️ 内容加载失败</h3>
-                            <p>${error.message}</p>
-                        </div>
-                    `;
+						<div class="error">
+							<h3>⚠️ 内容加载失败</h3>
+							<p>${error.message}</p>
+						</div>
+					`;
 				}
 			}
 		});
