@@ -125,6 +125,8 @@
 				scrollbar-width: thin;
 				/* Firefox */
 				scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
+				overflow-x: hidden; /* 新增横向滚动隐藏 */
+				width: calc(100% - 2rem); /* 确保宽度适配 */
 			}
 
 			.toc-overlay.active .mobile-toc {
@@ -135,6 +137,8 @@
 			.toc-category {
 				margin: 0.5rem 0;
 				background: rgba(255, 255, 255, 0.9);
+				width: 100%;
+				box-sizing: border-box;
 			}
 
 			.toc-subitem {
@@ -142,6 +146,10 @@
 				font-size: 0.95rem;
 				border-radius: 12px;
 				margin: 4px 0;
+				white-space: normal; /* 确保文本换行 */
+				max-width: 100%;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 
 			/* 搜索框优化 */
@@ -182,6 +190,12 @@
 				min-height: 56px;
 				/* 最小触摸高度 */
 				-webkit-tap-highlight-color: var(--tap-highlight);
+			}
+
+			/* 隐藏横向滚动条 */
+			.mobile-toc::-webkit-scrollbar:horizontal {
+				display: none;
+				height: 0;
 			}
 		}
 
