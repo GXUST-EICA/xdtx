@@ -23,3 +23,9 @@ Ubuntu这类的系统毕竟是系统，所以让你的开发板保证软件最�
 
 ```bash
 apt-get update
+
+<div align="right">
+🎨 文档维护：自231班 黄海东 
+📅 最后更新：2024.06  
+📧 联系作者：jnjnjnn@163.com
+</div>

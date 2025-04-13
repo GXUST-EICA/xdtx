@@ -6,3 +6,9 @@
 - **立创EDA专业版**: [网页版直达](https://pro.lceda.cn/editor)
 - **标准版官方教程**: [点我直达](https://docs.lceda.cn/cn/Introduction/Introduction-to-LCEDA/)
 - **专业版官方视频教程**: [哔哩哔哩视频](https://www.bilibili.com/video/BV1x6421f7AT/?spm_id_from=333.999.0.0&vd_source=0bd1e74e0fe7e200ff74a89bbb96cc11)
+
+<div align="right">
+🎨 文档维护：自231班 黄海东 
+📅 最后更新：2024.06  
+📧 联系作者：jnjnjnn@163.com
+</div>

@@ -8,3 +8,9 @@ HAL库的编程环境可以多样，比如Keil、IAR、STM32CubeIDE等，可以�
 
 - **KeySking**: [哔哩哔哩链接](https://www.bilibili.com/video/BV12v4y1y7uV/?spm_id_from=333.788)
 - **野火**: [哔哩哔哩链接](https://www.bilibili.com/video/BV18X4y1M763?p=15&vd_source=0bd1e74e0fe7e200ff74a89bbb96cc11) & [野火在线文档](https://doc.embedfire.com/mcu/stm32/f103/hal_general/zh/latest/index.html)
+
+<div align="right">
+🎨 文档维护：自231班 黄海东 
+📅 最后更新：2024.06  
+📧 联系作者：jnjnjnn@163.com
+</div>

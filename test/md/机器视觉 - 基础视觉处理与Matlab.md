@@ -8,3 +8,9 @@
 - **opencv-python学习教程**: [黑马程序员图像处理OpenCV入门教程](https://www.bilibili.com/video/BV1Fo4y1d7JL/?p=7&share_source=copy_web&vd_source=d1ac1cf47f7200c9e192c32b7af1fc41)
 - **matlab学习教程**: [MATLAB图像处理教程](https://www.bilibili.com/video/BV1ci4y1b7NY/?share_source=copy_web&vd_source=d1ac1cf47f7200c9e192c32b7af1fc41)
 - **matlab学习教程**: [matlab图像处理基础文字版](https://blog.csdn.net/qq_49030808/article/details/108690293)
+
+<div align="right">
+🎨 文档维护：自231班 黄海东 
+📅 最后更新：2024.06  
+📧 联系作者：jnjnjnn@163.com
+</div>

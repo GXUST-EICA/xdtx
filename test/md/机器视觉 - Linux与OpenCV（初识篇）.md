@@ -24,3 +24,9 @@ OpenMV是一个开源的机器视觉模块，它集成了摄像头、处理器�
 ### OpenMV与STM32单片机通信
 
 - [OpenMV与STM32单片机通信](https://blog.csdn.net/2401_87555310/article/details/143197859)
+
+<div align="right">
+🎨 文档维护：自231班 黄海东 
+📅 最后更新：2024.06  
+📧 联系作者：jnjnjnn@163.com
+</div>

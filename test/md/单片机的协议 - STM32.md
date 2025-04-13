@@ -7,3 +7,9 @@
 - I2C、SPI等接口协议的基础学习与应用。
 
 - **STM32上常用的几个通信协议简介及相关代码**: [CSDN链接](https://blog.csdn.net/lyj456258/article/details/125135919)
+
+<div align="right">
+🎨 文档维护：自231班 黄海东 
+📅 最后更新：2024.06  
+📧 联系作者：jnjnjnn@163.com
+</div>
