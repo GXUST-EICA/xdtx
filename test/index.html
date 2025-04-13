@@ -109,7 +109,7 @@
 			/* 目录容器 */
 			.mobile-toc {
 				position: absolute;
-				bottom: calc(56px + 3rem);
+				bottom: calc(56px + 2rem);
 				right: 1.5rem;
 				width: 86vw;
 				max-width: 320px;
@@ -120,7 +120,7 @@
 				transform: translateY(20px);
 				transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28),
 					opacity 0.2s ease;
-				max-height: 85vh;
+				max-height: 70vh;
 				overflow-y: auto;
 				-webkit-overflow-scrolling: touch;
 				scrollbar-width: thin;
@@ -375,20 +375,56 @@
 
 		/* 新增Markdown内容样式 */
 		.markdown-content {
-			max-width: 800px;
-			margin: 0 auto;
 			padding: 2rem;
+			margin: 1rem auto;
+			max-width: 800px;
 			background: var(--glass);
 			border-radius: var(--radius);
 			box-shadow: var(--shadow);
 		}
 
-		.markdown-content h2 {
+		/* 标题样式 */
+		.markdown-content h1,
+		.markdown-content h2,
+		.markdown-content h3 {
 			color: var(--primary);
-			border-bottom: 2px solid var(--secondary);
-			padding-bottom: 0.5rem;
+			margin-top: 1.5rem;
+			margin-bottom: 0.5rem;
 		}
 
+		.markdown-content h1 {
+			font-size: 2.5rem;
+		}
+
+		.markdown-content h2 {
+			font-size: 2rem;
+		}
+
+		.markdown-content h3 {
+			font-size: 1.5rem;
+		}
+
+		/* 列表样式 */
+		.markdown-content ul,
+		.markdown-content ol {
+			margin: 1rem 0;
+			padding-left: 1.5rem;
+		}
+
+		.markdown-content li {
+			margin-bottom: 0.5rem;
+		}
+
+		/* 引用样式 */
+		.markdown-content blockquote {
+			background: rgba(108, 92, 231, 0.05);
+			border-left: 4px solid var(--primary);
+			padding: 1rem;
+			margin: 1.5rem 0;
+			border-radius: 0 8px 8px 0;
+		}
+
+		/* 代码块样式 */
 		.markdown-content pre {
 			background: rgba(108, 92, 231, 0.05);
 			padding: 1rem;
@@ -396,10 +432,27 @@
 			overflow-x: auto;
 		}
 
+		.markdown-content code {
+			background: rgba(108, 92, 231, 0.1);
+			padding: 0.2rem 0.4rem;
+			border-radius: 4px;
+		}
+
+		/* 增加链接样式 */
+		.markdown-content a {
+			color: var(--primary);
+			text-decoration: underline;
+		}
+
+		.markdown-content a:hover {
+			text-decoration: none;
+			color: var(--accent);
+		}
+
 		/* 优化移动端目录布局 */
 		.mobile-toc {
 			padding: 1rem;
-			bottom: calc(56px + 3rem);
+			bottom: calc(56px + 1.5rem);
 		}
 
 		.toc-category {
@@ -771,9 +824,12 @@
 		}
 
 		.mobile-toc {
-			overflow-y: auto; /* 保留滚动条 */
-			scrollbar-gutter: stable; /* 防止内容抖动 */
-			will-change: transform; /* 优化渲染性能 */
+			overflow-y: auto;
+			-webkit-overflow-scrolling: touch;
+			transform: translateZ(0);
+			/* 强制硬件加速 */
+			backface-visibility: hidden;
+			perspective: 1000px;
 		}
 
 		/* 滚动条视觉优化 */
@@ -874,6 +930,68 @@
 			margin: 0.5rem;
 			animation: slideIn 0.3s ease;
 		}
+
+		/* 更新字体 */
+		body {
+			font-family: 'Arial', sans-serif; /* 使用更现代的字体 */
+			color: #333; /* 更深的文本颜色 */
+			line-height: 1.6; /* 增加行高 */
+		}
+
+		/* 按钮样式 */
+		.download-btn,
+		.copy-btn {
+			transition: background 0.3s, transform 0.2s; /* 增加过渡效果 */
+		}
+
+		.download-btn:hover,
+		.copy-btn:hover {
+			transform: translateY(-2px); /* 悬停时轻微上移 */
+			background: var(--accent); /* 悬停时背景色变化 */
+		}
+
+		/* 增加阴影效果 */
+		.markdown-content {
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 增加阴影 */
+			border-radius: 8px; /* 圆角 */
+		}
+
+		/* 更新标题样式 */
+		h1, h2, h3 {
+			color: var(--primary); /* 使用主题色 */
+			margin-bottom: 1rem; /* 增加底部间距 */
+		}
+
+		/* 更新输入框样式 */
+		#mobile-search {
+			border: 1px solid var(--secondary);
+			border-radius: 12px; /* 圆角 */
+			padding: 0.8rem; /* 增加内边距 */
+		}
+
+		/* 更新滚动条样式 */
+		.mobile-toc::-webkit-scrollbar {
+			width: 8px; /* 增加滚动条宽度 */
+		}
+
+		.mobile-toc::-webkit-scrollbar-thumb {
+			background: var(--primary);
+			border-radius: 4px; /* 圆角 */
+		}
+
+		/* 更新错误提示样式 */
+		.error-message {
+			background: rgba(255, 0, 0, 0.1);
+			border: 1px solid red; /* 增加边框 */
+			border-radius: 8px; /* 圆角 */
+		}
+
+		/* 更新加载指示器样式 */
+		.loading-indicator {
+			background: rgba(255, 255, 255, 0.9); /* 背景色 */
+			border-radius: 8px; /* 圆角 */
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
+		}
 	</style>
 </head>
 
@@ -885,7 +1003,7 @@
 	<div class="toc-overlay">
 		<div class="mobile-toc" id="mobile-toc-container">
 			<div class="search-box">
-				<input type="text" id="mobile-search" placeholder="搜索课程..."
+				<input type="text" id="mobile-search" placeholder="      搜索课程..."
 					style="width:100%; border-radius:12px; border:1px solid var(--secondary)">
 			</div>
 			<div class="toc" id="mobile-toc"></div>
@@ -974,39 +1092,26 @@
 			});
 
 			document.getElementById('mobile-toc').innerHTML = tocHTML;
-			
-			// PC端添加hover效果
-			if (window.innerWidth > 768) {
-				document.querySelectorAll('.toc-subitem').forEach(item => {
-					item.addEventListener('mouseenter', () => {
-						item.style.transform = 'translateX(8px)';
-					});
-					item.addEventListener('mouseleave', () => {
-						item.style.transform = 'none';
-					});
-				});
-			}
 		}
 
-		// 统一目录交互逻辑
+		// 浮动按钮交互逻辑
 		const floatingToc = document.querySelector('.floating-toc');
 		const tocOverlay = document.querySelector('.toc-overlay');
 
-		// 修改点击处理逻辑
-		function toggleToc() {
+		floatingToc.addEventListener('click', (e) => {
+			e.stopPropagation();
 			floatingToc.classList.toggle('active');
 			tocOverlay.classList.toggle('active');
-			document.body.classList.toggle('toc-open');
-			
-			// PC端添加额外样式
-			if (window.innerWidth > 768) {
-				tocOverlay.style.backdropFilter = 'blur(12px)';
-				document.querySelector('.mobile-toc').style.boxShadow = '0 24px 48px rgba(108, 92, 231, 0.2)';
-			}
-		}
+			document.body.classList.toggle('toc-open'); // 新增body状态
+		});
 
-		// 统一事件绑定
-		floatingToc.addEventListener('click', toggleToc);
+		// 点击外部关闭
+		tocOverlay.addEventListener('click', (e) => {
+			if (e.target === tocOverlay) {
+				floatingToc.classList.remove('active');
+				tocOverlay.classList.remove('active');
+			}
+		});
 
 		// 修改搜索功能，添加防抖和缓存
 		// 修改搜索功能，添加防抖
@@ -1531,7 +1636,7 @@
 			safeAddEventListener('.mobile-toc', 'touchmove', handleTouchMove, { passive: false });
 
 			// 其他关键事件初始化
-			safeAddEventListener('.floating-toc', 'click', toggleToc);
+			safeAddEventListener('.floating-toc', 'click', toggleTocOverlay);
 			safeAddEventListener('.toc-overlay', 'click', closeTocOnOutsideClick);
 		});
 
