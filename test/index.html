@@ -131,6 +131,10 @@
 				width: calc(100% - 2rem);
 				/* 确保宽度适配 */
 				will-change: transform;
+				height: calc(100vh - 160px); /* 增加底部留白空间 */
+				min-height: 300px; /* 保证最小可操作高度 */
+				overscroll-behavior: contain; /* 防止滚动传播 */
+				touch-action: pan-y; /* 明确垂直滚动 */
 			}
 
 			.toc-overlay.active .mobile-toc {
@@ -201,6 +205,12 @@
 			.mobile-toc::-webkit-scrollbar:horizontal {
 				display: none;
 				height: 0;
+			}
+
+			/* 增加以下新规则 */
+			.toc#mobile-toc {
+				min-height: 100%; /* 保证内容高度 */
+				padding-bottom: 20px; /* 底部留白 */
 			}
 		}
 
@@ -931,6 +941,9 @@
 		.markdown-content {
 			scrollbar-width: thin;
 			scrollbar-color: var(--primary) rgba(108, 92, 231, 0.1);
+			-webkit-overflow-scrolling: touch !important; /* 强制启用弹性滚动 */
+			overscroll-behavior: contain;
+			transform: translateZ(0); /* 触发硬件加速 */
 		}
 
 		/* Webkit滚动条样式 */
