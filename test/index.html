@@ -1288,6 +1288,12 @@
 		// 修改内容加载逻辑适配PC端布局
 		document.addEventListener('click', async (e) => {
 			if (e.target.closest('.toc-subitem')) {
+				// 新增：立即滚动到页面顶部
+				window.scrollTo({
+					top: 0,
+					behavior: 'smooth'
+				});
+
 				// 移动端点击后关闭目录
 				if (window.innerWidth <= 768) {
 					floatingToc.classList.remove('active');
@@ -1328,6 +1334,12 @@
 							behavior: 'smooth'
 						});
 					}
+
+					// 确保内容插入后再次定位到顶部
+					requestAnimationFrame(() => {
+						window.scrollTo(0, 0);
+						document.documentElement.scrollTop = 0;
+					});
 
 					// 添加历史记录
 					history.pushState({}, '', `#${encodeURIComponent(filePath)}`);
