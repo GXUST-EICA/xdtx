@@ -897,7 +897,7 @@
 
 	<!-- 内容区域 -->
 	<main class="content">
-		<h1>协会培训中心</h1>
+		<h1 id="top-anchor">协会培训中心</h1>
 		<div class="course-content">
 			<article class="markdown-content" id="welcome-container">
 				<!-- 内容将由JavaScript动态加载 -->
@@ -1372,7 +1372,16 @@
 
 		// 在DOM加载完成后调用
 		document.addEventListener('DOMContentLoaded', () => {
+			// 新增：点击标题返回顶部
+			document.getElementById('top-anchor').addEventListener('click', () => {
+				window.scrollTo({
+					top: 0,
+					behavior: 'smooth'
+				});
+			});
+			
 			initContentScroll();
+			generateTOC();
 		});
 
 		// 在脚本部分添加下载功能
