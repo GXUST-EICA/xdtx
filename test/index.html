@@ -1288,11 +1288,19 @@
 		// 修改内容加载逻辑适配PC端布局
 		document.addEventListener('click', async (e) => {
 			if (e.target.closest('.toc-subitem')) {
-				// 新增：立即滚动到页面顶部
+				// 强制所有设备点击后立即滚动到顶部
 				window.scrollTo({
 					top: 0,
 					behavior: 'smooth'
 				});
+
+				// 新增：PC端额外处理
+				if (window.innerWidth > 768) {
+					// 双保险：直接操作滚动容器
+					document.documentElement.scrollTop = 0;
+					document.scrollingElement.scrollTop = 0;
+					document.querySelector('.content').scrollTop = 0;
+				}
 
 				// 移动端点击后关闭目录
 				if (window.innerWidth <= 768) {
