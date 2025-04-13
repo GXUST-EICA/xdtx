@@ -20,6 +20,11 @@
 			/* 统一圆角 */
 			--tap-highlight: rgba(108, 92, 231, 0.1);
 			/* 点击反馈色 */
+			--ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+			--indicator-width: 3px;
+			--gradient-angle: 45deg;
+			--breakpoint-mobile: 768px;
+			--breakpoint-tablet: 1024px;
 		}
 
 		/* 动态目录生成样式 */
@@ -535,6 +540,14 @@
 			align-items: center;
 			padding: 2rem;
 			min-height: 300px;
+			background: linear-gradient(
+				90deg,
+				rgba(108, 92, 231, 0.1) 25%,
+				rgba(108, 92, 231, 0.3) 50%,
+				rgba(108, 92, 231, 0.1) 75%
+			);
+			background-size: 200% 100%;
+			animation: content-loading 2s linear infinite;
 		}
 
 		.spinner {
@@ -877,6 +890,54 @@
 			margin: 0.5rem;
 			animation: slideIn 0.3s ease;
 		}
+
+		/* 优化目录项效果 */
+		.toc-subitem {
+			position: relative;
+			transition: transform 0.3s var(--ease-out-quart);
+			
+			&::before {
+				content: '';
+				position: absolute;
+				left: -1rem;
+				width: var(--indicator-width);
+				height: 60%;
+				background: linear-gradient(var(--gradient-angle), var(--primary), var(--accent));
+				opacity: 0;
+				transition: opacity 0.3s;
+			}
+			
+			&:hover {
+				transform: translateX(8px);
+				
+				&::before {
+					opacity: 1;
+				}
+			}
+		}
+
+		/* 新版加载动画 */
+		@keyframes content-loading {
+			0% { background-position: 200% 0 }
+			100% { background-position: -200% 0 }
+		}
+
+		.loading-indicator {
+			background: linear-gradient(
+				90deg,
+				rgba(108, 92, 231, 0.1) 25%,
+				rgba(108, 92, 231, 0.3) 50%,
+				rgba(108, 92, 231, 0.1) 75%
+			);
+			background-size: 200% 100%;
+			animation: content-loading 2s linear infinite;
+		}
+
+		@media (max-width: var(--breakpoint-mobile)) {
+			.mobile-toc {
+				padding: 0.5rem;
+			}
+		}
 	</style>
 </head>
 
@@ -897,7 +958,7 @@
 
 	<!-- 内容区域 -->
 	<main class="content">
-		<h1 id="top-anchor">协会培训中心</h1>
+		<h1>协会培训中心</h1>
 		<div class="course-content">
 			<article class="markdown-content" id="welcome-container">
 				<!-- 内容将由JavaScript动态加载 -->
@@ -1372,16 +1433,7 @@
 
 		// 在DOM加载完成后调用
 		document.addEventListener('DOMContentLoaded', () => {
-			// 新增：点击标题返回顶部
-			document.getElementById('top-anchor').addEventListener('click', () => {
-				window.scrollTo({
-					top: 0,
-					behavior: 'smooth'
-				});
-			});
-			
 			initContentScroll();
-			generateTOC();
 		});
 
 		// 在脚本部分添加下载功能
@@ -1550,6 +1602,75 @@
 		window.onerror = function (message, source, lineno, colno, error) {
 			console.error(`全局错误: ${message}@${source}:${lineno}`);
 			return true; // 阻止默认错误提示
+		};
+
+		// 模块化JS结构示例
+		const App = (() => {
+			// 私有变量
+			const config = {
+				CACHE_TTL: 300000,
+				SCROLL_DEBOUNCE: 100
+			};
+
+			// 初始化方法
+			const init = () => {
+				initSmoothScrolling();
+				initDynamicBackground();
+				initThemeSystem();
+			};
+
+			// 平滑滚动逻辑
+			const initSmoothScrolling = () => {
+				// 使用现有safeAddEventListener实现
+			};
+			
+			return { init };
+		})();
+
+		// 统一初始化入口
+		document.addEventListener('DOMContentLoaded', App.init);
+
+		const observer = new IntersectionObserver((entries) => {
+			entries.forEach(entry => {
+				if (entry.isIntersecting) {
+					entry.target.classList.add('visible');
+				}
+			});
+		}, { threshold: 0.1 });
+
+		document.querySelectorAll('.toc-subitem').forEach(item => {
+			observer.observe(item);
+		});
+
+		// 夜间模式切换
+		const ThemeManager = {
+			toggle() {
+				document.body.classList.toggle('dark-mode');
+				localStorage.setItem('theme', 
+					document.body.classList.contains('dark-mode') ? 'dark' : 'light'
+				);
+			},
+			init() {
+				const saved = localStorage.getItem('theme');
+				if (saved === 'dark') this.toggle();
+			}
+		};
+
+		// 学习进度保存
+		const ProgressTracker = {
+			saveProgress(chapterId) {
+				const progress = JSON.parse(localStorage.getItem('progress') || '{}');
+				progress[chapterId] = Date.now();
+				localStorage.setItem('progress', JSON.stringify(progress));
+			},
+			
+			highlightProgress() {
+				const progress = JSON.parse(localStorage.getItem('progress') || '{}');
+				Object.keys(progress).forEach(id => {
+					const item = document.querySelector(`[data-file="${id}"]`);
+					if (item) item.classList.add('completed');
+				});
+			}
 		};
 	</script>
 </body>
