@@ -98,7 +98,7 @@
 				z-index: 999;
 				opacity: 0;
 				visibility: hidden;
-				transition: opacity 0.3s ease;
+				transition: 0.3s ease;
 			}
 
 			.toc-overlay.active {
@@ -108,55 +108,33 @@
 
 			/* 目录容器 */
 			.mobile-toc {
-				position: fixed;
-				bottom: 0;
-				left: 0;
-				right: 0;
+				position: absolute;
+				bottom: calc(56px + 2rem);
+				right: 1.5rem;
+				width: 86vw;
+				max-width: 320px;
 				background: var(--glass);
-				border-radius: 24px 24px 0 0;
-				padding: 1rem;
-				max-height: 80vh;
-				transform: translateY(100%);
-				transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				border-radius: 24px;
+				padding: 1.5rem;
+				box-shadow: var(--shadow);
+				transform: translateY(20px);
+				transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28),
+					opacity 0.2s ease;
+				max-height: 70vh;
 				overflow-y: auto;
 				-webkit-overflow-scrolling: touch;
-				box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+				scrollbar-width: thin;
+				/* Firefox */
+				scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
+				overflow-x: hidden;
+				/* 新增横向滚动隐藏 */
+				width: calc(100% - 2rem);
+				/* 确保宽度适配 */
+				will-change: transform;
 			}
 
-			.toc-close-btn {
-				position: sticky;
-				top: 0;
-				width: 40px;
-				height: 40px;
-				margin-left: auto;
-				background: rgba(0,0,0,0.1);
-				border-radius: 50%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				z-index: 1;
-				backdrop-filter: blur(4px);
-			}
-
-			.toc-category {
-				margin: 1rem 0;
-				padding: 1rem;
-				background: rgba(255,255,255,0.95);
-				border-radius: 12px;
-				box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-			}
-
-			.toc-subitem {
-				padding: 12px;
-				margin: 8px 0;
-				border-radius: 8px;
-				background: rgba(108,92,231,0.05);
-				transition: transform 0.2s ease;
-			}
-
-			.toc-subitem:active {
-				transform: scale(0.98);
-				background: rgba(108,92,231,0.1);
+			.toc-overlay.active .mobile-toc {
+				transform: translateY(0);
 			}
 
 			/* 移动端目录项优化 */
@@ -234,17 +212,19 @@
 			}
 
 			.sidebar {
-				width: 350px;
+				width: 300px;
 				height: 100vh;
 				position: sticky;
 				top: 0;
 				overflow-y: auto;
 				transform: none !important;
-				box-shadow: 8px 0 40px rgba(108, 92, 231, 0.15);
-				border-right: 1px solid rgba(108, 92, 231, 0.1);
+				box-shadow: 8px 0 40px rgba(108, 92, 231, 0.1);
+				border-right: 1px solid var(--secondary);
+				/* 隐藏滚动条但保持滚动功能 */
 				scrollbar-width: none;
+				/* Firefox */
 				-ms-overflow-style: none;
-				padding: 2rem 1.5rem;
+				/* IE/Edge */
 			}
 
 			.sidebar::-webkit-scrollbar {
@@ -255,9 +235,11 @@
 			.content {
 				flex: 1;
 				padding: 2rem 4rem;
-				max-width: calc(100vw - 350px);
+				max-width: calc(100vw - 300px);
 				overflow-y: auto;
+				/* 添加独立滚动 */
 				height: calc(100vh - 3px);
+				/* 留出进度条空间 */
 			}
 
 			.menu-toggle {
@@ -270,6 +252,7 @@
 				top: 0;
 				padding: 1.5rem;
 				margin: 0 -1.5rem;
+				/* 抵消容器padding */
 				z-index: 200;
 				background: var(--glass);
 				backdrop-filter: blur(10px);
@@ -374,19 +357,10 @@
 		/* 优化移动端目录交互 */
 		.toc-category h3 {
 			cursor: pointer;
-			position: relative;
-			padding-right: 2rem;
-		}
-
-		.toc-category h3::after {
-			content: '⌄';
-			position: absolute;
-			right: 1rem;
-			transition: transform 0.3s ease;
-		}
-
-		.toc-category.collapsed h3::after {
-			transform: rotate(-90deg);
+			padding: 12px;
+			margin: -12px;
+			border-radius: var(--radius);
+			-webkit-tap-highlight-color: var(--tap-highlight);
 		}
 
 		.toc-category[data-fold="true"] .toc-subitem {
@@ -903,28 +877,22 @@
 			margin: 0.5rem;
 			animation: slideIn 0.3s ease;
 		}
-
-		/* 目录项展开效果 */
-		.toc-category {
-			max-height: 500px;
-			overflow-y: auto;
-			transition: max-height 0.3s ease;
-		}
-
-		.toc-category.collapsed {
-			max-height: 60px;
-			overflow: hidden;
-		}
 	</style>
 </head>
 
 <body>
-	<!-- 在body起始位置添加PC端目录 -->
-	<div class="sidebar">
-		<div class="search-box">
-			<input type="text" id="pc-search" placeholder="搜索课程...">
+	<!-- 新增浮动按钮 -->
+	<div class="floating-toc"></div>
+
+	<!-- 修改后的目录结构 -->
+	<div class="toc-overlay">
+		<div class="mobile-toc" id="mobile-toc-container">
+			<div class="search-box">
+				<input type="text" id="mobile-search" placeholder="搜索课程..."
+					style="width:100%; border-radius:12px; border:1px solid var(--secondary)">
+			</div>
+			<div class="toc" id="mobile-toc"></div>
 		</div>
-		<div class="toc" id="pc-toc"></div>
 	</div>
 
 	<!-- 内容区域 -->
@@ -949,14 +917,6 @@
 
 	<div id="error-container" aria-live="polite"></div>
 
-	<!-- 添加目录弹出层结构 -->
-	<div class="toc-overlay">
-		<div class="mobile-toc"></div>
-	</div>
-
-	<!-- 原浮动按钮保持 -->
-	<div class="floating-toc" id="mobile-toc-btn">📚</div>
-
 	<script>
 		// 动态生成目录
 		const courseFiles = [
@@ -964,7 +924,7 @@
 			"test/md/编程语言基础 - C语言.md",
 			"test/md/编程语言基础 - Python.md",
 
-			// 硬件基础知识
+			// 硬件基础
 			"test/md/硬件基础知识 - 电路基础.md",
 			"test/md/硬件基础知识 - MCU概念及架构.md",
 
@@ -1005,11 +965,10 @@
 			let tocHTML = '';
 			tocMap.forEach((items, category) => {
 				tocHTML += `
-                    <div class="toc-category" data-fold="false">
-                        <h3 onclick="this.parentElement.classList.toggle('collapsed')">${category}</h3>
+                    <div class="toc-category">
+                        <h3>${category}</h3>
                         ${items.map(item => `
                             <div class="toc-subitem" data-file="${item.path}">
-                                <span class="dot"></span>
                                 ${item.name}
                             </div>
                         `).join('')}
@@ -1017,9 +976,29 @@
                 `;
 			});
 
-			document.getElementById('pc-toc').innerHTML = tocHTML;
+			document.getElementById('mobile-toc').innerHTML = tocHTML;
 		}
 
+		// 浮动按钮交互逻辑
+		const floatingToc = document.querySelector('.floating-toc');
+		const tocOverlay = document.querySelector('.toc-overlay');
+
+		floatingToc.addEventListener('click', (e) => {
+			e.stopPropagation();
+			floatingToc.classList.toggle('active');
+			tocOverlay.classList.toggle('active');
+			document.body.classList.toggle('toc-open'); // 新增body状态
+		});
+
+		// 点击外部关闭
+		tocOverlay.addEventListener('click', (e) => {
+			if (e.target === tocOverlay) {
+				floatingToc.classList.remove('active');
+				tocOverlay.classList.remove('active');
+			}
+		});
+
+		// 修改搜索功能，添加防抖和缓存
 		// 修改搜索功能，添加防抖
 		function debounce(func, wait) {
 			let timeout;
@@ -1029,7 +1008,7 @@
 			};
 		}
 
-		document.getElementById('pc-search').addEventListener('input', debounce((e) => {
+		document.getElementById('mobile-search').addEventListener('input', debounce((e) => {
 			const term = e.target.value.trim().toLowerCase();
 			document.querySelectorAll('.toc-subitem').forEach(item => {
 				const text = item.textContent;
@@ -1060,10 +1039,8 @@
 		// 优化移动端点击体验
 		document.querySelectorAll('.toc-subitem').forEach(item => {
 			item.addEventListener('click', () => {
-				// 移动端点击后关闭目录
-				if (window.innerWidth <= 768) {
-					document.querySelector('.toc-overlay').classList.remove('active');
-				}
+				floatingToc.classList.remove('active');
+				tocOverlay.classList.remove('active');
 			});
 		});
 
@@ -1089,7 +1066,8 @@
 			if (e.target.closest('.toc-subitem')) {
 				// 移动端点击后关闭目录
 				if (window.innerWidth <= 768) {
-					document.querySelector('.toc-overlay').classList.remove('active');
+					floatingToc.classList.remove('active');
+					tocOverlay.classList.remove('active');
 				}
 
 				const contentArea = document.querySelector('.course-content');
@@ -1143,6 +1121,46 @@
 			const lastScroll = localStorage.getItem('lastScroll');
 			if (lastScroll) window.scrollTo(0, lastScroll);
 		});
+
+		// 修改后的移动端点击外部关闭菜单逻辑
+		document.addEventListener('click', (e) => {
+			if (window.innerWidth <= 768 &&
+				!e.target.closest('.mobile-toc') &&
+				!e.target.closest('.floating-toc')) {
+				document.querySelector('.toc-overlay').classList.remove('active');
+				document.body.classList.remove('toc-open');
+			}
+		});
+
+		// 替换原有复杂触摸处理
+		const mobileToc = document.querySelector('.mobile-toc');
+		let startY = 0;
+
+		mobileToc.addEventListener('touchstart', e => {
+			startY = e.touches[0].pageY;
+		}, { passive: true });
+
+		mobileToc.addEventListener('touchmove', e => {
+			const deltaY = e.touches[0].pageY - startY;
+			const atTop = mobileToc.scrollTop <= 0 && deltaY > 0;
+			const atBottom = mobileToc.scrollHeight <= mobileToc.clientHeight + mobileToc.scrollTop && deltaY < 0;
+
+			if (atTop || atBottom) {
+				e.preventDefault();
+			}
+		}, { passive: false });
+
+		// 优化滚动条渲染
+		requestAnimationFrame(() => {
+			mobileToc.style.scrollbarWidth = 'thin';
+		});
+
+		// 关闭时恢复滚动
+		function closeToc() {
+			floatingToc.classList.remove('active');
+			tocOverlay.classList.remove('active');
+			document.body.classList.remove('toc-open');
+		}
 
 		// 配置对象（方便后续维护）
 		const CONFIG = {
@@ -1320,6 +1338,43 @@
 			downloadContainer.style.display = 'block';
 		}
 
+		// 添加滚动状态检测
+		let scrollTimeout;
+		mobileToc.addEventListener('scroll', () => {
+			mobileToc.classList.add('scrolling');
+			clearTimeout(scrollTimeout);
+			scrollTimeout = setTimeout(() => {
+				mobileToc.classList.remove('scrolling');
+			}, 500);
+		});
+
+		// 阻止外层滚动传播
+		document.querySelector('.toc-overlay').addEventListener('wheel', (e) => {
+			if (e.target.closest('.mobile-toc')) {
+				e.stopPropagation();
+			}
+		}, { passive: true });
+
+		// 简化的触摸处理
+		function initContentScroll() {
+			const content = document.querySelector('.content');
+
+			// 仅保留必要的事件监听
+			content.addEventListener('touchstart', e => {
+				// 记录初始触摸位置
+				content.startY = e.touches[0].clientY;
+			}, { passive: true });
+
+			content.addEventListener('touchmove', e => {
+				// 允许浏览器处理滚动
+			}, { passive: true });
+		}
+
+		// 在DOM加载完成后调用
+		document.addEventListener('DOMContentLoaded', () => {
+			initContentScroll();
+		});
+
 		// 在脚本部分添加下载功能
 		document.getElementById('download-md').addEventListener('click', (e) => {
 			const menu = e.currentTarget.querySelector('.format-menu');
@@ -1414,6 +1469,62 @@
 			}, 5000); // 5秒后自动隐藏
 		});
 
+		// 修复事件监听器空指针问题
+		document.addEventListener('DOMContentLoaded', () => {
+			// 确保元素存在再绑定事件
+			const mobileToc = document.querySelector('.mobile-toc');
+			if (mobileToc) {
+				mobileToc.addEventListener('scroll', handleTocScroll);
+				mobileToc.addEventListener('touchstart', handleTouchStart, { passive: true });
+				mobileToc.addEventListener('touchmove', handleTouchMove, { passive: false });
+			}
+		});
+
+		// 优化后的触摸处理函数
+		function handleTouchStart(e) {
+			startY = e.touches[0].pageY;
+		}
+
+		function handleTouchMove(e) {
+			const deltaY = e.touches[0].pageY - startY;
+			const atTop = this.scrollTop <= 0 && deltaY > 0;
+			const atBottom = this.scrollHeight <= this.clientHeight + this.scrollTop && deltaY < 0;
+
+			if (atTop || atBottom) {
+				e.preventDefault();
+			}
+		}
+
+		function handleTocScroll() {
+			this.classList.add('scrolling');
+			clearTimeout(scrollTimeout);
+			scrollTimeout = setTimeout(() => {
+				this.classList.remove('scrolling');
+			}, 500);
+		}
+
+		// 修复空指针错误的核心代码
+		function safeAddEventListener(selector, eventType, handler, options) {
+			const element = document.querySelector(selector);
+			if (element) {
+				element.addEventListener(eventType, handler, options);
+			} else {
+				console.warn(`元素 ${selector} 不存在，无法绑定 ${eventType} 事件`);
+			}
+		}
+
+		// 安全初始化事件监听
+		document.addEventListener('DOMContentLoaded', () => {
+			// 目录相关事件
+			safeAddEventListener('.mobile-toc', 'scroll', handleTocScroll);
+			safeAddEventListener('.mobile-toc', 'touchstart', handleTouchStart, { passive: true });
+			safeAddEventListener('.mobile-toc', 'touchmove', handleTouchMove, { passive: false });
+
+			// 其他关键事件初始化
+			safeAddEventListener('.floating-toc', 'click', toggleTocOverlay);
+			safeAddEventListener('.toc-overlay', 'click', closeTocOnOutsideClick);
+		});
+
 		// 增强型错误处理
 		document.addEventListener('click', async (e) => {
 			if (e.target.closest('.toc-subitem')) {
@@ -1431,63 +1542,6 @@
 			console.error(`全局错误: ${message}@${source}:${lineno}`);
 			return true; // 阻止默认错误提示
 		};
-
-		// 在生成目录的代码部分添加
-		document.querySelector('.mobile-toc').innerHTML += `
-			<div class="toc-close-btn" onclick="document.querySelector('.toc-overlay').classList.remove('active')">
-				×
-			</div>
-		`;
-
-		// 修复1：添加目录开关控制函数
-		function toggleToc() {
-			const overlay = document.querySelector('.toc-overlay');
-			const body = document.querySelector('body');
-			
-			if (overlay.classList.contains('active')) {
-				overlay.classList.remove('active');
-				body.classList.remove('toc-open');
-			} else {
-				overlay.classList.add('active');
-				body.classList.add('toc-open');
-				// 确保目录内容已生成
-				if(!document.querySelector('.mobile-toc').innerHTML.includes('toc-category')){
-					generateMobileToc();
-				}
-			}
-		}
-
-		// 修复2：正确绑定浮动按钮事件
-		document.getElementById('mobile-toc-btn').addEventListener('click', function(e) {
-			e.stopPropagation(); // 阻止事件冒泡
-			toggleToc();
-		});
-
-		// 修复3：确保移动端目录生成
-		function generateMobileToc() {
-			const pcToc = document.getElementById('pc-toc').cloneNode(true);
-			const mobileToc = document.querySelector('.mobile-toc');
-			mobileToc.innerHTML = '';
-			mobileToc.appendChild(pcToc);
-			mobileToc.innerHTML += `
-				<div class="toc-close-btn" onclick="toggleToc()">
-					×
-				</div>
-			`;
-		}
-
-		// 修复4：添加点击外部关闭功能
-		document.querySelector('.toc-overlay').addEventListener('click', function(e) {
-			if(e.target === this) {
-				toggleToc();
-			}
-		});
-
-		// 在DOM加载完成后初始化
-		document.addEventListener('DOMContentLoaded', () => {
-			generateTOC();
-			generateMobileToc(); // 新增移动端目录生成
-		});
 	</script>
 </body>
 
