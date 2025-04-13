@@ -877,6 +877,46 @@
 			margin: 0.5rem;
 			animation: slideIn 0.3s ease;
 		}
+
+		@media (max-width: 768px) {
+			body {
+				overflow: hidden; /* 禁止主页面滚动 */
+				height: 100vh;
+			}
+
+			.mobile-toc {
+				overflow-y: auto;
+				height: 80vh; /* 目录独立滚动区域 */
+				scroll-behavior: smooth;
+				-webkit-overflow-scrolling: touch;
+			}
+
+			.course-content {
+				overflow-y: auto; /* Markdown独立滚动区域 */
+				height: calc(100vh - 120px);
+				-webkit-overflow-scrolling: touch;
+			}
+
+			.markdown-content {
+				overflow: visible !important; /* 内容在滚动容器内 */
+			}
+		}
+
+		@media (min-width: 769px) {
+			body {
+				overflow: hidden; /* PC端也禁止主页面滚动 */
+			}
+
+			.sidebar {
+				overflow-y: auto;
+				height: 100vh; /* 左侧目录独立滚动 */
+			}
+
+			.content {
+				overflow-y: auto; /* 右侧内容独立滚动 */
+				height: 100vh;
+			}
+		}
 	</style>
 </head>
 
