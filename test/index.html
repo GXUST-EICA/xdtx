@@ -109,7 +109,7 @@
 			/* 目录容器 */
 			.mobile-toc {
 				position: absolute;
-				bottom: calc(56px + 2rem);
+				bottom: calc(56px + 3rem);
 				right: 1.5rem;
 				width: 86vw;
 				max-width: 320px;
@@ -120,7 +120,7 @@
 				transform: translateY(20px);
 				transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28),
 					opacity 0.2s ease;
-				max-height: 70vh;
+				max-height: 85vh;
 				overflow-y: auto;
 				-webkit-overflow-scrolling: touch;
 				scrollbar-width: thin;
@@ -399,7 +399,7 @@
 		/* 优化移动端目录布局 */
 		.mobile-toc {
 			padding: 1rem;
-			bottom: calc(56px + 1.5rem);
+			bottom: calc(56px + 3rem);
 		}
 
 		.toc-category {
@@ -771,12 +771,9 @@
 		}
 
 		.mobile-toc {
-			overflow-y: auto;
-			-webkit-overflow-scrolling: touch;
-			transform: translateZ(0);
-			/* 强制硬件加速 */
-			backface-visibility: hidden;
-			perspective: 1000px;
+			overflow-y: auto; /* 保留滚动条 */
+			scrollbar-gutter: stable; /* 防止内容抖动 */
+			will-change: transform; /* 优化渲染性能 */
 		}
 
 		/* 滚动条视觉优化 */
@@ -977,26 +974,39 @@
 			});
 
 			document.getElementById('mobile-toc').innerHTML = tocHTML;
+			
+			// PC端添加hover效果
+			if (window.innerWidth > 768) {
+				document.querySelectorAll('.toc-subitem').forEach(item => {
+					item.addEventListener('mouseenter', () => {
+						item.style.transform = 'translateX(8px)';
+					});
+					item.addEventListener('mouseleave', () => {
+						item.style.transform = 'none';
+					});
+				});
+			}
 		}
 
-		// 浮动按钮交互逻辑
+		// 统一目录交互逻辑
 		const floatingToc = document.querySelector('.floating-toc');
 		const tocOverlay = document.querySelector('.toc-overlay');
 
-		floatingToc.addEventListener('click', (e) => {
-			e.stopPropagation();
+		// 修改点击处理逻辑
+		function toggleToc() {
 			floatingToc.classList.toggle('active');
 			tocOverlay.classList.toggle('active');
-			document.body.classList.toggle('toc-open'); // 新增body状态
-		});
-
-		// 点击外部关闭
-		tocOverlay.addEventListener('click', (e) => {
-			if (e.target === tocOverlay) {
-				floatingToc.classList.remove('active');
-				tocOverlay.classList.remove('active');
+			document.body.classList.toggle('toc-open');
+			
+			// PC端添加额外样式
+			if (window.innerWidth > 768) {
+				tocOverlay.style.backdropFilter = 'blur(12px)';
+				document.querySelector('.mobile-toc').style.boxShadow = '0 24px 48px rgba(108, 92, 231, 0.2)';
 			}
-		});
+		}
+
+		// 统一事件绑定
+		floatingToc.addEventListener('click', toggleToc);
 
 		// 修改搜索功能，添加防抖和缓存
 		// 修改搜索功能，添加防抖
@@ -1521,7 +1531,7 @@
 			safeAddEventListener('.mobile-toc', 'touchmove', handleTouchMove, { passive: false });
 
 			// 其他关键事件初始化
-			safeAddEventListener('.floating-toc', 'click', toggleTocOverlay);
+			safeAddEventListener('.floating-toc', 'click', toggleToc);
 			safeAddEventListener('.toc-overlay', 'click', closeTocOnOutsideClick);
 		});
 
