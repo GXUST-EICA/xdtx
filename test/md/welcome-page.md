@@ -65,7 +65,7 @@
 - 字体大小响应式调整
 - 触控板/鼠标滚轮优化
 
-<div align="right">
+<div align="center">
 🎨 文档维护：自231班 黄海东 
 📅 最后更新：2025.04  
 📧 联系作者：jnjnjnn@163.com

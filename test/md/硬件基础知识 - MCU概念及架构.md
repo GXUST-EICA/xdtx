@@ -5,7 +5,7 @@
 - **一文看懂ARM Cortex-M处理器**: [CSDN链接](https://blog.csdn.net/flyingcys/article/details/115447114#:~:text=Cortex-M)
 - **MCU的基本概念、原理、分类、特点和应用**: [CSDN链接](https://blog.csdn.net/weixin_45875986/article/details/136694522#:~:text=%E6%9C%AC%E6%96%87%E4%BB%8B%E7%BB%8D%E4%BA%86MCU)
 
-<div align="right">
+<div align="center">
 🎨 文档维护：自231班 黄海东 
 📅 最后更新：2024.06  
 📧 联系作者：jnjnjnn@163.com

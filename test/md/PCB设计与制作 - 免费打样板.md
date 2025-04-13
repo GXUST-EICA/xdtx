@@ -16,7 +16,7 @@
 - 4层板,5张 订单总金额≤300元全部减免，
 - 6层板,5张 订单总金额≤500元全部减免。也算能免费打板了：[免费打板](https://www.jiepei.com/Activity/newfree.html#:~:text=%E6%8D%B7%E9%85%8DPCB%E6%8F%90%E4%BE%9B1)
 
-<div align="right">
+<div align="center">
 🎨 文档维护：自231班 黄海东 
 📅 最后更新：2024.06  
 📧 联系作者：jnjnjnn@163.com

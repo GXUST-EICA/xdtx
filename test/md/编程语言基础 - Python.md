@@ -19,7 +19,7 @@ Python作为高层次脚本语言，具有以下特性：
 入门教程 | 📚 Python3 教程 | [菜鸟教程](https://www.runoob.com/python3/python3-tutorial.html)
 视频课程 | 🎥 600集零基础教程 | [黑马程序员](https://www.bilibili.com/video/BV1qW4y1a7fU/)
 
-<div align="right">
+<div align="center">
 🎨 文档维护：自231班 黄海东 
 📅 最后更新：2024.06  
 📧 联系作者：jnjnjnn@163.com
