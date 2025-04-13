@@ -1,22 +1,32 @@
-## Linux与OpenCV（代码自启动）
+# 🐧 OpenCV服务自启动配置指南
 
-### 代码自启动
+### 🔄 技术方案对比
+**自启动方式选择**  
 
-我们写完代码之后，总是要手动执行，这样很麻烦，所以我们可以使用代码自启动，这样就可以自动执行代码了。
+| 方式         | 优势                        | 适用场景               |
+|--------------|----------------------------|-----------------------|
+| **systemd**  | 🎯 系统级服务管理            | 长期运行/开机自启      |
+| **crontab**  | ⏰ 定时任务调度              | 周期性执行任务         |
+| **手动启动** | 🖥️ 临时调试                 | 开发测试阶段           |
 
-### 使用systemd管理服务
+---
 
-我们以Ubuntu为例，使用代码自启动，需要使用到systemd，systemd是Linux的系统和服务管理器，可以用来管理系统的服务和进程，我们使用systemd来管理代码自启动。
+### 🛠️ systemd服务配置流程
+**四步完成服务部署**  
 
-### 创建脚本
+| 步骤 | 操作说明                  | 关键命令/文件           |
+|------|---------------------------|-------------------------|
+| 1️⃣   | 创建启动脚本              | `/home/orangepi/code/start_pi.sh` |
+| 2️⃣   | 编写服务配置文件          | `/etc/systemd/system/pi.service` |
+| 3️⃣   | 重载服务配置              | `sudo systemctl daemon-reload` |
+| 4️⃣   | 启用并启动服务            | `sudo systemctl enable --now pi.service` |
 
-首先，我们需要创建脚本，我们可以用nano创建一个脚本，打开终端，输入以下命令：
+---
+
+### 📜 关键配置文件示例
+**启动脚本配置**  
 
 ```bash
-nano /home/orangepi/code/start_pi.sh
-然后复制并修改以下代码：
-
-bash
 #!/bin/bash
 # 加载Conda环境变量，orangepi是香橙派zero3的用户名，miniconda3是miniconda的安装目录
 source /home/orangepi/miniconda3/etc/profile.d/conda.sh
@@ -26,19 +36,10 @@ conda activate cv
 
 # 运行Python脚本
 /home/orangepi/miniconda3/envs/cv/bin/python /home/orangepi/code/pi.py
-给予权限
-按下ctrl+s保存，然后按下ctrl+x退出，然后给这个脚本给予权限，输入以下命令：
+```
 
-bash
-sudo chmod +x /home/orangepi/code/start_pi.sh
-创建systemd服务文件
-代码自启动自然是，创建一个新的 systemd 服务文件，输入以下命令：
-
-bash
-sudo nano /etc/systemd/system/pi.service
-然后复制并修改以下代码：
-
-bash
+**systemd服务文件**  
+```ini
 [Unit]
 Description=Run pi.py in cv Conda Environment
 After=network.target
@@ -54,18 +55,35 @@ User=orangepi
 
 [Install]
 WantedBy=multi-user.target
-启动服务
-重新上电一下，输入以下命令，查看服务是否启动成功：
+```
 
-bash
+---
+
+### 🔍 服务状态监控
+**常用管理命令**  
+
+```bash
+# 查看服务状态
 sudo systemctl status pi.service
-如果服务启动成功，会显示active (running)，如果服务启动失败，会显示inactive (dead)。
 
-使用systemd管理服务
-我们就可以使用代码自启动了。
+# 重启服务
+sudo systemctl restart pi.service
 
-<div align="center">
-🎨 文档维护：自231班 黄海东 
-📅 最后更新：2025.04.13  
-📧 联系作者：jnjnjnn@163.com
-</div>
+# 查看日志
+journalctl -u pi.service -f
+```
+
+---
+
+### 🚨 常见问题排查
+| 现象                 | 可能原因                  | 解决方案               |
+|----------------------|--------------------------|------------------------|
+| 服务启动失败         | 脚本权限不足             | `chmod +x start_pi.sh` |
+| Conda环境未激活      | 环境变量加载路径错误      | 检查conda.sh路径       |
+| Python依赖缺失       | 虚拟环境包未安装         | `pip install -r requirements.txt` |
+
+<p align="center">
+👨💻 文档维护：自231班 黄海东<br/>
+📅 版本追踪：v2.1.3 (2025.04.13)<br/>
+📧 技术支持：<a href="mailto:jnjnjnn@163.com">jnjnjnn@163.com</a>
+</p>
