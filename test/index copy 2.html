@@ -98,7 +98,7 @@
 				z-index: 999;
 				opacity: 0;
 				visibility: hidden;
-				transition: opacity 0.3s ease;
+				transition: 0.3s ease;
 			}
 
 			.toc-overlay.active {
@@ -108,55 +108,33 @@
 
 			/* 目录容器 */
 			.mobile-toc {
-				position: fixed;
-				bottom: 0;
-				left: 0;
-				right: 0;
+				position: absolute;
+				bottom: calc(56px + 2rem);
+				right: 1.5rem;
+				width: 86vw;
+				max-width: 320px;
 				background: var(--glass);
-				border-radius: 24px 24px 0 0;
-				padding: 1rem;
-				max-height: 80vh;
-				transform: translateY(100%);
-				transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				border-radius: 24px;
+				padding: 1.5rem;
+				box-shadow: var(--shadow);
+				transform: translateY(20px);
+				transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28),
+					opacity 0.2s ease;
+				max-height: 70vh;
 				overflow-y: auto;
 				-webkit-overflow-scrolling: touch;
-				box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+				scrollbar-width: thin;
+				/* Firefox */
+				scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
+				overflow-x: hidden;
+				/* 新增横向滚动隐藏 */
+				width: calc(100% - 2rem);
+				/* 确保宽度适配 */
+				will-change: transform;
 			}
 
-			.toc-close-btn {
-				position: sticky;
-				top: 0;
-				width: 40px;
-				height: 40px;
-				margin-left: auto;
-				background: rgba(0,0,0,0.1);
-				border-radius: 50%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				z-index: 1;
-				backdrop-filter: blur(4px);
-			}
-
-			.toc-category {
-				margin: 1rem 0;
-				padding: 1rem;
-				background: rgba(255,255,255,0.95);
-				border-radius: 12px;
-				box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-			}
-
-			.toc-subitem {
-				padding: 12px;
-				margin: 8px 0;
-				border-radius: 8px;
-				background: rgba(108,92,231,0.05);
-				transition: transform 0.2s ease;
-			}
-
-			.toc-subitem:active {
-				transform: scale(0.98);
-				background: rgba(108,92,231,0.1);
+			.toc-overlay.active .mobile-toc {
+				transform: translateY(0);
 			}
 
 			/* 移动端目录项优化 */
@@ -234,17 +212,19 @@
 			}
 
 			.sidebar {
-				width: 350px;
+				width: 300px;
 				height: 100vh;
 				position: sticky;
 				top: 0;
 				overflow-y: auto;
 				transform: none !important;
-				box-shadow: 8px 0 40px rgba(108, 92, 231, 0.15);
-				border-right: 1px solid rgba(108, 92, 231, 0.1);
+				box-shadow: 8px 0 40px rgba(108, 92, 231, 0.1);
+				border-right: 1px solid var(--secondary);
+				/* 隐藏滚动条但保持滚动功能 */
 				scrollbar-width: none;
+				/* Firefox */
 				-ms-overflow-style: none;
-				padding: 2rem 1.5rem;
+				/* IE/Edge */
 			}
 
 			.sidebar::-webkit-scrollbar {
@@ -255,9 +235,11 @@
 			.content {
 				flex: 1;
 				padding: 2rem 4rem;
-				max-width: calc(100vw - 350px);
+				max-width: calc(100vw - 300px);
 				overflow-y: auto;
+				/* 添加独立滚动 */
 				height: calc(100vh - 3px);
+				/* 留出进度条空间 */
 			}
 
 			.menu-toggle {
@@ -270,6 +252,7 @@
 				top: 0;
 				padding: 1.5rem;
 				margin: 0 -1.5rem;
+				/* 抵消容器padding */
 				z-index: 200;
 				background: var(--glass);
 				backdrop-filter: blur(10px);
@@ -374,19 +357,10 @@
 		/* 优化移动端目录交互 */
 		.toc-category h3 {
 			cursor: pointer;
-			position: relative;
-			padding-right: 2rem;
-		}
-
-		.toc-category h3::after {
-			content: '⌄';
-			position: absolute;
-			right: 1rem;
-			transition: transform 0.3s ease;
-		}
-
-		.toc-category.collapsed h3::after {
-			transform: rotate(-90deg);
+			padding: 12px;
+			margin: -12px;
+			border-radius: var(--radius);
+			-webkit-tap-highlight-color: var(--tap-highlight);
 		}
 
 		.toc-category[data-fold="true"] .toc-subitem {
@@ -903,18 +877,6 @@
 			margin: 0.5rem;
 			animation: slideIn 0.3s ease;
 		}
-
-		/* 目录项展开效果 */
-		.toc-category {
-			max-height: 500px;
-			overflow-y: auto;
-			transition: max-height 0.3s ease;
-		}
-
-		.toc-category.collapsed {
-			max-height: 60px;
-			overflow: hidden;
-		}
 	</style>
 </head>
 
@@ -948,14 +910,6 @@
 	<script src="style/tippy-bundle.umd.js"></script>
 
 	<div id="error-container" aria-live="polite"></div>
-
-	<!-- 添加目录弹出层结构 -->
-	<div class="toc-overlay">
-		<div class="mobile-toc"></div>
-	</div>
-
-	<!-- 原浮动按钮保持 -->
-	<div class="floating-toc" id="mobile-toc-btn">📚</div>
 
 	<script>
 		// 动态生成目录
@@ -1005,11 +959,10 @@
 			let tocHTML = '';
 			tocMap.forEach((items, category) => {
 				tocHTML += `
-                    <div class="toc-category" data-fold="false">
-                        <h3 onclick="this.parentElement.classList.toggle('collapsed')">${category}</h3>
+                    <div class="toc-category">
+                        <h3>${category}</h3>
                         ${items.map(item => `
                             <div class="toc-subitem" data-file="${item.path}">
-                                <span class="dot"></span>
                                 ${item.name}
                             </div>
                         `).join('')}
@@ -1431,63 +1384,6 @@
 			console.error(`全局错误: ${message}@${source}:${lineno}`);
 			return true; // 阻止默认错误提示
 		};
-
-		// 在生成目录的代码部分添加
-		document.querySelector('.mobile-toc').innerHTML += `
-			<div class="toc-close-btn" onclick="document.querySelector('.toc-overlay').classList.remove('active')">
-				×
-			</div>
-		`;
-
-		// 修复1：添加目录开关控制函数
-		function toggleToc() {
-			const overlay = document.querySelector('.toc-overlay');
-			const body = document.querySelector('body');
-			
-			if (overlay.classList.contains('active')) {
-				overlay.classList.remove('active');
-				body.classList.remove('toc-open');
-			} else {
-				overlay.classList.add('active');
-				body.classList.add('toc-open');
-				// 确保目录内容已生成
-				if(!document.querySelector('.mobile-toc').innerHTML.includes('toc-category')){
-					generateMobileToc();
-				}
-			}
-		}
-
-		// 修复2：正确绑定浮动按钮事件
-		document.getElementById('mobile-toc-btn').addEventListener('click', function(e) {
-			e.stopPropagation(); // 阻止事件冒泡
-			toggleToc();
-		});
-
-		// 修复3：确保移动端目录生成
-		function generateMobileToc() {
-			const pcToc = document.getElementById('pc-toc').cloneNode(true);
-			const mobileToc = document.querySelector('.mobile-toc');
-			mobileToc.innerHTML = '';
-			mobileToc.appendChild(pcToc);
-			mobileToc.innerHTML += `
-				<div class="toc-close-btn" onclick="toggleToc()">
-					×
-				</div>
-			`;
-		}
-
-		// 修复4：添加点击外部关闭功能
-		document.querySelector('.toc-overlay').addEventListener('click', function(e) {
-			if(e.target === this) {
-				toggleToc();
-			}
-		});
-
-		// 在DOM加载完成后初始化
-		document.addEventListener('DOMContentLoaded', () => {
-			generateTOC();
-			generateMobileToc(); // 新增移动端目录生成
-		});
 	</script>
 </body>
 
