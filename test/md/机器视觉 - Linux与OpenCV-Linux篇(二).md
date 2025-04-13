@@ -1,38 +1,45 @@
-## Linux与OpenCV-Linux篇（二）
+# 🐧 Linux与OpenCV配置指南（二）
 
-### Conda命令
+### 🛠️ Conda命令速查表
+**环境管理核心指令**  
+快速掌握Conda环境操作：
 
-1. **查看conda版本**: `conda --version`
-2. **创建虚拟环境**: `conda create -n myenv python=3.10`
-3. **激活虚拟环境**: `conda activate myenv`
-4. **退出虚拟环境**: `conda deactivate`
-5. **删除虚拟环境**: `conda remove -n myenv --all`
-6. **升级全部库**: `conda update --all`
-7. **升级一个包**: `conda update package_name`
-8. **查看已安装的包**: `conda list`
-9. **移除一个包**: `conda remove opencv`
-10. **安装一个包**: `conda install opencv`
+| 操作描述               | 终端指令                          |
+|-----------------------|----------------------------------|
+| **查看conda版本**      | `conda --version`               |
+| **创建虚拟环境**       | `conda create -n myenv python=3.10` |
+| **激活虚拟环境**       | `conda activate myenv`          |
+| **退出虚拟环境**       | `conda deactivate`              |
+| **删除虚拟环境**       | `conda remove -n myenv --all`   |
 
-### 使用顺序
+---
 
-1. **创建虚拟环境**: `conda create -n cv python=3.10`
-2. **激活虚拟环境**: `conda activate cv`
-3. **安装opencv-python**: `pip install opencv-contrib-python`
-4. **使用opencv**: `python`
+### 🚀 OpenCV配置流程
+**四步完成环境部署**  
+推荐操作顺序：
 
-### 更换pip源
+1. **创建专用环境** → `conda create -n cv python=3.10`
+2. **激活环境** → `conda activate cv`
+3. **安装OpenCV** → `pip install opencv-contrib-python`
+4. **验证安装** → `python -c "import cv2; print(cv2.__version__)"`
 
-建议更换pip源为阿里源，直接在命令窗口输入:
+---
+
+### 🌐 镜像加速配置
+**阿里云镜像设置**  
+提升包下载速度的最佳实践：
 
 ```bash
 pip config set global.index-url https://mirrors.aliyun.com/pypi/simple
 pip config set install.trusted-host mirrors.aliyun.com
 ```
-- [菜鸟教程的pip教程](https://www.runoob.com/python3/python3-pip.html)
+
+学习资源直达 → [![菜鸟教程](https://img.shields.io/badge/PIP教程-32CD32?style=flat-square)](https://www.runoob.com/python3/python3-pip.html)
+
 ---
 
-<div align="center">
-🎨 文档维护：自231班 黄海东 
-📅 最后更新：2025.04.13  
-📧 联系作者：jnjnjnn@163.com
-</div>
+<p align="center">
+👨💻 文档维护：自231班 黄海东<br/>
+📅 版本追踪：v2.1.3 (2025.04.13)<br/>
+📧 技术支持：<a href="mailto:jnjnjnn@163.com">jnjnjnn@163.com</a>
+</p>
