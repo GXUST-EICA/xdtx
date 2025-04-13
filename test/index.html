@@ -352,14 +352,14 @@
 
 		/* 新增阅读进度条 */
 		.progress-bar {
-			display: none;
-			/* 隐藏进度条 */
+			display: block;
 			position: fixed;
 			top: 0;
 			left: 0;
 			height: 3px;
 			background: var(--accent);
 			z-index: 500;
+			transition: width 0.2s ease-out;
 		}
 
 		/* 优化移动端目录交互 */
@@ -1251,11 +1251,33 @@
 			const progressBar = document.createElement('div');
 			progressBar.className = 'progress-bar';
 			document.body.prepend(progressBar);
-
-			window.addEventListener('scroll', () => {
+			
+			let rafId;
+			function updateProgress() {
 				const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-				const progress = (window.scrollY / scrollHeight) * 100;
-				progressBar.style.width = progress + '%';
+				const progress = Math.min(1, Math.max(0, window.scrollY / scrollHeight));
+				progressBar.style.width = `${progress * 100}%`;
+				rafId = requestAnimationFrame(updateProgress);
+			}
+			
+			// 使用IntersectionObserver优化性能
+			const observer = new IntersectionObserver(() => {
+				if (document.documentElement.scrollHeight > window.innerHeight * 2) {
+					rafId = requestAnimationFrame(updateProgress);
+				} else {
+					progressBar.style.width = '0';
+				}
+			}, { threshold: 0.1 });
+
+			observer.observe(document.documentElement);
+			
+			// 滚动结束隐藏（可选）
+			let scrollTimeout;
+			window.addEventListener('scroll', () => {
+				clearTimeout(scrollTimeout);
+				scrollTimeout = setTimeout(() => {
+					cancelAnimationFrame(rafId);
+				}, 100);
 			});
 		}
 
