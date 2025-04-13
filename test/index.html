@@ -20,219 +20,188 @@
 			/* 统一圆角 */
 			--tap-highlight: rgba(108, 92, 231, 0.1);
 			/* 点击反馈色 */
-			--ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-			--indicator-width: 3px;
-			--gradient-angle: 45deg;
-			--breakpoint-mobile: 768px;
-			--breakpoint-tablet: 1024px;
 		}
 
 		/* 动态目录生成样式 */
 		/* 合并.toc-category样式 */
 		.toc-category {
-			margin-bottom: 1rem;
-			border-radius: 8px;
-			background: rgba(255,255,255,0.05);
-			transition: background 0.2s;
-		}
-
-		.category-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 0.8rem 1rem;
-			cursor: pointer;
-		}
-
-		.toggle-more {
-			font-size: 0.9em;
-			color: var(--accent);
-			opacity: 0.7;
-			transition: opacity 0.2s;
-		}
-
-		.toc-category:hover .toggle-more {
-			opacity: 1;
-		}
-
-		.category-items {
-			padding: 0 1rem;
-		}
-
-		.show-all {
-			text-align: center;
-			padding: 0.5rem;
-			margin: 0.5rem 0;
 			background: var(--glass);
-			border-radius: 6px;
-			cursor: pointer;
-			font-size: 0.9em;
-			color: var(--accent);
+			backdrop-filter: blur(12px);
+			border-radius: var(--radius);
+			margin: 1rem 0;
+			padding: 1rem;
+			box-shadow: var(--shadow);
+			transition: transform 0.2s ease;
+			position: relative;
+			-webkit-tap-highlight-color: var(--tap-highlight);
 		}
 
-		.show-all:hover {
-			background: rgba(108, 92, 231, 0.1);
+		/* 合并后的媒体查询 */
+		@media (max-width: 768px) {
+			.toc-category {
+				margin: 0.5rem 0;
+				background: rgba(255, 255, 255, 0.9);
+			}
+		}
+
+		@media (min-width: 769px) {
+			.toc-category {
+				margin: 0.5rem 1rem;
+			}
 		}
 
 		/* 移动端优化 */
 		@media (max-width: 768px) {
+			.sidebar {
+				display: none;
+				/* 隐藏原始侧边栏 */
+			}
+
+			/* 新增浮动目录按钮 */
+			.floating-toc {
+				position: fixed;
+				bottom: 2rem;
+				right: 1.5rem;
+				z-index: 1000;
+				width: 56px;
+				height: 56px;
+				border-radius: 50%;
+				background: var(--primary);
+				box-shadow: 0 8px 24px rgba(108, 92, 231, 0.3);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.floating-toc::after {
+				content: '📚';
+				font-size: 1.8rem;
+				filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+			}
+
+			.floating-toc.active {
+				transform: rotate(135deg);
+				background: var(--accent);
+			}
+
+			/* 目录弹出层 */
+			.toc-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: rgba(0, 0, 0, 0.4);
+				backdrop-filter: blur(8px);
+				z-index: 999;
+				opacity: 0;
+				visibility: hidden;
+				transition: 0.3s ease;
+			}
+
+			.toc-overlay.active {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			/* 目录容器 */
+			.mobile-toc {
+				position: absolute;
+				bottom: calc(56px + 2rem);
+				right: 1.5rem;
+				width: 86vw;
+				max-width: 320px;
+				background: var(--glass);
+				border-radius: 24px;
+				padding: 1.5rem;
+				box-shadow: var(--shadow);
+				transform: translateY(20px);
+				transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28),
+					opacity 0.2s ease;
+				max-height: 70vh;
+				overflow-y: auto;
+				-webkit-overflow-scrolling: touch;
+				scrollbar-width: thin;
+				/* Firefox */
+				scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
+				overflow-x: hidden;
+				/* 新增横向滚动隐藏 */
+				width: calc(100% - 2rem);
+				/* 确保宽度适配 */
+				will-change: transform;
+			}
+
+			.toc-overlay.active .mobile-toc {
+				transform: translateY(0);
+			}
+
+			/* 移动端目录项优化 */
 			.toc-category {
-				margin-bottom: 0.5rem;
+				margin: 0.5rem 0;
+				background: rgba(255, 255, 255, 0.9);
+				width: 100%;
+				box-sizing: border-box;
 			}
-			
-			.category-header {
-				padding: 0.6rem;
+
+			.toc-subitem {
+				padding: 1rem;
+				font-size: 0.95rem;
+				border-radius: 12px;
+				margin: 4px 0;
+				white-space: normal;
+				/* 确保文本换行 */
+				max-width: 100%;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
-			
-			.show-all {
-				margin: 0.3rem 0;
+
+			/* 搜索框优化 */
+			.mobile-toc .search-box {
+				padding: 0 1rem 1rem;
+				margin: 0 -1rem;
 			}
-		}
 
-		/* 新增浮动目录按钮 */
-		.floating-toc {
-			position: fixed;
-			bottom: 2rem;
-			right: 1.5rem;
-			z-index: 1000;
-			width: 56px;
-			height: 56px;
-			border-radius: 50%;
-			background: var(--primary);
-			box-shadow: 0 8px 24px rgba(108, 92, 231, 0.3);
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			cursor: pointer;
-			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-		}
+			.mobile-toc #search {
+				font-size: 1rem;
+				padding: 1rem;
+			}
 
-		.floating-toc::after {
-			content: '📚';
-			font-size: 1.8rem;
-			filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-		}
+			/* 保证内容足够高度 */
+			.toc {
+				min-height: 120%;
+			}
 
-		.floating-toc.active {
-			transform: rotate(135deg);
-			background: var(--accent);
-		}
+			/* 优化滚动条样式 */
+			.mobile-toc::-webkit-scrollbar {
+				width: 8px;
+				/* 增大滚动条宽度 */
+				background: rgba(0, 0, 0, 0.05);
+			}
 
-		/* 目录弹出层 */
-		.toc-overlay {
-			position: fixed;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			background: rgba(0, 0, 0, 0.4);
-			backdrop-filter: blur(8px);
-			z-index: 999;
-			opacity: 0;
-			visibility: hidden;
-			transition: 0.3s ease;
-		}
+			.mobile-toc::-webkit-scrollbar-thumb {
+				background: var(--primary);
+				border-radius: 4px;
+				border: 2px solid rgba(255, 255, 255, 0.2);
+				/* 添加边框增强可视性 */
+			}
 
-		.toc-overlay.active {
-			opacity: 1;
-			visibility: visible;
-		}
+			/* 增强触摸反馈 */
+			.toc-category,
+			.toc-subitem {
+				padding: 16px !important;
+				/* 增大点击区域 */
+				min-height: 56px;
+				/* 最小触摸高度 */
+				-webkit-tap-highlight-color: var(--tap-highlight);
+			}
 
-		/* 目录容器 */
-		.mobile-toc {
-			position: absolute;
-			bottom: calc(56px + 2rem);
-			right: 1.5rem;
-			width: 86vw;
-			max-width: 320px;
-			background: var(--glass);
-			border-radius: 24px;
-			padding: 1.5rem;
-			box-shadow: var(--shadow);
-			transform: translateY(20px);
-			transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28),
-				opacity 0.2s ease;
-			max-height: 70vh;
-			overflow-y: auto;
-			-webkit-overflow-scrolling: touch;
-			scrollbar-width: thin;
-			/* Firefox */
-			scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
-			overflow-x: hidden;
-			/* 新增横向滚动隐藏 */
-			width: calc(100% - 2rem);
-			/* 确保宽度适配 */
-			will-change: transform;
-		}
-
-		.toc-overlay.active .mobile-toc {
-			transform: translateY(0);
-		}
-
-		/* 移动端目录项优化 */
-		.toc-category {
-			margin: 0.5rem 0;
-			background: rgba(255, 255, 255, 0.9);
-			width: 100%;
-			box-sizing: border-box;
-		}
-
-		.toc-subitem {
-			padding: 1rem;
-			font-size: 0.95rem;
-			border-radius: 12px;
-			margin: 4px 0;
-			white-space: normal;
-			/* 确保文本换行 */
-			max-width: 100%;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-
-		/* 搜索框优化 */
-		.mobile-toc .search-box {
-			padding: 0 1rem 1rem;
-			margin: 0 -1rem;
-		}
-
-		.mobile-toc #search {
-			font-size: 1rem;
-			padding: 1rem;
-		}
-
-		/* 保证内容足够高度 */
-		.toc {
-			min-height: 120%;
-		}
-
-		/* 优化滚动条样式 */
-		.mobile-toc::-webkit-scrollbar {
-			width: 8px;
-			/* 增大滚动条宽度 */
-			background: rgba(0, 0, 0, 0.05);
-		}
-
-		.mobile-toc::-webkit-scrollbar-thumb {
-			background: var(--primary);
-			border-radius: 4px;
-			border: 2px solid rgba(255, 255, 255, 0.2);
-			/* 添加边框增强可视性 */
-		}
-
-		/* 增强触摸反馈 */
-		.toc-category,
-		.toc-subitem {
-			padding: 16px !important;
-			/* 增大点击区域 */
-			min-height: 56px;
-			/* 最小触摸高度 */
-			-webkit-tap-highlight-color: var(--tap-highlight);
-		}
-
-		/* 隐藏横向滚动条 */
-		.mobile-toc::-webkit-scrollbar:horizontal {
-			display: none;
-			height: 0;
+			/* 隐藏横向滚动条 */
+			.mobile-toc::-webkit-scrollbar:horizontal {
+				display: none;
+				height: 0;
+			}
 		}
 
 		/* PC端布局优化 */
@@ -566,14 +535,6 @@
 			align-items: center;
 			padding: 2rem;
 			min-height: 300px;
-			background: linear-gradient(
-				90deg,
-				rgba(108, 92, 231, 0.1) 25%,
-				rgba(108, 92, 231, 0.3) 50%,
-				rgba(108, 92, 231, 0.1) 75%
-			);
-			background-size: 200% 100%;
-			animation: content-loading 2s linear infinite;
 		}
 
 		.spinner {
@@ -916,54 +877,6 @@
 			margin: 0.5rem;
 			animation: slideIn 0.3s ease;
 		}
-
-		/* 优化目录项效果 */
-		.toc-subitem {
-			position: relative;
-			transition: transform 0.3s var(--ease-out-quart);
-			
-			&::before {
-				content: '';
-				position: absolute;
-				left: -1rem;
-				width: var(--indicator-width);
-				height: 60%;
-				background: linear-gradient(var(--gradient-angle), var(--primary), var(--accent));
-				opacity: 0;
-				transition: opacity 0.3s;
-			}
-			
-			&:hover {
-				transform: translateX(8px);
-				
-				&::before {
-					opacity: 1;
-				}
-			}
-		}
-
-		/* 新版加载动画 */
-		@keyframes content-loading {
-			0% { background-position: 200% 0 }
-			100% { background-position: -200% 0 }
-		}
-
-		.loading-indicator {
-			background: linear-gradient(
-				90deg,
-				rgba(108, 92, 231, 0.1) 25%,
-				rgba(108, 92, 231, 0.3) 50%,
-				rgba(108, 92, 231, 0.1) 75%
-			);
-			background-size: 200% 100%;
-			animation: content-loading 2s linear infinite;
-		}
-
-		@media (max-width: var(--breakpoint-mobile)) {
-			.mobile-toc {
-				padding: 0.5rem;
-			}
-		}
 	</style>
 </head>
 
@@ -1034,10 +947,9 @@
 			"test/md/机器视觉 - Linux与OpenCV-Linux篇(一).md"
 		];
 
-		// 修改后的目录生成逻辑
+		// 动态生成目录结构
 		function generateTOC() {
 			const tocMap = new Map();
-			const MAX_ITEMS_PER_CATEGORY = 5; // 每类默认显示5项
 
 			courseFiles.forEach(path => {
 				const [category, filename] = path.split('/').pop().split(' - ');
@@ -1052,60 +964,19 @@
 
 			let tocHTML = '';
 			tocMap.forEach((items, category) => {
-				const hasMore = items.length > MAX_ITEMS_PER_CATEGORY;
-				
 				tocHTML += `
-					<div class="toc-category" data-expanded="false">
-						<div class="category-header">
-							<h3>${category}</h3>
-							${hasMore ? `<span class="toggle-more">▼ 展开</span>` : ''}
-						</div>
-						<div class="category-items">
-							${items.slice(0, MAX_ITEMS_PER_CATEGORY).map(item => `
-								<div class="toc-subitem" data-file="${item.path}">
-									${item.name}
-								</div>
-							`).join('')}
-							${hasMore ? `
-								<div class="more-items" style="display:none">
-									${items.slice(MAX_ITEMS_PER_CATEGORY).map(item => `
-										<div class="toc-subitem" data-file="${item.path}">
-											${item.name}
-										</div>
-									`).join('')}
-								</div>
-								<div class="show-all">显示全部 ${items.length} 项</div>
-							` : ''}
-						</div>
-					</div>
-				`;
+                    <div class="toc-category">
+                        <h3>${category}</h3>
+                        ${items.map(item => `
+                            <div class="toc-subitem" data-file="${item.path}">
+                                ${item.name}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
 			});
 
 			document.getElementById('mobile-toc').innerHTML = tocHTML;
-			
-			// 添加折叠交互
-			document.querySelectorAll('.toggle-more, .show-all').forEach(btn => {
-				btn.addEventListener('click', function(e) {
-					const category = this.closest('.toc-category');
-					const moreItems = category.querySelector('.more-items');
-					const isExpanded = category.dataset.expanded === 'true';
-
-					if (isExpanded) {
-						moreItems.style.display = 'none';
-						category.querySelector('.show-all').textContent = `显示全部 ${category.querySelectorAll('.toc-subitem').length} 项`;
-						category.dataset.expanded = 'false';
-					} else {
-						moreItems.style.display = 'block';
-						category.querySelector('.show-all').textContent = '收起';
-						category.dataset.expanded = 'true';
-					}
-					
-					// 自动滚动定位
-					if (!isExpanded) {
-						category.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-					}
-				});
-			});
 		}
 
 		// 浮动按钮交互逻辑
@@ -1670,75 +1541,6 @@
 		window.onerror = function (message, source, lineno, colno, error) {
 			console.error(`全局错误: ${message}@${source}:${lineno}`);
 			return true; // 阻止默认错误提示
-		};
-
-		// 模块化JS结构示例
-		const App = (() => {
-			// 私有变量
-			const config = {
-				CACHE_TTL: 300000,
-				SCROLL_DEBOUNCE: 100
-			};
-
-			// 初始化方法
-			const init = () => {
-				initSmoothScrolling();
-				initDynamicBackground();
-				initThemeSystem();
-			};
-
-			// 平滑滚动逻辑
-			const initSmoothScrolling = () => {
-				// 使用现有safeAddEventListener实现
-			};
-			
-			return { init };
-		})();
-
-		// 统一初始化入口
-		document.addEventListener('DOMContentLoaded', App.init);
-
-		const observer = new IntersectionObserver((entries) => {
-			entries.forEach(entry => {
-				if (entry.isIntersecting) {
-					entry.target.classList.add('visible');
-				}
-			});
-		}, { threshold: 0.1 });
-
-		document.querySelectorAll('.toc-subitem').forEach(item => {
-			observer.observe(item);
-		});
-
-		// 夜间模式切换
-		const ThemeManager = {
-			toggle() {
-				document.body.classList.toggle('dark-mode');
-				localStorage.setItem('theme', 
-					document.body.classList.contains('dark-mode') ? 'dark' : 'light'
-				);
-			},
-			init() {
-				const saved = localStorage.getItem('theme');
-				if (saved === 'dark') this.toggle();
-			}
-		};
-
-		// 学习进度保存
-		const ProgressTracker = {
-			saveProgress(chapterId) {
-				const progress = JSON.parse(localStorage.getItem('progress') || '{}');
-				progress[chapterId] = Date.now();
-				localStorage.setItem('progress', JSON.stringify(progress));
-			},
-			
-			highlightProgress() {
-				const progress = JSON.parse(localStorage.getItem('progress') || '{}');
-				Object.keys(progress).forEach(id => {
-					const item = document.querySelector(`[data-file="${id}"]`);
-					if (item) item.classList.add('completed');
-				});
-			}
 		};
 	</script>
 </body>
