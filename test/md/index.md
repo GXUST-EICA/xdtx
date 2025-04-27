@@ -4,7 +4,7 @@
 
 <!-- 美化表格：加外框和斑马纹 -->
 <div style="overflow-x:auto;">
-<table style="width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(108,92,231,0.08);font-size:1.05rem;">
+<table style="width:66vw;max-width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(108,92,231,0.08);font-size:1.05rem;">
   <thead style="background:linear-gradient(90deg,#a8a4e6 0%,#f3f5ff 100%);color:#333;">
     <tr>
       <th style="padding:1rem 0.5rem;">培训内容</th>
@@ -66,11 +66,17 @@
 </table>
 </div>
 
+---
 
-##[📥 培训资料下载中心](https://www.eica.fun/download)##
+<div align="center">
 
-##[🏫 粤嵌培训中心](http://vm.yueqian.com.cn:8886/index.html)##
-##[📚 旧版培训中心](https://www.eica.fun/oldtraining)##
+# 📥 [培训资料下载中心](https://www.eica.fun/download)
+
+# 🏫 [粤嵌培训中心](http://vm.yueqian.com.cn:8886/index.html)
+
+# 📚 [旧版培训中心](https://www.eica.fun/oldtraining)
+
+</div>
 
 后续更新时间表，敬请期待！
 
