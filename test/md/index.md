@@ -3,7 +3,7 @@
 下载中心提供了一些提到的软件，以下是个人整理的一些网络资源，仅代表个人观点，有需要的同学可以查看。蓝色字都是跳转教程的链接。
 
 <!-- 美化表格：加外框和斑马纹 -->
-<div style="overflow-x:auto;">
+<div style="overflow-x:auto;display:flex;justify-content:center;">
 <table style="width:100%;max-width:500px;border-collapse:collapse;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(108,92,231,0.08);font-size:0.98rem;">
   <thead style="background:linear-gradient(90deg,#a8a4e6 0%,#f3f5ff 100%);color:#333;">
     <tr>
