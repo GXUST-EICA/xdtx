@@ -66,11 +66,11 @@
 </table>
 </div>
 
-## 🔗 快速访问
 
-**[📥 培训资料下载中心](https://www.eica.fun/download)**  
-**[🏫 粤嵌培训中心](http://vm.yueqian.com.cn:8886/index.html)**  
-**[📚 旧版培训中心](https://www.eica.fun/oldtraining)**
+##[📥 培训资料下载中心](https://www.eica.fun/download)##
+
+##[🏫 粤嵌培训中心](http://vm.yueqian.com.cn:8886/index.html)##
+##[📚 旧版培训中心](https://www.eica.fun/oldtraining)##
 
 后续更新时间表，敬请期待！
 
