@@ -1081,46 +1081,10 @@
 			color: var(--primary);
 			/* 使用主题色 */
 		}
-
-		.site-header {
-			position: sticky;
-			top: 0;
-			width: 100%;
-			background: var(--glass);
-			box-shadow: 0 2px 8px rgba(108, 92, 231, 0.08);
-			z-index: 100;
-			padding: 1rem 2rem;
-		}
-		.header-inner {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-		.site-title {
-			font-size: 1.6rem;
-			color: var(--primary);
-			font-weight: bold;
-			letter-spacing: 2px;
-		}
-		.site-footer {
-			width: 100%;
-			text-align: center;
-			padding: 1.2rem 0;
-			background: var(--glass);
-			color: #888;
-			font-size: 1rem;
-			margin-top: 2rem;
-			border-top: 1px solid var(--secondary);
-		}
 	</style>
 </head>
 
 <body>
-	<header class="site-header">
-		<div class="header-inner">
-			<span class="site-title">嵌入式智控协会</span>
-		</div>
-	</header>
 	<!-- 新增浮动按钮 -->
 	<div class="floating-toc"></div>
 
@@ -1156,10 +1120,6 @@
 	<script src="style/tippy-bundle.umd.js"></script>
 
 	<div id="error-container" aria-live="polite"></div>
-
-	<footer class="site-footer">
-		嵌入式智控协会@小东同学
-	</footer>
 
 	<script>
 		// 动态生成目录
