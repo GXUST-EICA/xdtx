@@ -70,11 +70,17 @@
 
 <div align="center">
 
-# 📥 [培训资料下载中心](https://www.eica.fun/download)
+<a href="https://www.eica.fun/download" style="display:inline-block;margin:12px 8px;padding:18px 40px;font-size:1.5rem;font-weight:bold;color:#fff;background:linear-gradient(90deg,#6c5ce7 0%,#00b894 100%);border:none;border-radius:40px;text-decoration:none;box-shadow:0 4px 16px rgba(108,92,231,0.15);transition:background 0.3s;">
+📥 培训资料下载中心
+</a>
 
-# 🏫 [粤嵌培训中心](http://vm.yueqian.com.cn:8886/index.html)
+<a href="http://vm.yueqian.com.cn:8886/index.html" style="display:inline-block;margin:12px 8px;padding:18px 40px;font-size:1.5rem;font-weight:bold;color:#fff;background:linear-gradient(90deg,#00b894 0%,#0984e3 100%);border:none;border-radius:40px;text-decoration:none;box-shadow:0 4px 16px rgba(0,184,148,0.15);transition:background 0.3s;">
+🏫 粤嵌培训中心
+</a>
 
-# 📚 [旧版培训中心](https://www.eica.fun/oldtraining)
+<a href="https://www.eica.fun/oldtraining" style="display:inline-block;margin:12px 8px;padding:18px 40px;font-size:1.5rem;font-weight:bold;color:#fff;background:linear-gradient(90deg,#636e72 0%,#a29bfe 100%);border:none;border-radius:40px;text-decoration:none;box-shadow:0 4px 16px rgba(99,110,114,0.15);transition:background 0.3s;">
+📚 旧版培训中心
+</a>
 
 </div>
 
