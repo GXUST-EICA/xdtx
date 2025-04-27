@@ -687,7 +687,8 @@
 				-webkit-overflow-scrolling: touch;
 				/* 增加弹性效果 */
 				overscroll-behavior: contain;
-				height: calc(100vh - 120px); /* 确保有足够的高度 */
+				height: calc(100vh - 120px);
+				/* 确保有足够的高度 */
 				overflow-y: auto;
 			}
 
@@ -1101,7 +1102,7 @@
 
 	<!-- 内容区域 -->
 	<main class="content">
-		<h1>嵌入式智控协会培训中心</h1>
+		<h1>协会培训中心</h1>
 		<div class="course-content" style="min-height: 200vh;">
 			<article class="markdown-content" id="welcome-container">
 				<!-- 内容将由JavaScript动态加载 -->
@@ -1124,8 +1125,6 @@
 	<script>
 		// 动态生成目录
 		const courseFiles = [
-			// 首页
-			"test/md/index.md",
 			// 编程语言基础
 			"test/md/编程语言基础 - C语言.md",
 			"test/md/编程语言基础 - Python.md",
@@ -1167,11 +1166,21 @@
 		function generateTOC() {
 			const tocMap = new Map();
 
-			// 首页单独处理
-			const homeFile = "test/md/index.md";
-			let tocHTML = `
-				<div class="toc-category">
-					<h3>首页</h3>
+			courseFiles.forEach(path => {
+				const [category, filename] = path.split('/').pop().split(' - ');
+				if (!tocMap.has(category)) {
+					tocMap.set(category, []);
+				}
+				tocMap.get(category).push({
+					name: filename.replace('.md', ''),
+					path: path
+				});
+			});
+
+			let tocHTML = '';
+			tocMap.forEach((items, category) => {
+				tocHTML += `
+                    <div class="toc-category">
                         <h3>${category}</h3>
                         ${items.map(item => `
                             <div class="toc-subitem" data-file="${item.path}">
@@ -1255,7 +1264,7 @@
 			const progressBar = document.createElement('div');
 			progressBar.className = 'progress-bar';
 			document.body.prepend(progressBar);
-			
+
 			let rafId;
 			function updateProgress() {
 				const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -1263,7 +1272,7 @@
 				progressBar.style.width = `${progress * 100}%`;
 				rafId = requestAnimationFrame(updateProgress);
 			}
-			
+
 			// 使用IntersectionObserver优化性能
 			const observer = new IntersectionObserver(() => {
 				if (document.documentElement.scrollHeight > window.innerHeight * 2) {
@@ -1274,7 +1283,7 @@
 			}, { threshold: 0.1 });
 
 			observer.observe(document.documentElement);
-			
+
 			// 滚动结束隐藏（可选）
 			let scrollTimeout;
 			window.addEventListener('scroll', () => {
