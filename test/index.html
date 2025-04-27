@@ -687,6 +687,8 @@
 				-webkit-overflow-scrolling: touch;
 				/* 增加弹性效果 */
 				overscroll-behavior: contain;
+				height: calc(100vh - 120px); /* 确保有足够的高度 */
+				overflow-y: auto;
 			}
 
 			/* 增大触摸区域 */
@@ -1386,35 +1388,23 @@
 			}
 		});
 
-		// 替换原有复杂触摸处理
-		const mobileToc = document.querySelector('.mobile-toc');
-		let startY = 0;
-
-		mobileToc.addEventListener('touchstart', e => {
-			startY = e.touches[0].pageY;
-		}, { passive: true });
-
-		mobileToc.addEventListener('touchmove', e => {
-			const deltaY = e.touches[0].pageY - startY;
-			const atTop = mobileToc.scrollTop <= 0 && deltaY > 0;
-			const atBottom = mobileToc.scrollHeight <= mobileToc.clientHeight + mobileToc.scrollTop && deltaY < 0;
-
-			if (atTop || atBottom) {
-				e.preventDefault();
+		// 替换为新的滚动处理
+		document.addEventListener('DOMContentLoaded', () => {
+			const mobileToc = document.querySelector('.mobile-toc');
+			if (mobileToc) {
+				// 确保滚动容器正确设置
+				mobileToc.style.overflowY = 'auto';
+				mobileToc.style.webkitOverflowScrolling = 'touch';
+				mobileToc.style.height = 'calc(100vh - 120px)';
 			}
-		}, { passive: false });
-
-		// 优化滚动条渲染
-		requestAnimationFrame(() => {
-			mobileToc.style.scrollbarWidth = 'thin';
 		});
 
-		// 关闭时恢复滚动
-		function closeToc() {
-			floatingToc.classList.remove('active');
-			tocOverlay.classList.remove('active');
-			document.body.classList.remove('toc-open');
-		}
+		// 移除外层滚动锁定
+		document.querySelector('.toc-overlay').removeEventListener('wheel', (e) => {
+			if (e.target.closest('.mobile-toc')) {
+				e.stopPropagation();
+			}
+		}, { passive: true });
 
 		// 配置对象（方便后续维护）
 		const CONFIG = {
@@ -1601,28 +1591,6 @@
 				mobileToc.classList.remove('scrolling');
 			}, 500);
 		});
-
-		// 阻止外层滚动传播
-		document.querySelector('.toc-overlay').addEventListener('wheel', (e) => {
-			if (e.target.closest('.mobile-toc')) {
-				e.stopPropagation();
-			}
-		}, { passive: true });
-
-		// 简化的触摸处理
-		function initContentScroll() {
-			const content = document.querySelector('.content');
-
-			// 仅保留必要的事件监听
-			content.addEventListener('touchstart', e => {
-				// 记录初始触摸位置
-				content.startY = e.touches[0].clientY;
-			}, { passive: true });
-
-			content.addEventListener('touchmove', e => {
-				// 允许浏览器处理滚动
-			}, { passive: true });
-		}
 
 		// 在DOM加载完成后调用
 		document.addEventListener('DOMContentLoaded', () => {
