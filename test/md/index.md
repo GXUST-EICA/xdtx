@@ -4,60 +4,60 @@
 
 <!-- 美化表格：加外框和斑马纹 -->
 <div style="overflow-x:auto;">
-<table style="width:95vw;max-width:400px;border-collapse:collapse;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(108,92,231,0.08);font-size:1.05rem;">
+<table style="width:100%;max-width:500px;border-collapse:collapse;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(108,92,231,0.08);font-size:0.98rem;">
   <thead style="background:linear-gradient(90deg,#a8a4e6 0%,#f3f5ff 100%);color:#333;">
     <tr>
-      <th style="padding:1rem 0.5rem;">培训内容</th>
-      <th style="padding:1rem 0.5rem;">预计时间</th>
-      <th style="padding:1rem 0.5rem;">负责人</th>
-      <th style="padding:1rem 0.5rem;">培训地点</th>
+      <th style="padding:0.4rem 0.2rem;">培训内容</th>
+      <th style="padding:0.4rem 0.2rem;">预计时间</th>
+      <th style="padding:0.4rem 0.2rem;">负责人</th>
+      <th style="padding:0.4rem 0.2rem;">培训地点</th>
     </tr>
   </thead>
   <tbody>
     <tr style="background:#fff;">
-      <td style="padding:0.8rem 0.5rem;">引导培训见面会</td>
+      <td style="padding:0.3rem 0.2rem;">引导培训见面会</td>
       <td>2024年10月18日 19:30</td>
       <td>陈健锋</td>
       <td>T3-307</td>
     </tr>
     <tr style="background:#f8f9ff;">
-      <td style="padding:0.8rem 0.5rem;">万用表使用基础与基本电路认识培训计划</td>
+      <td style="padding:0.3rem 0.2rem;">万用表使用基础与基本电路认识培训计划</td>
       <td>2024年10月25日 19:30</td>
       <td>黄海东</td>
       <td>T3-307</td>
     </tr>
     <tr style="background:#fff;">
-      <td style="padding:0.8rem 0.5rem;">C语言与STM32基础培训计划</td>
+      <td style="padding:0.3rem 0.2rem;">C语言与STM32基础培训计划</td>
       <td>2024年11月2日 19:30</td>
       <td>黄泉清</td>
       <td>L2-413、L2-403</td>
     </tr>
     <tr style="background:#f8f9ff;">
-      <td style="padding:0.8rem 0.5rem;">GPIO——按键、红外传感器循迹培训计划</td>
+      <td style="padding:0.3rem 0.2rem;">GPIO——按键、红外传感器循迹培训计划</td>
       <td>2024年11月9日 19:30</td>
       <td>庞儿茗</td>
       <td>L2-413、L2-403</td>
     </tr>
     <tr style="background:#fff;">
-      <td style="padding:0.8rem 0.5rem;">STM32与HC05蓝牙串口通信培训计划</td>
+      <td style="padding:0.3rem 0.2rem;">STM32与HC05蓝牙串口通信培训计划</td>
       <td>2024年11月15日 19:30</td>
       <td>王旭晖</td>
       <td>L2-413、L2-403</td>
     </tr>
     <tr style="background:#f8f9ff;">
-      <td style="padding:0.8rem 0.5rem;">TB6612电机驱动直流电机培训计划</td>
+      <td style="padding:0.3rem 0.2rem;">TB6612电机驱动直流电机培训计划</td>
       <td>2024年11月22日 19:30</td>
       <td>陈健锋</td>
       <td>L2-413、L2-403</td>
     </tr>
     <tr style="background:#fff;">
-      <td style="padding:0.8rem 0.5rem;">I2C-OLED的显示培训计划</td>
+      <td style="padding:0.3rem 0.2rem;">I2C-OLED的显示培训计划</td>
       <td>2024年11月29日 19:30</td>
       <td>胡志勇</td>
       <td>L2-413、L2-403</td>
     </tr>
     <tr style="background:#f8f9ff;">
-      <td style="padding:0.8rem 0.5rem;">绘制PCB-立创EDA培训计划</td>
+      <td style="padding:0.3rem 0.2rem;">绘制PCB-立创EDA培训计划</td>
       <td>2024年12月2日 19:30</td>
       <td>黄海东</td>
       <td>L2-413、L2-403</td>
