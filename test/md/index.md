@@ -2,20 +2,74 @@
 
 下载中心提供了一些提到的软件，以下是个人整理的一些网络资源，仅代表个人观点，有需要的同学可以查看。蓝色字都是跳转教程的链接。
 
-| 培训内容                             | 预计时间             | 负责人 | 培训地点       |
-| ------------------------------------ | -------------------- | ------ | -------------- |
-| 引导培训见面会                       | 2024年10月18日 19:30 | 陈健锋 | T3-307         |
-| 万用表使用基础与基本电路认识培训计划 | 2024年10月25日 19:30 | 黄海东 | T3-307         |
-| C语言与STM32基础培训计划             | 2024年11月2日 19:30  | 黄泉清 | L2-413、L2-403 |
-| GPIO——按键、红外传感器循迹培训计划   | 2024年11月9日 19:30  | 庞儿茗 | L2-413、L2-403 |
-| STM32与HC05蓝牙串口通信培训计划      | 2024年11月15日 19:30 | 王旭晖 | L2-413、L2-403 |
-| TB6612电机驱动直流电机培训计划       | 2024年11月22日 19:30 | 陈健锋 | L2-413、L2-403 |
-| I2C-OLED的显示培训计划               | 2024年11月29日 19:30 | 胡志勇 | L2-413、L2-403 |
-| 绘制PCB-立创EDA培训计划              | 2024年12月2日 19:30  | 黄海东 | L2-413、L2-403 |
+<!-- 美化表格：加外框和斑马纹 -->
+<div style="overflow-x:auto;">
+<table style="width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(108,92,231,0.08);font-size:1.05rem;">
+  <thead style="background:linear-gradient(90deg,#a8a4e6 0%,#f3f5ff 100%);color:#333;">
+    <tr>
+      <th style="padding:1rem 0.5rem;">培训内容</th>
+      <th style="padding:1rem 0.5rem;">预计时间</th>
+      <th style="padding:1rem 0.5rem;">负责人</th>
+      <th style="padding:1rem 0.5rem;">培训地点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="background:#fff;">
+      <td style="padding:0.8rem 0.5rem;">引导培训见面会</td>
+      <td>2024年10月18日 19:30</td>
+      <td>陈健锋</td>
+      <td>T3-307</td>
+    </tr>
+    <tr style="background:#f8f9ff;">
+      <td style="padding:0.8rem 0.5rem;">万用表使用基础与基本电路认识培训计划</td>
+      <td>2024年10月25日 19:30</td>
+      <td>黄海东</td>
+      <td>T3-307</td>
+    </tr>
+    <tr style="background:#fff;">
+      <td style="padding:0.8rem 0.5rem;">C语言与STM32基础培训计划</td>
+      <td>2024年11月2日 19:30</td>
+      <td>黄泉清</td>
+      <td>L2-413、L2-403</td>
+    </tr>
+    <tr style="background:#f8f9ff;">
+      <td style="padding:0.8rem 0.5rem;">GPIO——按键、红外传感器循迹培训计划</td>
+      <td>2024年11月9日 19:30</td>
+      <td>庞儿茗</td>
+      <td>L2-413、L2-403</td>
+    </tr>
+    <tr style="background:#fff;">
+      <td style="padding:0.8rem 0.5rem;">STM32与HC05蓝牙串口通信培训计划</td>
+      <td>2024年11月15日 19:30</td>
+      <td>王旭晖</td>
+      <td>L2-413、L2-403</td>
+    </tr>
+    <tr style="background:#f8f9ff;">
+      <td style="padding:0.8rem 0.5rem;">TB6612电机驱动直流电机培训计划</td>
+      <td>2024年11月22日 19:30</td>
+      <td>陈健锋</td>
+      <td>L2-413、L2-403</td>
+    </tr>
+    <tr style="background:#fff;">
+      <td style="padding:0.8rem 0.5rem;">I2C-OLED的显示培训计划</td>
+      <td>2024年11月29日 19:30</td>
+      <td>胡志勇</td>
+      <td>L2-413、L2-403</td>
+    </tr>
+    <tr style="background:#f8f9ff;">
+      <td style="padding:0.8rem 0.5rem;">绘制PCB-立创EDA培训计划</td>
+      <td>2024年12月2日 19:30</td>
+      <td>黄海东</td>
+      <td>L2-413、L2-403</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 📥 **相关资源下载**：
-- [培训资料下载中心](https://example.com/downloads)
-- [粤嵌培训中心](https://example.com/yueqian)
+
+- 🔗 [培训资料下载中心](https://www.eica.fun/download)
+- 🏫 [粤嵌培训中心](http://vm.yueqian.com.cn:8886/index.html)
 
 后续更新时间表，敬请期待！
 
