@@ -4,6 +4,7 @@ from datetime import datetime
 import urllib3
 import os
 import json
+import platform
 from flask import Flask, render_template, request, jsonify
 import threading
 import logging
@@ -43,33 +44,37 @@ class CampusNetwork:
         self.logs = []
         self.max_logs = 100  # 最多保存100条日志
         self.monitoring_thread = None
-
+        self.is_mips = self.check_architecture()
+        
+    def check_architecture(self):
+        """检查系统架构"""
+        arch = platform.machine().lower()
+        return arch in ['mips', 'mipsel']
+        
     def load_config(self):
-        """加载保存的配置"""
+        """加载配置"""
         try:
             if os.path.exists(self.config_path):
-                with open(self.config_path, 'r', encoding='utf-8') as f:
+                with open(self.config_path, 'r') as f:
                     config = json.load(f)
                     self.username = config.get('username', '')
                     self.password = config.get('password', '')
                     self.operator = config.get('operator', '免费校园网')
                     self.interval = config.get('interval', '30')
             else:
-                self.username = USERNAME
-                self.password = PASSWORD
-                self.operator = "免费校园网"
-                self.interval = "30"
-                self.save_config()
+                self.username = ''
+                self.password = ''
+                self.operator = '免费校园网'
+                self.interval = '30'
         except Exception as e:
             logging.error(f"加载配置失败: {str(e)}")
-            self.username = USERNAME
-            self.password = PASSWORD
-            self.operator = "免费校园网"
-            self.interval = "30"
-            self.save_config()
+            self.username = ''
+            self.password = ''
+            self.operator = '免费校园网'
+            self.interval = '30'
 
     def save_config(self):
-        """保存配置到文件"""
+        """保存配置"""
         try:
             config = {
                 'username': self.username,
@@ -77,42 +82,26 @@ class CampusNetwork:
                 'operator': self.operator,
                 'interval': self.interval
             }
-            with open(self.config_path, 'w', encoding='utf-8') as f:
-                json.dump(config, f, ensure_ascii=False, indent=2)
+            with open(self.config_path, 'w') as f:
+                json.dump(config, f)
         except Exception as e:
             logging.error(f"保存配置失败: {str(e)}")
 
     def log(self, message):
         """记录日志"""
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        log_message = f"[{current_time}] {message}"
-        logging.info(log_message)
-        self.logs.append(log_message)
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_entry = f"[{timestamp}] {message}"
+        self.logs.append(log_entry)
         if len(self.logs) > self.max_logs:
             self.logs.pop(0)
+        logging.info(message)
 
     def check_connection(self):
-        """检查是否能访问百度，并验证返回内容"""
+        """检查网络连接"""
         try:
-            start_time = time.time()
-            response = requests.get(TEST_URL, timeout=3)
-            response_time = time.time() - start_time
-            if (response.status_code == 200 and 
-                len(response.text) > 0 and 
-                ('baidu' in response.text.lower() or '百度' in response.text)):
-                self.log(f"网络延迟: {response_time:.2f}秒")
-                return True
-            
-            self.log("好像校园网断了！！！尝试重新登录...")
-            return False
-        except requests.exceptions.Timeout:
-            self.log("请求超时（>3秒）")
-            return False
-        except requests.exceptions.ConnectionError:
-            self.log("连接错误")
-            return False
-        except Exception as e:
-            self.log(f"网络请求失败: {str(e)}")
+            response = requests.get(TEST_URL, timeout=5)
+            return response.status_code == 200
+        except:
             return False
 
     def campus_network_login(self):
@@ -241,7 +230,8 @@ def index():
                          interval=campus_net.interval,
                          is_running=campus_net.is_running,
                          logs=campus_net.logs[-10:],  # 只显示最近10条日志
-                         operators=list(OPERATORS.keys()))
+                         operators=list(OPERATORS.keys()),
+                         is_mips=campus_net.is_mips)  # 添加MIPS架构标志
 
 @app.route('/api/update_config', methods=['POST'])
 def update_config():

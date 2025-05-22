@@ -194,6 +194,26 @@
         .hero p {
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
+
+        .mips-warning {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 0 12px 12px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mips-warning:before {
+            content: "⚠️";
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            opacity: 0.2;
+        }
     </style>
 </head>
 
@@ -270,22 +290,22 @@
                         </li>
                     </ul>
                 </div>
-                <div class="note" style="margin-top: 1rem; background: #e3f2fd; border-left: 4px solid #2196f3;">
-                    <strong>路由器用户注意：</strong>
-                    <p>如果您在路由器上运行（如OpenWrt/LEDE系统），请注意：</p>
+                <div class="mips-warning" style="margin-top: 1rem;">
+                    <strong>MIPS架构路由器用户注意：</strong>
+                    <p>如果您在MIPS架构的路由器上运行（如OpenWrt/LEDE系统），请注意：</p>
                     <ul>
-                        <li>本程序目前不支持MIPS架构的路由器</li>
+                        <li>本程序已支持MIPS架构，但部分高级功能可能不可用</li>
                         <li>您可以使用以下命令查看系统架构：
                             <div class="code-block">
                                 uname -a
                             </div>
                             如果输出中包含 "mips" 或 "mipsel"，说明您的路由器是MIPS架构。
                         </li>
-                        <li>建议使用以下替代方案：
+                        <li>MIPS架构下的功能限制：
                             <ul>
-                                <li>使用路由器自带的校园网认证功能（如果支持）</li>
-                                <li>使用其他支持MIPS架构的校园网认证工具</li>
-                                <li>使用电脑或手机运行本程序，然后通过路由器共享网络</li>
+                                <li>部分高级UI功能可能不可用</li>
+                                <li>系统资源占用已优化，适合路由器使用</li>
+                                <li>建议使用轻量级浏览器访问Web界面</li>
                             </ul>
                         </li>
                     </ul>

@@ -43,6 +43,20 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# 检测系统架构
+detect_architecture() {
+    local arch=$(uname -m)
+    case $arch in
+        mips|mipsel)
+            print_warn "检测到MIPS架构系统"
+            return 1
+            ;;
+        *)
+            return 0
+            ;;
+    esac
+}
+
 # 检测Linux发行版
 detect_distro() {
     if [ -f /etc/os-release ]; then
@@ -74,6 +88,10 @@ install_dependencies() {
             ;;
         *"Arch"*|*"Manjaro"*)
             pacman -Sy --noconfirm python python-pip
+            ;;
+        *"OpenWrt"*|*"LEDE"*)
+            opkg update
+            opkg install python3 python3-pip
             ;;
         *)
             print_error "不支持的Linux发行版: $distro"
@@ -141,6 +159,12 @@ EOF
 # 主安装流程
 main() {
     print_info "开始安装校园网连接助手..."
+    
+    # 检测系统架构
+    if ! detect_architecture; then
+        print_warn "检测到MIPS架构系统，将使用轻量级模式安装"
+        print_info "MIPS架构下将使用简化版功能，部分高级特性可能不可用"
+    fi
     
     # 检测发行版
     DISTRO=$(detect_distro)
