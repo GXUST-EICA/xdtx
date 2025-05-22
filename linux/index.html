@@ -253,16 +253,40 @@
                     <ul>
                         <li>使用root用户直接运行：<div class="code-block">./net.sh</div></li>
                         <li>或者安装sudo（根据您的发行版选择以下命令之一）：
+                            <p>Debian/Ubuntu系统：</p>
                             <div class="code-block">
-                                # Debian/Ubuntu
                                 apt-get update && apt-get install -y sudo
-                                
-                                # CentOS/RHEL
+                            </div>
+                            
+                            <p>CentOS/RHEL系统：</p>
+                            <div class="code-block">
                                 yum install -y sudo
-                                
-                                # Alpine
+                            </div>
+                            
+                            <p>Alpine系统：</p>
+                            <div class="code-block">
                                 apk add sudo
                             </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="note" style="margin-top: 1rem; background: #e3f2fd; border-left: 4px solid #2196f3;">
+                    <strong>路由器用户注意：</strong>
+                    <p>如果您在路由器上运行（如OpenWrt/LEDE系统），请注意：</p>
+                    <ul>
+                        <li>本程序目前不支持MIPS架构的路由器</li>
+                        <li>您可以使用以下命令查看系统架构：
+                            <div class="code-block">
+                                uname -a
+                            </div>
+                            如果输出中包含 "mips" 或 "mipsel"，说明您的路由器是MIPS架构。
+                        </li>
+                        <li>建议使用以下替代方案：
+                            <ul>
+                                <li>使用路由器自带的校园网认证功能（如果支持）</li>
+                                <li>使用其他支持MIPS架构的校园网认证工具</li>
+                                <li>使用电脑或手机运行本程序，然后通过路由器共享网络</li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
