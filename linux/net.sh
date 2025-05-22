@@ -5,23 +5,17 @@ clear
 
 # 显示署名
 echo -e "\033[1;36m╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮\033[0m"
-sleep 0.2
 echo -e "\033[1;36m┃\033[0m                                                \033[1;36m┃\033[0m"
-sleep 0.2
 echo -e "\033[1;36m┃\033[0m                    \033[1;33m小东同学\033[0m                    \033[1;36m┃\033[0m"
-sleep 0.2
 echo -e "\033[1;36m┃\033[0m                \033[1;35m嵌入式智控协会\033[0m                  \033[1;36m┃\033[0m"
-sleep 0.2
 echo -e "\033[1;36m┃\033[0m                                                \033[1;36m┃\033[0m"
-sleep 0.2
 echo -e "\033[1;36m╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯\033[0m"
-sleep 0.2
 echo -e "\033[1;32m[✓] 正在启动校园网连接助手...\033[0m"
-sleep 0.2
+sleep 1
 echo -e "\033[1;32m[✓] 正在初始化系统...\033[0m"
 sleep 0.2
 echo -e "\033[1;32m[✓] 正在检查网络连接...\033[0m"
-sleep 0.2
+sleep 0.5
 echo
 
 # 颜色定义
@@ -88,11 +82,31 @@ install_dependencies() {
     esac
 }
 
+# 定义安装路径
+INSTALL_DIR="/usr/local/campus_network"
+
+# 检查并创建安装目录
+check_and_create_dir() {
+    if [ ! -d "$INSTALL_DIR" ]; then
+        print_info "创建安装目录: $INSTALL_DIR"
+        mkdir -p "$INSTALL_DIR"
+        if [ $? -ne 0 ]; then
+            print_error "无法创建安装目录，尝试使用备用位置"
+            INSTALL_DIR="/tmp/campus_network"
+            mkdir -p "$INSTALL_DIR"
+            if [ $? -ne 0 ]; then
+                print_error "无法创建任何安装目录，安装失败"
+                exit 1
+            fi
+        fi
+    fi
+}
+
 # 创建虚拟环境并安装依赖
 setup_python_env() {
     print_info "正在设置Python环境..."
-    python3 -m venv /opt/campus_network
-    source /opt/campus_network/bin/activate
+    python3 -m venv "$INSTALL_DIR/venv"
+    source "$INSTALL_DIR/venv/bin/activate"
     pip install flask requests
 }
 
@@ -109,8 +123,8 @@ After=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/campus_network
-ExecStart=/opt/campus_network/bin/python /opt/campus_network/net.py
+WorkingDirectory=$INSTALL_DIR
+ExecStart=$INSTALL_DIR/venv/bin/python $INSTALL_DIR/net.py
 Restart=always
 RestartSec=3
 
@@ -122,11 +136,6 @@ EOF
     systemctl daemon-reload
     systemctl enable campus-network.service
     print_info "服务已创建并启用"
-    
-    # 运行systemctl daemon-reload
-    print_info "正在重新加载systemd..."
-    sudo systemctl daemon-reload
-    print_info "systemd重新加载完成"
 }
 
 # 主安装流程
@@ -140,8 +149,8 @@ main() {
     # 安装依赖
     install_dependencies "$DISTRO"
     
-    # 创建安装目录
-    mkdir -p /opt/campus_network
+    # 检查并创建安装目录
+    check_and_create_dir
     
     # 下载主程序
     print_info "正在下载主程序..."
@@ -150,7 +159,7 @@ main() {
         case $choice in
             [Ww]* )
                 if command -v wget >/dev/null 2>&1; then
-                    wget "https://xdtx.eica.fun/linux/net.py" -O /opt/campus_network/net.py
+                    wget "https://xdtx.eica.fun/linux/net.py" -O "$INSTALL_DIR/net.py"
                     break
                 else
                     print_error "wget未安装，请选择curl或安装wget"
@@ -158,7 +167,7 @@ main() {
                 ;;
             [Cc]* )
                 if command -v curl >/dev/null 2>&1; then
-                    curl -L "https://xdtx.eica.fun/linux/net.py" -o /opt/campus_network/net.py
+                    curl -L "https://xdtx.eica.fun/linux/net.py" -o "$INSTALL_DIR/net.py"
                     break
                 else
                     print_error "curl未安装，请选择wget或安装curl"
@@ -177,7 +186,7 @@ main() {
     create_service
     
     # 设置权限
-    chmod +x /opt/campus_network/net.py
+    chmod +x "$INSTALL_DIR/net.py"
     
     echo -e "\033[1;32m╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮\033[0m"
     echo -e "\033[1;32m┃\033[0m                                                \033[1;32m┃\033[0m"
@@ -210,8 +219,8 @@ main() {
         echo -e "    4. 网络连接是否正常"
         echo
         echo -e "\033[1;33m[提示] 您可以尝试手动启动服务来查看详细错误：\033[0m"
-        echo -e "    cd /opt/campus_network"
-        echo -e "    source bin/activate"
+        echo -e "    cd $INSTALL_DIR"
+        echo -e "    source venv/bin/activate"
         echo -e "    python net.py"
     fi
     echo
