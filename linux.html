@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux版校园网连接助手</title>
+    <link rel="stylesheet" href="style/styles.css">
+    <link href="/style/css2.css" rel="stylesheet">
+    <style>
+        .steps {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        .steps h3 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        
+        .steps h3:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+        
+        .step {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 16px;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .step:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+        }
+        
+        .step:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+        
+        .step strong {
+            display: block;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .step strong:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            transition: transform 0.3s ease;
+        }
+        
+        .step:hover strong:before {
+            transform: translateX(5px);
+        }
+        
+        .code-block {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 1.2rem;
+            border-radius: 12px;
+            font-family: 'Fira Code', monospace;
+            margin: 1rem 0;
+            overflow-x: auto;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .code-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        
+        .code-block::before {
+            content: "复制";
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .code-block:hover::before {
+            opacity: 1;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 0 12px 12px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .note:before {
+            content: "💡";
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            opacity: 0.2;
+        }
+        
+        .step ul {
+            list-style: none;
+            padding-left: 1.5rem;
+        }
+        
+        .step ul li {
+            position: relative;
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+        }
+        
+        .step ul li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #4A90E2, #1246FF);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+        
+        .hero h1 {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .hero p {
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="index.html" class="nav-logo">返回首页</a>
+            <a href="https://www.eica.fun" class="nav-link">官网</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1>Linux版校园网连接助手</h1>
+        <p>为Linux用户打造的校园网连接解决方案</p>
+    </header>
+
+    <main class="container">
+        <div class="steps">
+            <h3>安装步骤</h3>
+            
+            <div class="step">
+                <strong>1. 下载安装脚本</strong>
+                <p>使用curl下载：</p>
+                <div class="code-block">
+                    curl -L "https://xdtx.eica.fun/linux/net.sh" -o net.sh
+                </div>
+                <p>或者使用wget下载：</p>
+                <div class="code-block">
+                    wget "https://xdtx.eica.fun/linux/net.sh" -O net.sh
+                </div>
+            </div>
+
+            <div class="step">
+                <strong>2. 添加执行权限</strong>
+                <div class="code-block">
+                    chmod +x net.sh
+                </div>
+            </div>
+
+            <div class="step">
+                <strong>3. 运行安装脚本</strong>
+                <div class="code-block">
+                    sudo ./net.sh
+                </div>
+                <div class="note">
+                    脚本会自动检测您的Linux发行版并安装所需依赖
+                </div>
+            </div>
+
+            <div class="step">
+                <strong>4. 配置程序</strong>
+                <p>安装完成后，打开浏览器访问：</p>
+                <div class="code-block">
+                    http://localhost:5000
+                </div>
+                <p>或者使用IP地址访问：</p>
+                <div class="code-block">
+                    http://127.0.0.1:5000
+                </div>
+                <p>在网页界面中：</p>
+                <ul>
+                    <li>输入您的校园网账号和密码</li>
+                    <li>选择运营商</li>
+                    <li>设置检查间隔时间</li>
+                    <li>点击"开始连接"按钮</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <strong>5. 管理服务</strong>
+                <p>使用以下命令管理服务：</p>
+                <div class="code-block">
+                    # 启动服务
+                    sudo systemctl start campus-network
+                </div>
+
+                <div class="code-block">
+                    # 停止服务
+                    sudo systemctl stop campus-network
+                </div>
+
+                <div class="code-block">
+                    # 查看状态
+                    sudo systemctl status campus-network
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Made by 小东同学</p>
+    </footer>
+
+    <script>
+    // 添加页面载入动画类
+    document.addEventListener('DOMContentLoaded', () => {
+        document.body.classList.add('loaded');
+        
+        // 添加代码块复制功能
+        document.querySelectorAll('.code-block').forEach(block => {
+            block.addEventListener('click', () => {
+                const text = block.textContent.trim();
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = block.textContent;
+                    block.textContent = '已复制！';
+                    setTimeout(() => {
+                        block.textContent = originalText;
+                    }, 1000);
+                });
+            });
+        });
+    });
+    </script>
+</body>
+
+</html> 

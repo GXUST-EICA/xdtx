@@ -462,4 +462,16 @@ footer p.clicked {
 
 .download-btn:hover .download-icon {
     transform: translateY(2px);
+}
+
+.btn-group {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-group .btn {
+    flex: 1;
+    max-width: 200px;
 } 
