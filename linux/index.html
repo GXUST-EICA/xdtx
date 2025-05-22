@@ -224,6 +224,13 @@
                 <div class="code-block">
                     wget "https://xdtx.eica.fun/linux/net.sh" -O net.sh
                 </div>
+                <div class="note" style="margin-top: 1rem;">
+                    <strong>注意：</strong>如果使用wget下载时遇到SSL证书验证错误，可以使用以下命令：
+                    <div class="code-block" style="margin-top: 0.5rem;">
+                        wget --no-check-certificate "https://xdtx.eica.fun/linux/net.sh" -O net.sh
+                    </div>
+                    或者直接使用curl命令下载，curl通常不会遇到此问题。
+                </div>
             </div>
 
             <div class="step">
@@ -240,6 +247,24 @@
                 </div>
                 <div class="note">
                     脚本会自动检测您的Linux发行版并安装所需依赖
+                </div>
+                <div class="note" style="margin-top: 1rem;">
+                    <strong>注意：</strong>如果提示 <code>sudo: not found</code>，说明您的系统没有安装sudo。您可以：
+                    <ul>
+                        <li>使用root用户直接运行：<div class="code-block">./net.sh</div></li>
+                        <li>或者安装sudo（根据您的发行版选择以下命令之一）：
+                            <div class="code-block">
+                                # Debian/Ubuntu
+                                apt-get update && apt-get install -y sudo
+                                
+                                # CentOS/RHEL
+                                yum install -y sudo
+                                
+                                # Alpine
+                                apk add sudo
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
