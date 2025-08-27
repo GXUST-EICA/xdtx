@@ -44,10 +44,10 @@
 		h1 {
 			text-align: center;
 			color: var(--text-color);
-			font-size: clamp(1.8rem, 4vw, 2.5rem);
-			margin-bottom: 40px;
+			font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+			margin-bottom: 30px;
 			position: relative;
-			padding-bottom: 15px;
+			padding-bottom: 12px;
 		}
 
 		h1::after {
@@ -64,15 +64,15 @@
 
 		.instruction {
 			display: grid;
-			gap: 40px;
-			padding: 20px;
+			gap: 30px;
+			padding: 15px;
 		}
 
 		.step {
 			background: rgba(255, 255, 255, 0.98);
-			border-radius: 24px;
-			padding: 30px;
-			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+			border-radius: 20px;
+			padding: 25px;
+			box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
 			transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 			position: relative;
 			overflow: hidden;
@@ -96,12 +96,12 @@
 
 		.step img {
 			width: 100%;
-			max-width: 600px;
+			max-width: 500px;
 			height: auto;
 			display: block;
-			margin: 20px auto;
-			border-radius: 16px;
-			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+			margin: 15px auto;
+			border-radius: 12px;
+			box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 			transition: var(--transition-default);
 		}
 
@@ -116,53 +116,55 @@
 			background-clip: text;
 			-webkit-background-clip: text;
 			-webkit-text-fill-color: transparent;
-			padding-bottom: 10px;
+			padding-bottom: 8px;
 			border-bottom: 2px solid #eee;
 			color: var(--primary-color);
-			font-size: clamp(1.2rem, 3vw, 1.8rem);
-			margin-bottom: 20px;
+			font-size: clamp(1rem, 2.5vw, 1.6rem);
+			margin-bottom: 15px;
 			display: flex;
 			align-items: center;
-			gap: 10px;
+			gap: 8px;
 		}
 
 		.step h2::before {
 			content: attr(data-step);
 			background: var(--primary-color);
 			color: white;
-			width: 30px;
-			height: 30px;
+			width: 25px;
+			height: 25px;
 			border-radius: 50%;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			font-size: 0.8em;
+			font-size: 0.7em;
 		}
 
 		.step p {
 			color: #505050;
-			font-size: clamp(1rem, 2vw, 1.1rem);
-			line-height: 1.8;
-			margin: 15px 0;
+			font-size: clamp(0.9rem, 1.8vw, 1rem);
+			line-height: 1.6;
+			margin: 12px 0;
 		}
 
 		@media (max-width: 768px) {
 			.container {
-				margin: 15px;
-				padding: 20px;
+				margin: 10px;
+				padding: 15px;
 			}
 
 			.instruction {
-				gap: 30px;
-				padding: 10px;
+				gap: 20px;
+				padding: 5px;
 			}
 
 			.step {
-				padding: 25px;
+				padding: 20px;
 			}
 
 			.step img {
-				margin: 15px auto;
+				margin: 10px auto;
+				max-width: 100%;
+				height: auto;
 			}
 		}
 
@@ -189,6 +191,10 @@
 		.step:nth-child(3) { animation-delay: 0.3s; }
 		.step:nth-child(4) { animation-delay: 0.4s; }
 		.step:nth-child(5) { animation-delay: 0.5s; }
+		.step:nth-child(6) { animation-delay: 0.6s; }
+		.step:nth-child(7) { animation-delay: 0.7s; }
+		.step:nth-child(8) { animation-delay: 0.8s; }
+		.step:nth-child(9) { animation-delay: 0.9s; }
 
 		.copyright {
 			background: rgba(255, 255, 255, 0.9);
@@ -217,14 +223,14 @@
 		.device-types {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
-			gap: 20px;
-			margin-top: 20px;
+			gap: 15px;
+			margin-top: 15px;
 		}
 
 		.device-type {
 			background: rgba(255, 255, 255, 0.9);
-			padding: 20px;
-			border-radius: 12px;
+			padding: 15px;
+			border-radius: 10px;
 			text-align: center;
 		}
 
@@ -262,6 +268,163 @@
 		@media (max-width: 768px) {
 			.device-types {
 				grid-template-columns: 1fr;
+				gap: 10px;
+			}
+			
+			.device-type {
+				padding: 12px;
+			}
+		}
+
+		/* 为什么选择小爱课程表样式 */
+		.why-choose {
+			margin-bottom: 40px;
+		}
+
+		.features-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 20px;
+			margin-top: 25px;
+		}
+
+		.feature-card {
+			background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+			border-radius: 16px;
+			padding: 20px;
+			text-align: center;
+			transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			border: 1px solid rgba(74, 144, 226, 0.1);
+			position: relative;
+			overflow: hidden;
+		}
+
+		.feature-card::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 3px;
+			background: linear-gradient(90deg, var(--primary-color), #fed6e3);
+			transform: scaleX(0);
+			transition: transform 0.3s ease;
+		}
+
+		.feature-card:hover {
+			transform: translateY(-8px);
+			box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+			border-color: rgba(74, 144, 226, 0.3);
+		}
+
+		.feature-card:hover::before {
+			transform: scaleX(1);
+		}
+
+		.feature-icon {
+			font-size: 2.5rem;
+			margin-bottom: 12px;
+			display: block;
+			transition: transform 0.3s ease;
+		}
+
+		.feature-card:hover .feature-icon {
+			transform: scale(1.1);
+		}
+
+		.feature-card h3 {
+			color: var(--primary-color);
+			font-size: 1.1rem;
+			font-weight: 600;
+			margin-bottom: 10px;
+			background: linear-gradient(120deg, var(--primary-color), #34495e);
+			background-clip: text;
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+		}
+
+		.feature-card p {
+			color: #666;
+			font-size: 0.9rem;
+			line-height: 1.5;
+			margin: 0;
+		}
+
+		@media (max-width: 768px) {
+			.features-grid {
+				grid-template-columns: 1fr;
+				gap: 15px;
+			}
+
+			.feature-card {
+				padding: 15px;
+			}
+
+			.feature-icon {
+				font-size: 2rem;
+			}
+		}
+
+		/* 小图展示区域样式 */
+		.small-images {
+			margin-bottom: 40px;
+		}
+
+		.small-image-gallery {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 20px;
+			margin-top: 20px;
+		}
+
+		.small-image-item {
+			text-align: center;
+			background: rgba(255, 255, 255, 0.8);
+			border-radius: 12px;
+			padding: 15px;
+			transition: all 0.3s ease;
+			border: 1px solid rgba(74, 144, 226, 0.1);
+		}
+
+		.small-image-item:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+			border-color: rgba(74, 144, 226, 0.3);
+		}
+
+		.small-image-item img {
+			width: 100%;
+			max-width: 250px;
+			height: auto;
+			border-radius: 8px;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+			transition: all 0.3s ease;
+		}
+
+		.small-image-item:hover img {
+			transform: scale(1.05);
+			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+		}
+
+		.small-image-item p {
+			margin-top: 10px;
+			color: var(--primary-color);
+			font-weight: 500;
+			font-size: 1rem;
+		}
+
+		@media (max-width: 768px) {
+			.small-image-gallery {
+				grid-template-columns: 1fr;
+				gap: 15px;
+			}
+
+			.small-image-item {
+				padding: 12px;
+			}
+
+			.small-image-item img {
+				max-width: 200px;
 			}
 		}
 
@@ -295,62 +458,116 @@
 	<div class="container">
 		<h1>小爱课程表使用方法</h1>
 		
-		<!-- 添加重要通知 -->
-		<div class="step" style="background: #fff3cd; border-left: 4px solid #ffc107;">
-			<h2 style="color: #856404;">重要通知</h2>
-			<p style="color: #856404; font-size: 1.1rem; line-height: 1.6;">
-				小爱课程表的教务系统导入课程表已经下架，感谢大家的陪伴。<br>
-				推荐使用WakeUP课程表<br>
-				<strong>【有root或者无Root但是会使用虚拟框架的的小伙伴可以继续看】<br></strong>
-				下载模块在lsposed安装后按照以下的步骤实现，模块与小爱课程表下载链接，小米手机也需要下载小爱课程表：<br>
-				<a href="https://xdtx.lanzoum.com/b01ynxxeza" class="download-btn" target="_blank">
-					下载小爱课程表（密码：aatm）
-				</a>
-			</p>
+		<!-- 为什么选择小爱课程表 -->
+		<div class="why-choose step">
+			<h2 data-step="0">为什么选择小爱课程表？</h2>
+			<div class="features-grid">
+				<div class="feature-card">
+					<div class="feature-icon">📱</div>
+					<h3>智能导入</h3>
+					<p>支持教务系统一键导入，无需手动输入课程信息，省时省力</p>
+				</div>
+				<div class="feature-card">
+					<div class="feature-icon">🎯</div>
+					<h3>精准提醒</h3>
+					<p>智能课程提醒，上课前及时通知，再也不会错过重要课程</p>
+				</div>
+				<div class="feature-card">
+					<div class="feature-icon">📊</div>
+					<h3>清晰展示</h3>
+					<p>美观的课程表界面，课程信息一目了然，支持周视图和月视图</p>
+				</div>
+				<div class="feature-card">
+	<div class="feature-card">
+					<div class="feature-icon">🔧</div>
+					<h3>灵活设置</h3>
+					<p>支持自定义上课时间、周数设置，适应不同学校的教学安排</p>
+				</div>
+				<div class="feature-card">
+					<div class="feature-icon">💡</div>
+					<h3>简单易用</h3>
+					<p>操作界面简洁直观，新手也能快速上手，学习成本低</p>
+				</div>					<div class="feature-icon">⚡</div>
+					<h3>快速同步</h3>
+					<p>课程信息实时同步，修改后立即生效，数据安全可靠</p>
+				</div>
+			
+			</div>
 		</div>
-
-		<!-- 添加设备选择提示 -->
+		
+		<!-- 小图展示区域 -->
+		<div class="small-images step">
+			<h2 data-step="1">小爱课程表特色展示</h2>
+			<div class="small-image-gallery">
+				<div class="small-image-item">
+					<img src="img/small1.jpg" alt="小爱课程表特色功能1" loading="lazy">
+					<p>智能课程管理</p>
+				</div>
+				<div class="small-image-item">
+					<img src="img/small2.jpg" alt="小爱课程表特色功能2" loading="lazy">
+					<p>便捷操作体验</p>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 合并重要通知和设备类型说明 -->
 		<div class="device-notice step">
-			<h2 data-step="0">设备类型说明</h2>
+			<h2 data-step="2">重要通知与设备类型说明</h2>
+			
+			<!-- 重要通知部分 -->
+			<div style="margin-bottom: 25px;">
+				<h3>重要通知</h3>
+				<p style="font-size: 1.1rem; line-height: 1.6; margin: 0;">
+					小爱课程表官方的教务系统导入课程表已经下架，感谢大家的陪伴。<br><br>
+					感谢小爱课程表教务导入适配联盟的帕帝天秀开发的开发模块（需要ROOT），本版本仅注入模块，无需ROOT类操作。<br>
+					<strong>本教程无需ROOT类操作，直接打开操作即可</strong><br><br>
+					小爱课程表注入模块版下载链接，所有安卓手机通用<br><br>
+					<a href="https://xdtx.lanzoum.com/b01ynxxeza" class="download-btn" target="_blank">
+						下载小爱课程表注入模块版（密码：aatm）
+					</a>
+				</p>
+			</div>
+
+			<!-- 设备类型说明部分 -->
 			<div class="device-types">
 				<div class="device-type">
 					<h3>非小米手机用户</h3>
-					<p>有官方的小爱课程表：</p>
+					<p>官方的小爱课程表+注入模块版：</p>
 					<a href="https://xdtx.lanzoum.com/b01ynxxeza" class="download-btn" target="_blank">
-						下载小爱课程表（密码：aatm）
+						下载小爱课程表注入模块版（密码：aatm）
 					</a>
 				</div>
 				<div class="device-type">
 					<h3>小米手机用户</h3>
-					<p>可直接使用系统内置的小爱课程表</p>
+					<p>原本小米是系统内置的小爱课程表，现在因为导入则也需要下载小爱课程表</p>
 				</div>
 			</div>
 		</div>
 
 		<div class="instruction">
 			<div class="step">
-				<h2 data-step="1">第一步：打开小爱课程表应用(非小米手机用户可跳过此步骤)</h2>
+				<h2 data-step="3">第一步：打开小爱课程表注入模块版(第一次打开会闪退为正常现象，重新打开即可)</h2>
 				<img src="img/1.jpg" alt="打开小爱课程表应用">
 				<p>在您的手机或平板电脑上找到小爱同学并打开小爱课程表。</p>
 			</div>
 			<div class="step">
-				<h2 data-step="2">第二步:寻找导入入口</h2>
+				<h2 data-step="4">第二步:寻找导入入口</h2>
 				<img src="img/2.jpg" alt="浏览课程表">
 				<p>在主页的加号打开教务系统导入。</p>
 			</div>
 			<div class="step">
-				<h2 data-step="3">第三步：打开项目</h2>
+				<h2 data-step="5">第三步：打开项目</h2>
 				<img src="img/3.jpg" alt="查看课程详情">
 				<img src="img/4.jpg" alt="查看课程详情">
 				<p></p>
 			</div>
 			<div class="step">
-				<h2 data-step="4">第四步：一键导入课程</h2>
+				<h2 data-step="6">第四步：一键导入课程</h2>
 				<img src="img/5.jpg" alt="编辑课程">
 				<p>登录教务系统后，查看想导入的课表一键导入</p>
 			</div>
 			<div class="step">
-				<h2 data-step="5">第五步：修改上课日期和上课周数</h2>
+				<h2 data-step="7">第五步：修改上课日期和上课周数</h2>
 				<img src="img/6.jpg" alt="添加新课程">
 				<img src="img/7.jpg" alt="添加新课程">
 				<p>在弹出窗口修改上课日期和上课周数，如果修改失败就去设置那里修改</p>
