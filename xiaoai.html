@@ -394,61 +394,16 @@
 
 		.small-image-item img {
 			width: 100%;
-			max-width: 250px;
+			max-width: 300px;
 			height: auto;
 			border-radius: 8px;
 			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 			transition: all 0.3s ease;
-			cursor: pointer;
 		}
 
 		.small-image-item:hover img {
 			transform: scale(1.05);
 			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-		}
-
-		/* 图片放大模态框样式 */
-		.image-modal {
-			display: none;
-			position: fixed;
-			z-index: 10000;
-			left: 0;
-			top: 0;
-			width: 100%;
-			height: 100%;
-			overflow: auto;
-			background-color: rgba(0, 0, 0, 0.8);
-			backdrop-filter: blur(5px);
-		}
-
-		.modal-content {
-			margin: auto;
-			display: block;
-			max-width: 90%;
-			max-height: 90%;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			border-radius: 8px;
-			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-		}
-
-		.close-modal {
-			position: absolute;
-			top: 15px;
-			right: 35px;
-			color: #f1f1f1;
-			font-size: 40px;
-			font-weight: bold;
-			cursor: pointer;
-			z-index: 10001;
-		}
-
-		.close-modal:hover,
-		.close-modal:focus {
-			color: #bbb;
-			text-decoration: none;
 		}
 
 		.small-image-item p {
@@ -469,7 +424,7 @@
 			}
 
 			.small-image-item img {
-				max-width: 200px;
+				max-width: 240px;
 			}
 		}
 
@@ -719,12 +674,6 @@
 			</div>
 		</div>
 		
-		<!-- 图片放大模态框 -->
-		<div id="imageModal" class="image-modal">
-			<span class="close-modal">&times;</span>
-			<img class="modal-content" id="modalImage">
-		</div>
-		
 		<footer class="copyright">
 			<p>@小东同学</p>
 		</footer>
@@ -782,38 +731,6 @@
 				img.setAttribute('loading', 'lazy');
 				img.setAttribute('alt', img.getAttribute('alt') || '课程表使用说明图片');
 			});
-		});
-
-		// 图片点击放大功能
-		const modal = document.getElementById('imageModal');
-		const modalImg = document.getElementById('modalImage');
-		const closeBtn = document.querySelector('.close-modal');
-
-		// 为所有图片添加点击事件
-		document.addEventListener('click', function(e) {
-			if (e.target.tagName === 'IMG') {
-				modal.style.display = 'block';
-				modalImg.src = e.target.src;
-			}
-		});
-
-		// 关闭模态框
-		closeBtn.addEventListener('click', function() {
-			modal.style.display = 'none';
-		});
-
-		// 点击模态框背景关闭
-		modal.addEventListener('click', function(e) {
-			if (e.target === modal) {
-				modal.style.display = 'none';
-			}
-		});
-
-		// ESC键关闭模态框
-		document.addEventListener('keydown', function(e) {
-			if (e.key === 'Escape' && modal.style.display === 'block') {
-				modal.style.display = 'none';
-			}
 		});
 	</script>
 </body>
